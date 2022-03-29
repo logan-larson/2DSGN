@@ -1,18 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerManager : MonoBehaviour
+namespace Player
 {
-    // Start is called before the first frame update
-    void Start()
+    public class PlayerManager : MonoBehaviour
     {
-        
-    }
+        public PlayerInputManager inputManager;
+        public Animator playerAnimator;
+        public Animation playerAnimation;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public void OnUpdate()
+        {
+
+        }
     }
 }

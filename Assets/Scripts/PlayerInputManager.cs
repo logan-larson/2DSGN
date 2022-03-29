@@ -2,29 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInputManager : MonoBehaviour
+namespace Player
 {
-
-    private Vector2 keyboardInput;
-    private Vector2 mouseInput;
-
-
-    public void GetInputs()
+    public class PlayerInputManager : MonoBehaviour
     {
-        keyboardInput.x = Input.GetAxisRaw("Horizontal");
-        keyboardInput.y = Input.GetAxisRaw("Vertical");
 
-        mouseInput.x = Input.GetAxisRaw("Mouse X");
-        mouseInput.y = Input.GetAxisRaw("Mouse Y");
-    }
+        private Vector2 keyboardInput;
+        private Vector2 mouseInput;
 
-    public Vector2 GetKeyboardInput()
-    {
-        return keyboardInput;
-    }
 
-    public Vector2 GetMouseInput()
-    {
-        return mouseInput;
+        public void GetInputs()
+        {
+            keyboardInput.x = Input.GetAxisRaw("Horizontal");
+            keyboardInput.y = Input.GetAxisRaw("Vertical");
+
+            mouseInput.x = Input.GetAxisRaw("Mouse X");
+            mouseInput.y = Input.GetAxisRaw("Mouse Y");
+        }
+
+        public Vector2 GetKeyboardInput()
+        {
+            return keyboardInput;
+        }
+
+        public Vector2 GetMouseInput()
+        {
+            return mouseInput;
+        }
     }
 }
+
