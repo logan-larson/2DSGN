@@ -1280,8 +1280,8 @@ ScriptedImporter:
     allowsAlphaSplitting: 0
     androidETC2FallbackOverride: 0
   mosaicLayers: 1
-  documentPivot: {x: 0, y: 0}
-  documentAlignment: 7
+  documentPivot: {x: 0.15, y: 0}
+  documentAlignment: 0
   importHiddenLayers: 0
   importedTextureWidth: 64
   importedTextureHeight: 64
