@@ -1,0 +1,95 @@
+\documentclass{article}
+
+\usepackage{gensymb}
+
+\title{Movement Requirements}
+\author{Logan Larson}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Grounded Movement}
+
+    \subsection*{Lateral Movement}
+    \begin{itemize}
+        \item Move \emph{left} or \emph{right} relative to body orientation
+            when movement input is pressed
+        \item Accelerate relative to acceleration variable
+        \item Limit top-speed to set amount
+        \item On key release, apply friction to reduce speed
+    \end{itemize}
+    \subsection*{Sprinting}
+    \begin{itemize}
+        \item When sprint input is held, increase top speed by sprint multiplier
+        \item On release, don't apply sprint multiplier
+        \item Sprinting is only allowed in parkour mode
+    \end{itemize}
+    \subsection*{Grounded orientation}
+    \begin{itemize}
+        \item When \emph{grounded}, match player orientation to surface below's
+            normal vector
+            \begin{itemize}
+                \item \emph{Grounded} is a property that returns true when the
+                    player is within a height threshold above the ground
+            \end{itemize}
+    \end{itemize}
+    \subsection*{Grounded height above ground}
+    \begin{itemize}
+        \item When grounded, set height above ground to certain amount
+    \end{itemize}
+
+\section{Player State}
+    \subsection*{Parkour mode}
+    \begin{itemize}
+        \item Player is quadrupedal
+        \item Increased movement speed
+    \end{itemize}
+    \subsection*{Combat mode}
+    \begin{itemize}
+        \item Player is bipedal
+        \item Reduced movement speed
+        \item Other functionality will be added, but it is irrelevant at the time
+    \end{itemize}
+
+\section{Jumping}
+    \begin{itemize}
+        \item On jump key press, grounded is false
+        \item On jump key press, impulse force is added to player movement in
+            direction of cursor
+        \item If cursor direction is between 180\degree{} and 360\degree{}
+            relative to the player body, no jump is performed
+        \item Jumping can only be performed in \emph{Parkour mode}
+        \begin{itemize}
+            \item If in combat mode, switch to parkour mode then perform jump
+        \end{itemize}
+    \end{itemize}
+
+\section{Airborne Movement}
+    \subsection*{Landing prediction}
+    \begin{itemize}
+        \item When in air, use projectile motion physics to predict landing spot
+        \item With known landing spot, rotate player body to match surface
+            normal of landing spot
+    \end{itemize}
+    \subsection*{Forces applied}
+    \begin{itemize}
+        \item Movement mechanic will be added during combat
+        \item Must allow for forces to be applied to player while airborne
+    \end{itemize}
+
+\section{Animations}
+    \subsection*{Body orientation}
+    \begin{itemize}
+        \item Orient body based on horizontal directional input
+    \end{itemize}
+    \subsection*{Head orientation}
+    \begin{itemize}
+        \item Orient head toward cursor
+        \item Once head breaks the vertical plane relative to the player up
+            direction, vertically mirror it, so that the head doesn't perform
+            unnatural rotations
+    \end{itemize}
+
+\end{document}
