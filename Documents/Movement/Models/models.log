@@ -1,0 +1,159 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.4.19)  23 MAY 2022 09:33
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**./models.tex
+(models.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-04-10>
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/base\size10.clo
+File: size10.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count185
+\c@section=\count186
+\c@subsection=\count187
+\c@subsubsection=\count188
+\c@paragraph=\count189
+\c@subparagraph=\count190
+\c@figure=\count191
+\c@table=\count192
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen138
+)
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/graphics\keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks16
+)
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/graphics\graphics.sty
+Package: graphics 2021/03/04 v1.4d Standard LaTeX Graphics (DPC,SPQR)
+
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/graphics\trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+)
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/graphics-cfg\graphics.c
+fg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: pdftex.def on input line 107.
+
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/graphics-def\pdftex.def
+File: pdftex.def 2020/10/05 v1.2a Graphics/color driver for pdftex
+))
+\Gin@req@height=\dimen139
+\Gin@req@width=\dimen140
+)
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdf
+tex.def
+File: l3backend-pdftex.def 2022-04-14 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count193
+\l__pdf_internal_box=\box50
+) (models.aux)
+\openout1 = `models.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 10.
+LaTeX Font Info:    ... okay on input line 10.
+
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/context/base/mkii\supp-pdf.mk
+ii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count194
+\scratchdimen=\dimen141
+\scratchbox=\box51
+\nofMPsegments=\count195
+\nofMParguments=\count196
+\everyMPshowfont=\toks17
+\MPscratchCnt=\count197
+\MPscratchDim=\dimen142
+\MPnumerator=\count198
+\makeMPintoPDFobject=\count199
+\everyMPtoPDFconversion=\toks18
+)
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-b
+ase.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+
+(C:\Users\logan\AppData\Local\Programs\MiKTeX\tex/latex/00miktex\epstopdf-sys.c
+fg
+File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
+))
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 12.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 12.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 12.
+<../../Images/Models/Movement//InputSystem.png, id=1, 600.74437pt x 282.30469pt
+>
+File: ../../Images/Models/Movement//InputSystem.png Graphic file (type png)
+<use ../../Images/Models/Movement//InputSystem.png>
+Package pdftex.def Info: ../../Images/Models/Movement//InputSystem.png  used on
+ input line 17.
+(pdftex.def)             Requested size: 345.0pt x 162.13008pt.
+<../../Images/Models/Movement//MovementSystem.png, id=3, 916.92563pt x 277.035p
+t>
+File: ../../Images/Models/Movement//MovementSystem.png Graphic file (type png)
+<use ../../Images/Models/Movement//MovementSystem.png>
+Package pdftex.def Info: ../../Images/Models/Movement//MovementSystem.png  used
+ on input line 22.
+(pdftex.def)             Requested size: 345.0pt x 104.2345pt.
+<../../Images/Models/Movement//AnimationSystem.png, id=4, 486.31688pt x 234.124
+7pt>
+File: ../../Images/Models/Movement//AnimationSystem.png Graphic file (type png)
+
+<use ../../Images/Models/Movement//AnimationSystem.png>
+Package pdftex.def Info: ../../Images/Models/Movement//AnimationSystem.png  use
+d on input line 27.
+(pdftex.def)             Requested size: 345.0pt x 166.09036pt.
+<../../Images/Models/Movement//Components.png, id=5, 633.86812pt x 491.58656pt>
+
+File: ../../Images/Models/Movement//Components.png Graphic file (type png)
+<use ../../Images/Models/Movement//Components.png>
+Package pdftex.def Info: ../../Images/Models/Movement//Components.png  used on 
+input line 34.
+(pdftex.def)             Requested size: 345.0pt x 267.56807pt.
+ [1
+
+{C:/Users/logan/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <../../Images
+/Models/Movement//InputSystem.png> <../../Images/Models/Movement//MovementSyste
+m.png>] [2 <../../Images/Models/Movement//AnimationSystem.png>] [3 <../../Image
+s/Models/Movement//Components.png>] (models.aux) ) 
+Here is how much of TeX's memory you used:
+ 1343 strings out of 478552
+ 23764 string characters out of 2841938
+ 312289 words of memory out of 3000000
+ 19595 multiletter control sequences out of 15000+600000
+ 472899 words of font info for 40 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 55i,6n,62p,233b,231s stack positions out of 10000i,1000n,20000p,200000b,80000s
+<C:/Users/logan/AppData/Local
+/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/logan/AppD
+ata/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/lo
+gan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/
+Users/logan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.
+pfb>
+Output written on models.pdf (3 pages, 215967 bytes).
+PDF statistics:
+ 41 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 21 words of extra memory for PDF output out of 10000 (max. 10000000)
+
