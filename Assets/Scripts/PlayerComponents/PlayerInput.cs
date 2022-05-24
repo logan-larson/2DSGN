@@ -7,4 +7,7 @@ public class PlayerInput : MonoBehaviour
     public bool isSprintKeyPressed;
     public float horizontalAimInput;
     public float verticalAimInput;
+
+    // Testing purposes only
+    public bool isResetKeyPressed;
 }

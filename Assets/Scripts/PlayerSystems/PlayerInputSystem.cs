@@ -25,6 +25,9 @@ public class PlayerInputSystem : MonoBehaviour
         UpdateSprintInput();
         UpdateHorizontalAimInput();
         UpdateVerticalAimInput();
+
+        // Testing purposes only
+        UpdateResetInput();
     }
 
     // Movement Input Subsystem
@@ -52,6 +55,11 @@ public class PlayerInputSystem : MonoBehaviour
     void UpdateVerticalAimInput()
     {
         input.verticalAimInput = Input.GetAxisRaw("Mouse Y");
+    }
+
+    void UpdateResetInput()
+    {
+        input.isResetKeyPressed = Input.GetKeyDown(KeyCode.R);
     }
 
 }
