@@ -1,8 +1,10 @@
-public class PlayerInput
+using UnityEngine;
+
+public class PlayerInput : MonoBehaviour
 {
-    public float horizontalMovementInput { get; set; }
-    public bool isJumpKeyPressed { get; set; }
-    public bool isSprintKeyPressed { get; set; }
-    public float horizontalAimInput { get; set; }
-    public float verticalAimInput { get; set; }
+    public float horizontalMovementInput;
+    public bool isJumpKeyPressed;
+    public bool isSprintKeyPressed;
+    public float horizontalAimInput;
+    public float verticalAimInput;
 }

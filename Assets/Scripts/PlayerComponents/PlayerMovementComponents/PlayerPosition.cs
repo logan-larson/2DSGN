@@ -1,6 +1,8 @@
-public class PlayerPosition
+using UnityEngine;
+
+public class PlayerPosition : MonoBehaviour
 {
-    public float x { get; set; }
-    public float y { get; set; }
-    public float rotation { get; set; }
+    public float x;
+    public float y;
+    public float rotation;
 }

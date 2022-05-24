@@ -1,7 +1,9 @@
-public class PlayerAnimation
+using UnityEngine;
+
+public class PlayerAnimation : MonoBehaviour
 {
-    public float headRotation { get; set; }
-    public bool isIdleAnimation { get; set; }
-    public bool isRunningAnimation { get; set; }
-    public float animationSpeed { get; set; }
+    public float headRotation;
+    public bool isIdleAnimation;
+    public bool isRunningAnimation;
+    public float animationSpeed;
 }

@@ -1,5 +1,7 @@
-public class PlayerVelocity
+using UnityEngine;
+
+public class PlayerVelocity : MonoBehaviour
 {
-    public float x { get; set; }
-    public float y { get; set; }
+    public float x;
+    public float y;
 }

@@ -1,5 +1,7 @@
-public class PlayerJump
+using UnityEngine;
+
+public class PlayerJump : MonoBehaviour
 {
-    public bool isJumping { get; set; }
-    public float timeFromLastJump { get; set; }
+    public bool isJumping;
+    public float timeFromLastJump;
 }

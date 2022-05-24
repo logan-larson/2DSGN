@@ -1,31 +1,57 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerInputSystem : MonoBehaviour
 {
 
-    PlayerInput inputComponent;
+    public PlayerInput input;
 
     public void OnStart()
     {
-        inputComponent = gameObject.GetComponent<PlayerInput>();
+        input = gameObject.GetComponent<PlayerInput>();
 
         // Initialize component values
-        inputComponent.horizontalMovementInput = 0;
-        inputComponent.isJumpKeyPressed = false;
-        inputComponent.isSprintKeyPressed = false;
-        inputComponent.horizontalAimInput = 0;
-        inputComponent.verticalAimInput = 0;
+        input.horizontalMovementInput = 0;
+        input.isJumpKeyPressed = false;
+        input.isSprintKeyPressed = false;
+        input.horizontalAimInput = 0;
+        input.verticalAimInput = 0;
     }
 
     public void OnUpdate()
     {
         // Update input component values based on player inputs
-        inputComponent.horizontalMovementInput = Input.GetAxis("Horizontal");
-        inputComponent.isJumpKeyPressed = Input.GetKeyDown(KeyCode.Space);
-        inputComponent.isSprintKeyPressed = Input.GetKey(KeyCode.LeftShift);
-        inputComponent.horizontalAimInput = Input.GetAxisRaw("Mouse X");
-        inputComponent.verticalAimInput = Input.GetAxisRaw("Mouse Y");
+        UpdateHorizontalMovementInput();
+        UpdateJumpInput();
+        UpdateSprintInput();
+        UpdateHorizontalAimInput();
+        UpdateVerticalAimInput();
     }
+
+    // Movement Input Subsystem
+    void UpdateHorizontalMovementInput()
+    {
+        input.horizontalMovementInput = Input.GetAxis("Horizontal");
+    }
+
+    void UpdateJumpInput()
+    {
+        input.isJumpKeyPressed = Input.GetKeyDown(KeyCode.Space);
+    }
+
+    void UpdateSprintInput()
+    {
+        input.isSprintKeyPressed = Input.GetKey(KeyCode.LeftShift);
+    }
+
+    // Aim Input Subsystem
+    void UpdateHorizontalAimInput()
+    {
+        input.horizontalAimInput = Input.GetAxisRaw("Mouse X");
+    }
+
+    void UpdateVerticalAimInput()
+    {
+        input.verticalAimInput = Input.GetAxisRaw("Mouse Y");
+    }
+
 }

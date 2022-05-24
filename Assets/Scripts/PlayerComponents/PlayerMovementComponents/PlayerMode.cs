@@ -1,5 +1,7 @@
-public class PlayerMode
+using UnityEngine;
+
+public class PlayerMode : MonoBehaviour
 {
-    public bool inParkourMode { get; set; }
-    public bool inCombatMode { get; set; }
+    public bool inParkourMode;
+    public bool inCombatMode;
 }

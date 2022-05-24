@@ -1,8 +1,10 @@
-public class PlayerMovement
+using UnityEngine;
+
+public class PlayerMovement : MonoBehaviour
 {
-    public PlayerPosition position { get; set; }
-    public PlayerVelocity velocity { get; set; }
-    public PlayerGrounded grounded { get; set; }
-    public PlayerJump jump { get; set; }
-    public PlayerMode mode { get; set; }
+    public PlayerPosition position;
+    public PlayerVelocity velocity;
+    public PlayerGrounded grounded;
+    public PlayerJump jump;
+    public PlayerMode mode;
 }

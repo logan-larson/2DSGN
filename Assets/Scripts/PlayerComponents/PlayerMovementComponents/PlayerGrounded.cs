@@ -1,5 +1,7 @@
-public class PlayerGrounded
+using UnityEngine;
+
+public class PlayerGrounded : MonoBehaviour
 {
-    public bool isGrounded { get; set; }
-    public PlayerPosition landingPosition { get; set; }
+    public bool isGrounded;
+    public PlayerPosition landingPosition;
 }
