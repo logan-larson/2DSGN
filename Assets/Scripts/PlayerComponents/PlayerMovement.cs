@@ -7,4 +7,5 @@ public class PlayerMovement : MonoBehaviour
     public PlayerGrounded grounded;
     public PlayerJump jump;
     public PlayerMode mode;
+    public PlayerMovementProperties properties;
 }

@@ -29,6 +29,7 @@ public class PlayerMovementSystem : MonoBehaviour
         movement.grounded = gameObject.GetComponent<PlayerGrounded>();
         movement.jump = gameObject.GetComponent<PlayerJump>();
         movement.mode = gameObject.GetComponent<PlayerMode>();
+        movement.properties = gameObject.GetComponent<PlayerMovementProperties>();
     }
 
     // Lateral Movement Subsystem
