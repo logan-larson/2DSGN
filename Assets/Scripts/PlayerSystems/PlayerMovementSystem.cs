@@ -26,10 +26,10 @@ public class PlayerMovementSystem : MonoBehaviour
 
         AddGravity();
         
+        SetHeightAboveGround();
+
         // Testing purposes only
         UpdateReset();
-
-        SetHeightAboveGround();
 
         UpdatePosition();
     }
@@ -51,15 +51,16 @@ public class PlayerMovementSystem : MonoBehaviour
 
     void UpdateGrounded()
     {
-        RaycastHit2D hit = GetGroundRaycastHit();
+        RaycastHit2D hit = GetGroundRaycastHitBelow();
 
         movement.grounded.isGrounded = hit.collider != null ? true : false;
     }
-    
-    RaycastHit2D GetGroundRaycastHit()
+
+    RaycastHit2D GetGroundRaycastHitBelow()
     {
-        float radRotation = (movement.position.rotation - 90) * Mathf.Deg2Rad;
+        float radRotation= (movement.position.rotation - 90) * Mathf.Deg2Rad;
         Vector2 down = new Vector2(Mathf.Cos(radRotation), Mathf.Sin(radRotation));
+        
         down.Normalize();
 
         Debug.DrawRay(transform.position, down, Color.green);
@@ -68,11 +69,38 @@ public class PlayerMovementSystem : MonoBehaviour
 
         return Physics2D.Raycast(transform.position, down, movement.properties.groundedHeightThreshold, environmentMask);
     }
+    
+    RaycastHit2D GetGroundRaycastHitClosest()
+    {
+
+        RaycastHit2D hit = GetGroundRaycastHitBelow();
+
+        Vector3 leftPos = transform.position - (transform.right / 4);
+        Vector3 rightPos = transform.position + (transform.right / 4);
+        Vector2 left = hit.point - new Vector2(leftPos.x, leftPos.y);
+        Vector2 right = hit.point - new Vector2(rightPos.x, rightPos.y);
+        
+        left.Normalize();
+        right.Normalize();
+
+        Debug.DrawRay(transform.position - (transform.right / 4), left, Color.yellow);
+        Debug.DrawRay(transform.position + (transform.right / 4), right, Color.blue);
+
+        LayerMask environmentMask = LayerMask.GetMask("Environment");
+
+        RaycastHit2D leftHit = Physics2D.Raycast(transform.position - (transform.right / 4), left, movement.properties.groundedHeightThreshold, environmentMask);
+        RaycastHit2D rightHit = Physics2D.Raycast(transform.position + (transform.right / 4), right, movement.properties.groundedHeightThreshold, environmentMask);
+
+        return rightHit.distance < leftHit.distance ? rightHit : leftHit;
+    }
 
     void MatchBodyToGround()
     {
         if (movement.grounded.isGrounded) {
-            RaycastHit2D hit = GetGroundRaycastHit();
+            //RaycastHit2D hit = GetGroundRaycastHitBelow();
+            RaycastHit2D hit = GetGroundRaycastHitClosest();
+
+            //Debug.DrawRay(transform.position, new Vector3(closestHit.point.x, closestHit.point.y, 0f) - transform.position);
 
             float rotation = Mathf.Atan2(hit.normal.y, hit.normal.x) * Mathf.Rad2Deg;
 
@@ -106,6 +134,20 @@ public class PlayerMovementSystem : MonoBehaviour
         if (movement.grounded.isGrounded) {
             movement.velocity.x = input.horizontalMovementInput * movement.properties.movementAcceleration;
             movement.velocity.y = input.horizontalMovementInput * movement.properties.movementAcceleration;
+
+            // Clamp movement speed to max
+            movement.velocity.x = Mathf.Clamp(movement.velocity.x, -movement.properties.maxXSpeed * xScaled, movement.properties.maxXSpeed * xScaled);
+            movement.velocity.y = Mathf.Clamp(movement.velocity.y, -movement.properties.maxYSpeed * yScaled, movement.properties.maxYSpeed * yScaled);
+
+            if (input.horizontalMovementInput == 0f) {
+                movement.velocity.x = 0f;
+                movement.velocity.y = 0f;
+            }
+
+            float sprintMultiplier = input.isSprintKeyPressed ? movement.properties.maxSpeedSprintMultiplier : 1f;
+
+            movement.velocity.x *= sprintMultiplier;
+            movement.velocity.y *= sprintMultiplier;
         }
 
         /*
@@ -123,19 +165,6 @@ public class PlayerMovementSystem : MonoBehaviour
         }
         */
         
-        // Clamp movement speed to max
-        movement.velocity.x = Mathf.Clamp(movement.velocity.x, -movement.properties.maxXSpeed * xScaled, movement.properties.maxXSpeed * xScaled);
-        movement.velocity.y = Mathf.Clamp(movement.velocity.y, -movement.properties.maxYSpeed * yScaled, movement.properties.maxYSpeed * yScaled);
-
-        if (input.horizontalMovementInput == 0f) {
-            movement.velocity.x = 0f;
-            movement.velocity.y = 0f;
-        }
-
-        float sprintMultiplier = input.isSprintKeyPressed ? movement.properties.maxSpeedSprintMultiplier : 1f;
-
-        movement.velocity.x *= sprintMultiplier;
-        movement.velocity.y *= sprintMultiplier;
 
     }
 
@@ -146,22 +175,23 @@ public class PlayerMovementSystem : MonoBehaviour
         }
     }
 
+
+    void SetHeightAboveGround()
+    {
+        if (movement.grounded.isGrounded) {
+            RaycastHit2D hit = GetGroundRaycastHitBelow();
+
+            movement.position.x = hit.point.x + (hit.normal.x * movement.properties.groundedHeight);
+            movement.position.y = hit.point.y + (hit.normal.y * movement.properties.groundedHeight);
+        }
+    }
+
     void UpdateReset()
     {
         if (input.isResetKeyPressed) {
             movement.position.x = 0f;
             movement.position.y = 0f;
             movement.position.rotation = 0f;
-        }
-    }
-
-    void SetHeightAboveGround()
-    {
-        if (movement.grounded.isGrounded) {
-            RaycastHit2D hit = GetGroundRaycastHit();
-
-            movement.position.x = hit.point.x + (hit.normal.x * movement.properties.groundedHeight);
-            movement.position.y = hit.point.y + (hit.normal.y * movement.properties.groundedHeight);
         }
     }
 
