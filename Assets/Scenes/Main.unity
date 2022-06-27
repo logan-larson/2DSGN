@@ -220,7 +220,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3723236053498183537, guid: 4410ee43b7980d4478efa6b57bb15325, type: 3}
       propertyPath: m_Name
-      value: SpriteAndAnimator
+      value: PlayerAnimator
       objectReference: {fileID: 0}
     - target: {fileID: 6463439736581533035, guid: 4410ee43b7980d4478efa6b57bb15325, type: 3}
       propertyPath: m_LocalPosition.x
@@ -646,7 +646,7 @@ MonoBehaviour:
   jumpAcceleration: 0
   jumpForceDuration: 0
   maxSpeedSprintMultiplier: 2
-  groundedHeightThreshold: 1
+  groundedHeightThreshold: 0.75
   groundedHeight: 0.5
   maxSpeedCombatMultiplier: 0
 --- !u!114 &1100856827
@@ -677,6 +677,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isJumping: 0
   timeFromLastJump: 0
+  x: 0
+  y: 0
 --- !u!114 &1100856829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -813,7 +815,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1100856825}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.046, y: 4.256, z: 0}
+  m_LocalPosition: {x: 3.9, y: -5.18, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1490146950}

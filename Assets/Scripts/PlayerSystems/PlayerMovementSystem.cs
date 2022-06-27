@@ -22,6 +22,8 @@ public class PlayerMovementSystem : MonoBehaviour
 
         MatchBodyToGround();
 
+        UpdateJumping();
+
         UpdateVelocity();
 
         AddGravity();
@@ -52,9 +54,16 @@ public class PlayerMovementSystem : MonoBehaviour
 
     void UpdateGrounded()
     {
-        RaycastHit2D hit = GetGroundRaycastHitBelow();
+        if (!movement.jump.isJumping)
+        {
+            RaycastHit2D hit = GetGroundRaycastHitBelow();
 
-        movement.grounded.isGrounded = hit.collider != null ? true : false;
+            movement.grounded.isGrounded = hit.collider != null ? true : false;
+        }
+        else
+        {
+            movement.grounded.isGrounded = false;
+        }
     }
 
     RaycastHit2D GetGroundRaycastHitBelow()
@@ -120,6 +129,43 @@ public class PlayerMovementSystem : MonoBehaviour
         }
     }
 
+    void UpdateJumping()
+    {
+        // If player is grounded, don't add jump force
+        if (movement.grounded.isGrounded)
+        {
+            movement.jump.isJumping = false;
+            movement.jump.timeFromLastJump = 0f;
+        }
+
+        // If player is able to jump setup jump forces
+        if (input.isJumpKeyPressed && movement.jump.timeFromLastJump == 0f)
+        {
+            movement.jump.isJumping = true;
+  
+            var mousePos = Input.mousePosition;
+            mousePos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, transform.position.z - Camera.main.transform.position.z));
+
+            Vector3 dir = mousePos - transform.position;
+
+            dir = Vector3.Normalize(dir);
+
+            movement.jump.x = dir.x;
+            movement.jump.y = dir.y;
+        }
+
+        // Limit duration of jump force being applied
+        if (movement.jump.isJumping && movement.jump.timeFromLastJump < 0.03f) 
+        {
+            movement.jump.timeFromLastJump += Time.deltaTime;
+        }
+        else if (movement.jump.isJumping)
+        {
+            movement.jump.isJumping = false;
+            movement.jump.timeFromLastJump = 0f;
+        }
+    }
+
     // Lateral Movement Subsystem
     void UpdateVelocity()
     {
@@ -147,6 +193,11 @@ public class PlayerMovementSystem : MonoBehaviour
 
             movement.velocity.x *= sprintMultiplier;
             movement.velocity.y *= sprintMultiplier;
+        }
+        else if (movement.jump.isJumping)
+        {
+            movement.velocity.x += movement.jump.x;
+            movement.velocity.y += movement.jump.y;
         }
 
         /*
