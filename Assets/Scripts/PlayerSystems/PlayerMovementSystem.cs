@@ -26,12 +26,13 @@ public class PlayerMovementSystem : MonoBehaviour
 
         AddGravity();
         
-        SetHeightAboveGround();
 
         // Testing purposes only
         UpdateReset();
 
         UpdatePosition();
+
+        SetHeightAboveGround();
     }
 
     void MovementStart()
@@ -58,7 +59,8 @@ public class PlayerMovementSystem : MonoBehaviour
 
     RaycastHit2D GetGroundRaycastHitBelow()
     {
-        float radRotation= (movement.position.rotation - 90) * Mathf.Deg2Rad;
+        float radRotation = (movement.position.rotation - 90) * Mathf.Deg2Rad;
+
         Vector2 down = new Vector2(Mathf.Cos(radRotation), Mathf.Sin(radRotation));
         
         down.Normalize();
@@ -97,8 +99,8 @@ public class PlayerMovementSystem : MonoBehaviour
     void MatchBodyToGround()
     {
         if (movement.grounded.isGrounded) {
-            //RaycastHit2D hit = GetGroundRaycastHitBelow();
-            RaycastHit2D hit = GetGroundRaycastHitClosest();
+            RaycastHit2D hit = GetGroundRaycastHitBelow();
+            //RaycastHit2D hit = GetGroundRaycastHitClosest();
 
             //Debug.DrawRay(transform.position, new Vector3(closestHit.point.x, closestHit.point.y, 0f) - transform.position);
 
@@ -124,11 +126,8 @@ public class PlayerMovementSystem : MonoBehaviour
         // Calculate scaling vectors for x and y based on rotation
         // TODO Clean this up
         float radRotation = movement.position.rotation * Mathf.Deg2Rad;
-        float xScale = Mathf.Cos(radRotation);
-        float yScale = Mathf.Sin(radRotation);
 
-        float xScaled = (Mathf.Abs(xScale) / (Mathf.Abs(xScale) + Mathf.Abs(yScale))) * Mathf.Sign(xScale);
-        float yScaled = (Mathf.Abs(yScale) / (Mathf.Abs(xScale) + Mathf.Abs(yScale))) * Mathf.Sign(yScale);
+        Vector2 scaled = new Vector2(Mathf.Cos(radRotation), Mathf.Sin(radRotation)).normalized;
 
         // Adjust velocity for player movement input
         if (movement.grounded.isGrounded) {
@@ -136,8 +135,8 @@ public class PlayerMovementSystem : MonoBehaviour
             movement.velocity.y = input.horizontalMovementInput * movement.properties.movementAcceleration;
 
             // Clamp movement speed to max
-            movement.velocity.x = Mathf.Clamp(movement.velocity.x, -movement.properties.maxXSpeed * xScaled, movement.properties.maxXSpeed * xScaled);
-            movement.velocity.y = Mathf.Clamp(movement.velocity.y, -movement.properties.maxYSpeed * yScaled, movement.properties.maxYSpeed * yScaled);
+            movement.velocity.x = Mathf.Clamp(movement.velocity.x, -movement.properties.maxXSpeed * scaled.x, movement.properties.maxXSpeed * scaled.x);
+            movement.velocity.y = Mathf.Clamp(movement.velocity.y, -movement.properties.maxYSpeed * scaled.y, movement.properties.maxYSpeed * scaled.y);
 
             if (input.horizontalMovementInput == 0f) {
                 movement.velocity.x = 0f;

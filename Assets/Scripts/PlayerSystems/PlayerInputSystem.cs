@@ -33,7 +33,7 @@ public class PlayerInputSystem : MonoBehaviour
     // Movement Input Subsystem
     void UpdateHorizontalMovementInput()
     {
-        input.horizontalMovementInput = Input.GetAxis("Horizontal");
+        input.horizontalMovementInput = Input.GetAxisRaw("Horizontal");
     }
 
     void UpdateJumpInput()
