@@ -178,7 +178,7 @@ public class PlayerMovementSystem : MonoBehaviour
         // Adjust velocity for player movement input
         if (movement.grounded.isGrounded) {
             movement.velocity.x = input.horizontalMovementInput * movement.properties.movementAcceleration;
-            movement.velocity.y = input.horizontalMovementInput * movement.properties.movementAcceleration;
+            movement.velocity.y = input.verticalMovementInput * movement.properties.movementAcceleration;
 
             // Clamp movement speed to max
             movement.velocity.x = Mathf.Clamp(movement.velocity.x, -movement.properties.maxXSpeed * scaled.x, movement.properties.maxXSpeed * scaled.x);

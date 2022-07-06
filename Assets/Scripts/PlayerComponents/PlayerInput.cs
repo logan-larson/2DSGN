@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerInput : MonoBehaviour
 {
     public float horizontalMovementInput;
+    public float verticalMovementInput;
     public bool isJumpKeyPressed;
     public bool isSprintKeyPressed;
     public float horizontalAimInput;

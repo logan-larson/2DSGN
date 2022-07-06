@@ -11,6 +11,7 @@ public class PlayerInputSystem : MonoBehaviour
 
         // Initialize component values
         input.horizontalMovementInput = 0;
+        input.verticalMovementInput = 0;
         input.isJumpKeyPressed = false;
         input.isSprintKeyPressed = false;
         input.horizontalAimInput = 0;
@@ -33,12 +34,19 @@ public class PlayerInputSystem : MonoBehaviour
     // Movement Input Subsystem
     void UpdateHorizontalMovementInput()
     {
-        input.horizontalMovementInput = Input.GetAxisRaw("Horizontal");
+        //input.horizontalMovementInput = Input.GetAxisRaw("Horizontal");
+        input.horizontalMovementInput = Input.GetAxis("Horizontal");
+    }
+
+    void UpdateVerticalMovementInput()
+    {
+        //input.horizontalMovementInput = Input.GetAxisRaw("Horizontal");
+        input.verticalMovementInput = Input.GetAxis("Vertical");
     }
 
     void UpdateJumpInput()
     {
-        input.isJumpKeyPressed = Input.GetKeyDown(KeyCode.Space);
+        input.isJumpKeyPressed = Input.GetButtonDown("Jump");
     }
 
     void UpdateSprintInput()
