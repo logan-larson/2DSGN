@@ -20,6 +20,7 @@ public class PlayerInputSystem : MonoBehaviour
 
     public void OnUpdate()
     {
+        /*
         // Update input component values based on player inputs
         UpdateHorizontalMovementInput();
         UpdateJumpInput();
@@ -29,8 +30,10 @@ public class PlayerInputSystem : MonoBehaviour
 
         // Testing purposes only
         UpdateResetInput();
+        */
     }
 
+    /*
     // Movement Input Subsystem
     void UpdateHorizontalMovementInput()
     {
@@ -69,5 +72,6 @@ public class PlayerInputSystem : MonoBehaviour
     {
         input.isResetKeyPressed = Input.GetKeyDown(KeyCode.R);
     }
+    */
 
 }

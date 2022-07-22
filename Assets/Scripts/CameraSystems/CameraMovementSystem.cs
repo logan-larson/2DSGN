@@ -5,10 +5,11 @@ using UnityEngine;
 public class CameraMovementSystem : MonoBehaviour
 {
     PlayerPosition playerPosition;
+    GameObject player;
 
     public void OnStart()
     {
-        GameObject player = GameObject.Find("Player");
+        player = GameObject.Find("PlayerNew");
 
         if (player != null)
         {
@@ -22,6 +23,8 @@ public class CameraMovementSystem : MonoBehaviour
         {
             transform.position = new Vector3(playerPosition.x, playerPosition.y, -10);
         }
+        
+        transform.position = new Vector3(player.transform.position.x, player.transform.position.y, -10);
         
     }
 }

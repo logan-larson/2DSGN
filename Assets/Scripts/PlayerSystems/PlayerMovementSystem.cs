@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovementSystem : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class PlayerMovementSystem : MonoBehaviour
 
         MatchBodyToGround();
 
-        UpdateJumping();
+        //UpdateJumping();
 
         UpdateVelocity();
 
@@ -129,6 +130,48 @@ public class PlayerMovementSystem : MonoBehaviour
         }
     }
 
+    public void Jump(InputAction.CallbackContext context)
+    {
+        if (!context.started) { return; }
+
+        Debug.Log("Jump! " + context.phase);
+
+        // If player is grounded, don't add jump force
+        if (movement.grounded.isGrounded)
+        {
+            movement.jump.isJumping = false;
+            movement.jump.timeFromLastJump = 0f;
+        }
+
+        // If player is able to jump setup jump forces
+        if (movement.jump.timeFromLastJump == 0f)
+        {
+            movement.jump.isJumping = true;
+  
+            var mousePos = Input.mousePosition;
+            mousePos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, transform.position.z - Camera.main.transform.position.z));
+
+            Vector3 dir = mousePos - transform.position;
+
+            dir = Vector3.Normalize(dir);
+
+            movement.jump.x = dir.x;
+            movement.jump.y = dir.y;
+        }
+
+        // Limit duration of jump force being applied
+        if (movement.jump.isJumping && movement.jump.timeFromLastJump < 0.03f) 
+        {
+            movement.jump.timeFromLastJump += Time.deltaTime;
+        }
+        else if (movement.jump.isJumping)
+        {
+            movement.jump.isJumping = false;
+            movement.jump.timeFromLastJump = 0f;
+        }
+    }
+
+    /*
     void UpdateJumping()
     {
         // If player is grounded, don't add jump force
@@ -165,6 +208,7 @@ public class PlayerMovementSystem : MonoBehaviour
             movement.jump.timeFromLastJump = 0f;
         }
     }
+    */
 
     // Lateral Movement Subsystem
     void UpdateVelocity()

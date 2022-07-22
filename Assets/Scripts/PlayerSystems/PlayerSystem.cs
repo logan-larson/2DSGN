@@ -15,7 +15,7 @@ public class PlayerSystem : MonoBehaviour
         animationSystem = gameObject.GetComponent<PlayerAnimationSystem>();
 
         // Call initialize functions on systems
-        inputSystem.OnStart();
+        //inputSystem.OnStart();
         movementSystem.OnStart();
         animationSystem.OnStart();
     }
@@ -23,7 +23,7 @@ public class PlayerSystem : MonoBehaviour
     void Update()
     {
         // Call update functions
-        inputSystem.OnUpdate();
+        //inputSystem.OnUpdate();
         movementSystem.OnUpdate();
         animationSystem.OnUpdate();
     }
