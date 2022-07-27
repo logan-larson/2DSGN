@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PlayerMovementSystem : MonoBehaviour
 {
@@ -130,12 +129,8 @@ public class PlayerMovementSystem : MonoBehaviour
         }
     }
 
-    public void Jump(InputAction.CallbackContext context)
+    public void Jump()
     {
-        if (!context.started) { return; }
-
-        Debug.Log("Jump! " + context.phase);
-
         // If player is grounded, don't add jump force
         if (movement.grounded.isGrounded)
         {

@@ -41,7 +41,7 @@ public class InputSystemPivot : MonoBehaviour
 
     void UpdateJump()
     {
-        input.isJumpKeyPressed = Input.GetButtonDown("Jump");
+        input.isJumpKeyPressed = Input.GetKey(KeyCode.Space);
     }
 
     void UpdateSprint()
