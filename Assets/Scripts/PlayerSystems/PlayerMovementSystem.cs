@@ -2,20 +2,22 @@ using UnityEngine;
 
 public class PlayerMovementSystem : MonoBehaviour
 {
-
     PlayerInput input;
-    PlayerMovement movement;
+    //PlayerMovement movement;
 
     public void OnStart()
     {
+    /*
         input = gameObject.GetComponent<PlayerInput>();
         movement = gameObject.GetComponent<PlayerMovement>();
         
         MovementStart();
+        */
     }
 
     public void OnUpdate()
     {
+        /*
         UpdateGrounded();
 
         PredictLandingPosition();
@@ -35,7 +37,9 @@ public class PlayerMovementSystem : MonoBehaviour
         UpdatePosition();
 
         SetHeightAboveGround();
+        */
     }
+    /*
 
     void MovementStart()
     {
@@ -68,7 +72,8 @@ public class PlayerMovementSystem : MonoBehaviour
 
     RaycastHit2D GetGroundRaycastHitBelow()
     {
-        float radRotation = (movement.position.rotation - 90) * Mathf.Deg2Rad;
+        //float radRotation = (movement.position.rotation - 90) * Mathf.Deg2Rad;
+        float radRotation = 0f;
 
         Vector2 down = new Vector2(Mathf.Cos(radRotation), Mathf.Sin(radRotation));
         
@@ -117,7 +122,7 @@ public class PlayerMovementSystem : MonoBehaviour
 
             Debug.DrawRay(hit.point, hit.normal, Color.red);
 
-            movement.position.rotation = rotation - 90f;
+            //movement.position.rotation = rotation - 90f;
         }
     }
 
@@ -203,14 +208,14 @@ public class PlayerMovementSystem : MonoBehaviour
             movement.jump.timeFromLastJump = 0f;
         }
     }
-    */
 
     // Lateral Movement Subsystem
     void UpdateVelocity()
     {
         // Calculate scaling vectors for x and y based on rotation
-        // TODO Clean this up
-        float radRotation = movement.position.rotation * Mathf.Deg2Rad;
+        // Clean this up
+        //float radRotation = movement.position.rotation * Mathf.Deg2Rad;
+        float radRotation = 0f;
 
         Vector2 scaled = new Vector2(Mathf.Cos(radRotation), Mathf.Sin(radRotation)).normalized;
 
@@ -238,6 +243,7 @@ public class PlayerMovementSystem : MonoBehaviour
             movement.velocity.x += movement.jump.x;
             movement.velocity.y += movement.jump.y;
         }
+        */
 
         /*
         // Apply friction if not applying input
@@ -254,8 +260,10 @@ public class PlayerMovementSystem : MonoBehaviour
         }
         */
         
+        /*
 
     }
+
 
     void AddGravity()
     {
@@ -277,23 +285,23 @@ public class PlayerMovementSystem : MonoBehaviour
 
     void UpdateReset()
     {
-        if (input.isResetKeyPressed) {
-            movement.position.x = 0f;
-            movement.position.y = 0f;
-            movement.position.rotation = 0f;
-        }
+        //if (input.isResetKeyPressed) {
+            //movement.position.x = 0f;
+            //movement.position.y = 0f;
+            ////movement.position.rotation = 0f;
+        //}
     }
 
     // General Movement Subsystem
     void UpdatePosition()
     {
 
-        movement.position.x += movement.velocity.x * Time.deltaTime;
-        movement.position.y += movement.velocity.y * Time.deltaTime;
+        //movement.position.x += movement.velocity.x * Time.deltaTime;
+        //movement.position.y += movement.velocity.y * Time.deltaTime;
 
-        Vector3 position = new Vector3(movement.position.x, movement.position.y, 0f);
-        Quaternion rotation = Quaternion.Euler(0f, 0f, movement.position.rotation);
-        transform.SetPositionAndRotation(position, rotation);
+        //Vector3 position = new Vector3(movement.position.x, movement.position.y, 0f);
+        //Quaternion rotation = Quaternion.Euler(0f, 0f, movement.position.rotation);
+        //transform.SetPositionAndRotation(position, rotation);
     }
-
+    */
 }

@@ -28,11 +28,13 @@ public class PlayerAnimationSystem : MonoBehaviour
 
     void SetDirection()
     {
+        /*
         if (input.horizontalMovementInput < 0) {
             playerAnimator.transform.rotation = Quaternion.Euler(0, 180, -position.rotation - 90);
         } else if (input.horizontalMovementInput > 0) {
             playerAnimator.transform.rotation = Quaternion.Euler(0, 0, position.rotation - 90);
         }
+        */
     }
 
     void SetSpeed()

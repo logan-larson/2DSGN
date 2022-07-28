@@ -4,16 +4,19 @@ public class PlayerSystemPivot : MonoBehaviour
 {
     InputSystemPivot inputSystem;
     MovementSystemPivot movementSystem;
+    AnimationSystemPivot animationSystem;
 
     void Awake()
     {
         // Get attached scripts
-        inputSystem = gameObject.GetComponent<InputSystemPivot>();
-        movementSystem = gameObject.GetComponent<MovementSystemPivot>();
+        inputSystem = GetComponent<InputSystemPivot>();
+        movementSystem = GetComponent<MovementSystemPivot>();
+        animationSystem = GetComponent<AnimationSystemPivot>();
 
         // Call OnAwake methods in scripts
         inputSystem.OnAwake();
         movementSystem.OnAwake();
+        animationSystem.OnAwake();
     }
 
     void Start()
@@ -24,5 +27,6 @@ public class PlayerSystemPivot : MonoBehaviour
     {
         inputSystem.OnUpdate();
         movementSystem.OnUpdate();
+        animationSystem.OnUpdate();
     }
 }

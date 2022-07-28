@@ -1,62 +1,43 @@
 using UnityEngine;
 
-public class InputSystemPivot : MonoBehaviour
-{
+public class InputSystemPivot : MonoBehaviour {
+
     PlayerInput input;
 
-    public void OnAwake()
-    {
+    public void OnAwake() {
         input = gameObject.GetComponent<PlayerInput>();
-        
-        InitializeInput();
     }
 
-    public void OnUpdate()
-    {
+    public void OnUpdate() {
         UpdateHorizontalMovement();
-    }
-
-    void InitializeInput()
-    {
-        input.horizontalMovementInput = 0;
-        input.verticalMovementInput = 0;
-        input.isJumpKeyPressed = false;
-        input.isSprintKeyPressed = false;
-        input.horizontalAimInput = 0;
-        input.verticalAimInput = 0;
+        UpdateSprint();
     }
 
     // Movement Input Subsystem
-    void UpdateHorizontalMovement()
-    {
+    void UpdateHorizontalMovement() {
         input.horizontalMovementInput = Input.GetAxisRaw("Horizontal");
         //input.horizontalMovementInput = Input.GetAxis("Horizontal");
     }
 
-    void UpdateVerticalMovement()
-    {
+    void UpdateVerticalMovement() {
         input.verticalMovementInput = Input.GetAxisRaw("Vertical");
         //input.verticalMovementInput = Input.GetAxis("Vertical");
     }
 
-    void UpdateJump()
-    {
+    void UpdateJump() {
         input.isJumpKeyPressed = Input.GetKey(KeyCode.Space);
     }
 
-    void UpdateSprint()
-    {
+    void UpdateSprint() {
         input.isSprintKeyPressed = Input.GetKey(KeyCode.LeftShift);
     }
 
     // Aim Input Subsystem
-    void UpdateHorizontalAim()
-    {
+    void UpdateHorizontalAim() {
         input.horizontalAimInput = Input.GetAxisRaw("Mouse X");
     }
 
-    void UpdateVerticalAim()
-    {
+    void UpdateVerticalAim() {
         input.verticalAimInput = Input.GetAxisRaw("Mouse Y");
     }
 }
