@@ -6,11 +6,25 @@ public class InputSystemPivot : MonoBehaviour {
 
     public void OnAwake() {
         input = gameObject.GetComponent<PlayerInput>();
+
+        InitializeInput();
     }
 
     public void OnUpdate() {
         UpdateHorizontalMovement();
+
         UpdateSprint();
+
+        UpdateJump();
+    }
+
+    void InitializeInput() {
+        input.horizontalMovementInput = 0f;
+        input.verticalMovementInput = 0f;
+        input.isJumpKeyPressed = false;
+        input.isSprintKeyPressed = false;
+        input.horizontalAimInput = 0f;
+        input.verticalAimInput = 0f;
     }
 
     // Movement Input Subsystem
@@ -25,7 +39,7 @@ public class InputSystemPivot : MonoBehaviour {
     }
 
     void UpdateJump() {
-        input.isJumpKeyPressed = Input.GetKey(KeyCode.Space);
+        input.isJumpKeyPressed = Input.GetKeyDown(KeyCode.W);
     }
 
     void UpdateSprint() {

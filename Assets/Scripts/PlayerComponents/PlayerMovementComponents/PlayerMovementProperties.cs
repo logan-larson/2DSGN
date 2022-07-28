@@ -9,14 +9,22 @@ public class PlayerMovementProperties : MonoBehaviour
 
     public float gravity;
     public float jumpAcceleration;
-    public float jumpForceDuration;
+    public float jumpVelocity;
 
     public float maxSpeedSprintMultiplier;
 
     public float groundedHeightThreshold;
     public float groundedHeight;
 
+    public float jumpDuration;
+    public float timeSinceJump;
+
     public float maxSpeedCombatMultiplier;
 
-    public float collisionDistance;
+    public Vector2 verticalDistance;
+    public Vector2 horizontalDistance;
+
+    public bool isCollidingAbove;
+    public float timeSinceCollidingAbove;
+    public float collidingAboveDuration;
 }
