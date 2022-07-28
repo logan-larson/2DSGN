@@ -1,13 +1,15 @@
 using UnityEngine;
 
+[RequireComponent (typeof (PlayerVelocity))]
+[RequireComponent (typeof (SpriteRenderer))]
 public class AnimationSystemPivot : MonoBehaviour {
 
     PlayerVelocity velocity;
     SpriteRenderer spriteRenderer;
 
     public void OnAwake() {
-        velocity = gameObject.GetComponent<PlayerVelocity>();
-        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        velocity = GetComponent<PlayerVelocity>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     public void OnUpdate() {

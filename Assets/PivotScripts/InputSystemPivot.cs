@@ -1,11 +1,12 @@
 using UnityEngine;
 
+[RequireComponent (typeof (PlayerInput))]
 public class InputSystemPivot : MonoBehaviour {
 
     PlayerInput input;
 
     public void OnAwake() {
-        input = gameObject.GetComponent<PlayerInput>();
+        input = GetComponent<PlayerInput>();
 
         InitializeInput();
     }

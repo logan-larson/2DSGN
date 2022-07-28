@@ -1,5 +1,8 @@
 using UnityEngine;
 
+[RequireComponent (typeof (InputSystemPivot))]
+[RequireComponent (typeof (MovementSystemPivot))]
+[RequireComponent (typeof (AnimationSystemPivot))]
 public class PlayerSystemPivot : MonoBehaviour
 {
     InputSystemPivot inputSystem;
@@ -17,10 +20,6 @@ public class PlayerSystemPivot : MonoBehaviour
         inputSystem.OnAwake();
         movementSystem.OnAwake();
         animationSystem.OnAwake();
-    }
-
-    void Start()
-    {
     }
 
     void Update()

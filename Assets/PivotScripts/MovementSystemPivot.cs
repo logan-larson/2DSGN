@@ -1,8 +1,18 @@
 using UnityEngine;
 
+[RequireComponent (typeof (CollisionSystem))]
+
+[RequireComponent (typeof (PlayerInput))]
+[RequireComponent (typeof (PlayerPosition))]
+[RequireComponent (typeof (PlayerVelocity))]
+[RequireComponent (typeof (PlayerMovementProperties))]
+[RequireComponent (typeof (PlayerGrounded))]
 public class MovementSystemPivot : MonoBehaviour {
 
-    // Define scripts
+    // Define system scripts
+    CollisionSystem collisionSystem;
+
+    // Define component scripts
     PlayerInput input;
     PlayerPosition position;
     PlayerVelocity velocity;
@@ -19,17 +29,22 @@ public class MovementSystemPivot : MonoBehaviour {
     public float timeToJumpApex = 0.4f;
 
     public void OnAwake() {
+
+        // Get attached systems
+        collisionSystem = GetComponent<CollisionSystem>();
+
         // Get attached components
-        input = gameObject.GetComponent<PlayerInput>();
-        movementProperties = gameObject.GetComponent<PlayerMovementProperties>();
-        position = gameObject.GetComponent<PlayerPosition>();
-        velocity = gameObject.GetComponent<PlayerVelocity>();
-        grounded = gameObject.GetComponent<PlayerGrounded>();
+        input = GetComponent<PlayerInput>();
+        movementProperties = GetComponent<PlayerMovementProperties>();
+        position = GetComponent<PlayerPosition>();
+        velocity = GetComponent<PlayerVelocity>();
+        grounded = GetComponent<PlayerGrounded>();
 
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
 		maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
 		minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
 
+        collisionSystem.OnAwake();
         InitializeMovement();
     }
 
@@ -37,8 +52,6 @@ public class MovementSystemPivot : MonoBehaviour {
         UpdateGrounded();
 
         UpdateVelocity();
-
-        UpdatePosition();
 
         ApplyMovement();
     }
@@ -140,6 +153,7 @@ public class MovementSystemPivot : MonoBehaviour {
         }
 
         // Above collisions
+        /*
         if (IsCollidingAbove() && !movementProperties.isCollidingAbove) {
             movementProperties.isCollidingAbove = true;
             movementProperties.timeSinceCollidingAbove = 0f;
@@ -153,6 +167,7 @@ public class MovementSystemPivot : MonoBehaviour {
         if (movementProperties.timeSinceCollidingAbove < 3f) {
             movementProperties.timeSinceCollidingAbove += Time.deltaTime;
         }
+        */
 
         if (movementProperties.timeSinceJump < 3f) {
             movementProperties.timeSinceJump += Time.deltaTime;
@@ -222,13 +237,9 @@ public class MovementSystemPivot : MonoBehaviour {
         return hitAbove.collider || hitAboveLeft.collider || hitAboveRight.collider;
     }
 
-
-    void UpdatePosition() {
-        position.x += velocity.x * Time.deltaTime;
-        position.y += velocity.y * Time.deltaTime;
-    }
-
     void ApplyMovement() {
-        transform.position = new Vector3(position.x, position.y);
+        collisionSystem.UpdateRaycastOrigins();
+
+        transform.Translate(new Vector3(velocity.x, velocity.y) * Time.deltaTime);
     }
 }
