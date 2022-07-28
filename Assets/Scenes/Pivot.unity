@@ -133,16 +133,20 @@ GameObject:
   m_Component:
   - component: {fileID: 23279878}
   - component: {fileID: 23279877}
+  - component: {fileID: 23279888}
   - component: {fileID: 23279884}
   - component: {fileID: 23279879}
+  - component: {fileID: 23279887}
   - component: {fileID: 23279876}
   - component: {fileID: 23279886}
   - component: {fileID: 23279885}
+  - component: {fileID: 23279890}
   - component: {fileID: 23279883}
   - component: {fileID: 23279882}
   - component: {fileID: 23279881}
   - component: {fileID: 23279880}
   - component: {fileID: 23279875}
+  - component: {fileID: 23279889}
   m_Layer: 0
   m_Name: PlayerBipedal
   m_TagString: Untagged
@@ -176,6 +180,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 233ba60d5fcdc7b4b9c5b4df4472094f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gravity: 0
+  minJumpVelocity: 0
+  maxJumpVelocity: 0
+  minJumpHeight: 1
+  maxJumpHeight: 4
+  timeToJumpApex: 0.4
 --- !u!212 &23279877
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -270,12 +280,18 @@ MonoBehaviour:
   movementAcceleration: 0
   gravity: 0
   jumpAcceleration: 0
-  jumpForceDuration: 0
+  jumpVelocity: 0
   maxSpeedSprintMultiplier: 0
   groundedHeightThreshold: 0
   groundedHeight: 0
+  jumpDuration: 0
+  timeSinceJump: 0
   maxSpeedCombatMultiplier: 0
-  collisionDistance: 0
+  verticalDistance: {x: 0, y: 0}
+  horizontalDistance: {x: 0, y: 0}
+  isCollidingAbove: 0
+  timeSinceCollidingAbove: 0
+  collidingAboveDuration: 0
 --- !u!114 &23279881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -363,6 +379,78 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f35b1866376ddc14d8d2c034ae84e8af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &23279887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 23279874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd45131186f02414180806ac09bacc53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!61 &23279888
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 23279874}
+  m_Enabled: 0
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.03781259, y: -0.045131087}
+  m_SpriteTilingProperty:
+    border: {x: 0.34375, y: 0.125, z: 0.1875, w: 0.21875}
+    pivot: {x: 0.75, y: 0.5}
+    oldSize: {x: 2, y: 2}
+    newSize: {x: 2, y: 2}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.56332564, y: 1.6690385}
+  m_EdgeRadius: 0
+--- !u!114 &23279889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 23279874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a96d80a5932be8468e6d42272a012de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skinWidth: 0.015
+  horizontalRayCount: 4
+  verticalRayCount: 4
+  horizontalRaySpacing: 0
+  verticalRaySpacing: 0
+--- !u!114 &23279890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 23279874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a96d80a5932be8468e6d42272a012de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skinWidth: 0.015
+  horizontalRayCount: 4
+  verticalRayCount: 4
+  horizontalRaySpacing: 0
+  verticalRaySpacing: 0
 --- !u!1 &853899930
 GameObject:
   m_ObjectHideFlags: 0
