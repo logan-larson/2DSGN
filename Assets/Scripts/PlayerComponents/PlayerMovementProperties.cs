@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class PlayerMovementProperties : MonoBehaviour
 {
-    public float maxXSpeed;
-    public float maxYSpeed;
+	public float horizontalSpeed = 6;
 
     public float movementAcceleration;
 
@@ -34,6 +33,5 @@ public class PlayerMovementProperties : MonoBehaviour
 	public float timeToJumpApex = .4f;
 	public float accelerationTimeAirborne = .2f;
 	public float accelerationTimeGrounded = .1f;
-	public float moveSpeed = 6;
 
 }

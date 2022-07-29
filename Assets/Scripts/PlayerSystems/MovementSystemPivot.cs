@@ -3,10 +3,8 @@ using UnityEngine;
 [RequireComponent (typeof (CollisionSystem))]
 
 [RequireComponent (typeof (PlayerInput))]
-[RequireComponent (typeof (PlayerPosition))]
 [RequireComponent (typeof (PlayerVelocity))]
 [RequireComponent (typeof (PlayerMovementProperties))]
-[RequireComponent (typeof (PlayerGrounded))]
 [RequireComponent (typeof (PlayerCollision))]
 public class MovementSystemPivot : MonoBehaviour {
 
@@ -15,7 +13,6 @@ public class MovementSystemPivot : MonoBehaviour {
 
     // Define component scripts
     PlayerInput input;
-    PlayerPosition position;
     PlayerVelocity velocity;
     PlayerMovementProperties movementProperties;
     PlayerCollision collision;
@@ -51,7 +48,7 @@ public class MovementSystemPivot : MonoBehaviour {
 
 		velocity.y += movementProperties.gravity * Time.deltaTime;
 
-		velocity.x = input.horizontalMovementInput * movementProperties.moveSpeed;
+		velocity.x = input.horizontalMovementInput * movementProperties.horizontalSpeed;
 
         collisionSystem.UpdateRaycastOrigins();
         collisionSystem.ResetCollisionInfo();
