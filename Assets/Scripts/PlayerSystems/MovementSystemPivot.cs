@@ -34,6 +34,11 @@ public class MovementSystemPivot : MonoBehaviour {
 	}
 
     void InitializeMovement() {
+        movementProperties.horizontalSpeed = 6f;
+
+        movementProperties.jumpHeight = 4;
+        movementProperties.timeToJumpApex = 0.4f;
+
 		movementProperties.gravity = -(2 * movementProperties.jumpHeight) / Mathf.Pow (movementProperties.timeToJumpApex, 2);
 		movementProperties.jumpVelocity = Mathf.Abs(movementProperties.gravity) * movementProperties.timeToJumpApex;
         movementProperties.sprintMultiplier = 2f;
