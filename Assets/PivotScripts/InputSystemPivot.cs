@@ -14,9 +14,10 @@ public class InputSystemPivot : MonoBehaviour {
     public void OnUpdate() {
         UpdateHorizontalMovement();
 
-        UpdateSprint();
-
         UpdateJump();
+
+        //UpdateVerticalMovement();
+        //UpdateSprint();
     }
 
     void InitializeInput() {

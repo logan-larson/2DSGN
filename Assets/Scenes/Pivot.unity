@@ -146,7 +146,6 @@ GameObject:
   - component: {fileID: 23279881}
   - component: {fileID: 23279880}
   - component: {fileID: 23279875}
-  - component: {fileID: 23279889}
   m_Layer: 0
   m_Name: PlayerBipedal
   m_TagString: Untagged
@@ -245,7 +244,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 23279874}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.75, y: 3.63, z: 0}
+  m_LocalPosition: {x: 0.01, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -398,7 +397,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 23279874}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -417,23 +416,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.56332564, y: 1.6690385}
   m_EdgeRadius: 0
---- !u!114 &23279889
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 23279874}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a96d80a5932be8468e6d42272a012de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  skinWidth: 0.015
-  horizontalRayCount: 4
-  verticalRayCount: 4
-  horizontalRaySpacing: 0
-  verticalRaySpacing: 0
 --- !u!114 &23279890
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -446,6 +428,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a96d80a5932be8468e6d42272a012de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mask:
+    serializedVersion: 2
+    m_Bits: 64
   skinWidth: 0.015
   horizontalRayCount: 4
   verticalRayCount: 4
@@ -545,7 +530,7 @@ GameObject:
   - component: {fileID: 1010107543}
   - component: {fileID: 1010107542}
   - component: {fileID: 1010107541}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Barrier (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -654,7 +639,7 @@ GameObject:
   - component: {fileID: 1280223222}
   - component: {fileID: 1280223221}
   - component: {fileID: 1280223220}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -763,7 +748,7 @@ GameObject:
   - component: {fileID: 1910528743}
   - component: {fileID: 1910528742}
   - component: {fileID: 1910528741}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Barrier
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -7,6 +7,7 @@ using UnityEngine;
 [RequireComponent (typeof (PlayerVelocity))]
 [RequireComponent (typeof (PlayerMovementProperties))]
 [RequireComponent (typeof (PlayerGrounded))]
+[RequireComponent (typeof (PlayerCollision))]
 public class MovementSystemPivot : MonoBehaviour {
 
     // Define system scripts
@@ -18,17 +19,84 @@ public class MovementSystemPivot : MonoBehaviour {
     PlayerVelocity velocity;
     PlayerMovementProperties movementProperties;
     PlayerGrounded grounded;
+    PlayerCollision collision;
 
-    // Testing vars
-    public float gravity;
-    public float minJumpVelocity;
-    public float maxJumpVelocity;
-
-    public float minJumpHeight = 1f;
-    public float maxJumpHeight = 4f;
-    public float timeToJumpApex = 0.4f;
+    /** SEBLAGUE CODE **/
 
     public void OnAwake() {
+        // Get attached systems
+		collisionSystem = GetComponent<CollisionSystem>();
+
+        // Get attached components
+        input = GetComponent<PlayerInput>();
+        movementProperties = GetComponent<PlayerMovementProperties>();
+        collision = GetComponent<PlayerCollision>();
+        velocity = GetComponent<PlayerVelocity>();
+
+        // Call subsystem OnAwake
+        collisionSystem.OnAwake();
+
+        InitializeMovement();
+	}
+
+    void InitializeMovement() {
+		movementProperties.gravity = -(2 * movementProperties.jumpHeight) / Mathf.Pow (movementProperties.timeToJumpApex, 2);
+		movementProperties.jumpVelocity = Mathf.Abs(movementProperties.gravity) * movementProperties.timeToJumpApex;
+    }
+
+	public void OnUpdate() {
+
+		if (collision.collisionInfo.above || collision.collisionInfo.below) {
+			velocity.y = 0;
+		}
+
+		if (input.isJumpKeyPressed && collision.collisionInfo.below) {
+			velocity.y = movementProperties.jumpVelocity;
+		}
+
+		float targetVelocityX = input.horizontalMovementInput * movementProperties.moveSpeed;
+
+		velocity.x = Mathf.SmoothDamp(
+            velocity.x,
+            targetVelocityX,
+            ref movementProperties.velocityXSmoothing,
+            (collision.collisionInfo.below) ? movementProperties.accelerationTimeGrounded : movementProperties.accelerationTimeAirborne
+            );
+
+		velocity.y += movementProperties.gravity * Time.deltaTime;
+
+		collisionSystem.Move(new Vector3(velocity.x, velocity.y) * Time.deltaTime);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /** MY CODE **/
+
+    public void OnAwakeME() {
 
         // Get attached systems
         collisionSystem = GetComponent<CollisionSystem>();
@@ -39,27 +107,23 @@ public class MovementSystemPivot : MonoBehaviour {
         position = GetComponent<PlayerPosition>();
         velocity = GetComponent<PlayerVelocity>();
         grounded = GetComponent<PlayerGrounded>();
+        collision = GetComponent<PlayerCollision>();
 
-        gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
-		maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
-		minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
-
-        collisionSystem.OnAwake();
+        // Init this system
         InitializeMovement();
+
+        // Init subsystems
+        collisionSystem.OnAwake();
     }
 
-    public void OnUpdate() {
-        UpdateGrounded();
-
-        UpdateVelocity();
-
-        ApplyMovement();
-    }
-
-    void InitializeMovement() {
+    void InitializeMovementME() {
         // Position
         position.x = transform.position.x;
         position.y = transform.position.y;
+
+        velocity.x = 0f;
+        velocity.y = 0f;
+        movementProperties.gravity = -20f;
 
         movementProperties.maxXSpeed = 10f;
         movementProperties.maxYSpeed = 20f;
@@ -78,6 +142,46 @@ public class MovementSystemPivot : MonoBehaviour {
         movementProperties.isCollidingAbove = false;
         movementProperties.timeSinceCollidingAbove = 3f;
         movementProperties.collidingAboveDuration = 0.25f;
+    }
+
+    public void OnUpdateME() {
+
+        // Add natural forces (gravity, friction, air resistance)
+        AddGravity();
+
+        // Add Player input
+
+        // Modify based on collisions
+        //collisionSystem.UpdateRaycastOrigins();
+        //collisionSystem.ResetCollisions();
+
+        /*
+        if (velocity.x != 0) {
+            collisionSystem.HorizontalCollisions();
+        }
+        */
+
+        if (velocity.y != 0) {
+            collisionSystem.VerticalCollisions();
+        }
+
+        // Apply movement
+        ApplyMovement();
+
+        /*
+        UpdateGrounded();
+
+        UpdateVelocity();
+        */
+    }
+
+    void AddGravity() {
+        velocity.y += movementProperties.gravity * Time.deltaTime;
+    }
+
+    void ApplyMovement() {
+        //transform.Translate(new Vector3(velocity.x, velocity.y) * Time.deltaTime);
+        transform.position += new Vector3(velocity.x, velocity.y) * Time.deltaTime;
     }
 
     void UpdateGrounded() {
@@ -108,7 +212,7 @@ public class MovementSystemPivot : MonoBehaviour {
         if (grounded.isGrounded) {
             velocity.y = 0f;
         } else {
-            velocity.y += gravity * Time.deltaTime;
+            velocity.y += movementProperties.gravity * Time.deltaTime;
         }
 
         if (movementProperties.timeSinceJump < movementProperties.jumpDuration) {
@@ -143,7 +247,7 @@ public class MovementSystemPivot : MonoBehaviour {
 
         if (grounded.isGrounded && input.isJumpKeyPressed) {
             grounded.isGrounded = false;
-            velocity.y = maxJumpVelocity;
+            //velocity.y = maxJumpVelocity;
             movementProperties.timeSinceJump = 0f;
         } else {
             // Clamp velocity to max
@@ -237,9 +341,4 @@ public class MovementSystemPivot : MonoBehaviour {
         return hitAbove.collider || hitAboveLeft.collider || hitAboveRight.collider;
     }
 
-    void ApplyMovement() {
-        collisionSystem.UpdateRaycastOrigins();
-
-        transform.Translate(new Vector3(velocity.x, velocity.y) * Time.deltaTime);
-    }
 }
