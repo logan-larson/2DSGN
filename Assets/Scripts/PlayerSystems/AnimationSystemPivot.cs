@@ -5,10 +5,12 @@ using UnityEngine;
 public class AnimationSystemPivot : MonoBehaviour {
 
     PlayerVelocity velocity;
+    PlayerAnimation playerAnimation;
     SpriteRenderer spriteRenderer;
 
     public void OnAwake() {
         velocity = GetComponent<PlayerVelocity>();
+        playerAnimation = GetComponent<PlayerAnimation>();
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
@@ -17,7 +19,16 @@ public class AnimationSystemPivot : MonoBehaviour {
     }
 
     void UpdateDirection() {
-        spriteRenderer.flipX = velocity.x < 0;
-        //spriteRenderer.flipX = true;
+        if (velocity.x < 0f) {
+            playerAnimation.isFacingLeft = true;
+        } else if (velocity.x > 0f) {
+            playerAnimation.isFacingLeft = false;
+        }
+
+        if (playerAnimation.isFacingLeft) {
+            spriteRenderer.flipX = true;
+        } else {
+            spriteRenderer.flipX = false;
+        }
     }
 }

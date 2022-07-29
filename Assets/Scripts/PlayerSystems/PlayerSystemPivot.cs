@@ -14,18 +14,18 @@ public class PlayerSystemPivot : MonoBehaviour
         // Get attached scripts
         inputSystem = GetComponent<InputSystemPivot>();
         movementSystem = GetComponent<MovementSystemPivot>();
-        //animationSystem = GetComponent<AnimationSystemPivot>();
+        animationSystem = GetComponent<AnimationSystemPivot>();
 
         // Call OnAwake methods in scripts
         inputSystem.OnAwake();
         movementSystem.OnAwake();
-        //animationSystem.OnAwake();
+        animationSystem.OnAwake();
     }
 
     void Update()
     {
         inputSystem.OnUpdate();
         movementSystem.OnUpdate();
-        //animationSystem.OnUpdate();
+        animationSystem.OnUpdate();
     }
 }

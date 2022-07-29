@@ -11,13 +11,16 @@ public class PlayerMovementProperties : MonoBehaviour
     public float jumpVelocity;
     public float velocityXSmoothing;
 
-    public float maxSpeedSprintMultiplier;
+    public float sprintMultiplier;
 
     public float groundedHeightThreshold;
     public float groundedHeight;
 
     public float jumpDuration;
     public float timeSinceJump;
+
+    public float timeSinceGrounded;
+    public float coyoteTime;
 
     public float maxSpeedCombatMultiplier;
 
