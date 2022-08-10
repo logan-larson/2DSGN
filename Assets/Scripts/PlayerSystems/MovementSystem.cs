@@ -33,7 +33,7 @@ public class MovementSystem : MonoBehaviour {
         // Horizontal input
         velocity.x = Input.GetAxisRaw("Horizontal") * movementProperties.moveSpeed;
 
-        if (grounded) {
+        if (grounded.isGrounded) {
             float distFromGround = groundedHit.distance;
             if (distFromGround < 0.75f) {
                 velocity.y += 0.25f; 
@@ -54,17 +54,35 @@ public class MovementSystem : MonoBehaviour {
         RaycastHit2D leftHit = Physics2D.Raycast(leftRay.origin, leftRay.direction, 100f, grounded.mask);
         RaycastHit2D rightHit = Physics2D.Raycast(rightRay.origin, rightRay.direction, 100f, grounded.mask);
 
-        Debug.DrawRay(leftRay.origin, leftRay.direction, Color.yellow);
-        Debug.DrawRay(rightRay.origin, rightRay.direction, Color.red);
+        //Debug.DrawRay(leftRay.origin, leftRay.direction, Color.yellow);
+        //Debug.DrawRay(rightRay.origin, rightRay.direction, Color.red);
+
+        //Debug.DrawRay(leftRay.origin, -transform.right * overrideRayLength, Color.green);
+        //Debug.DrawRay(rightRay.origin, transform.right * overrideRayLength, Color.green);
+        if (velocity.x < 0f) {
+            RaycastHit2D leftOverrideHit = Physics2D.Raycast(leftRay.origin, -transform.right, movementProperties.overrideRayLength * Mathf.Abs(velocity.x), grounded.mask);
+            Debug.DrawRay(leftRay.origin, transform.right * movementProperties.overrideRayLength * velocity.x, Color.green);
+            if (leftOverrideHit.collider != null) {
+                leftHit = leftOverrideHit;
+            }
+        }
+
+        if (velocity.x > 0f) {
+            RaycastHit2D rightOverrideHit = Physics2D.Raycast(rightRay.origin, transform.right, movementProperties.overrideRayLength * Mathf.Abs(velocity.x), grounded.mask);
+            Debug.DrawRay(leftRay.origin, transform.right * movementProperties.overrideRayLength * velocity.x, Color.green);
+            if (rightOverrideHit.collider != null) {
+                rightHit = rightOverrideHit;
+            }
+        }
 
         if (leftHit && rightHit) {
             Vector2 avgPoint = (leftHit.point + rightHit.point) / 2;
             Vector2 avgNorm = (leftHit.normal + rightHit.normal) / 2;
 
-            Debug.DrawRay(leftHit.point, leftHit.normal, Color.green);
-            Debug.DrawRay(rightHit.point, rightHit.normal, Color.magenta);
+            //Debug.DrawRay(leftHit.point, leftHit.normal, Color.green);
+            //Debug.DrawRay(rightHit.point, rightHit.normal, Color.magenta);
 
-            Debug.DrawRay(avgPoint, avgNorm, Color.cyan);
+            //Debug.DrawRay(avgPoint, avgNorm, Color.cyan);
 
             Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, avgNorm);
             Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, movementProperties.maxRotationDegrees);
