@@ -27,24 +27,9 @@ public class MovementSystem : MonoBehaviour {
     public void OnUpdate() {
         UpdateRaycastOrigins();
 
-        RaycastHit2D groundedHit = GetGroundedHit();
-        grounded.isGrounded = groundedHit.collider != null;
+        UpdateGrounded();
 
-        // Horizontal input
-        velocity.x = Input.GetAxisRaw("Horizontal") * movementProperties.moveSpeed;
-
-        if (grounded.isGrounded) {
-            float distFromGround = groundedHit.distance;
-            if (distFromGround < 0.75f) {
-                velocity.y += 0.25f; 
-            } else if (distFromGround > 1.25f) {
-                velocity.y -= 0.25f; 
-            } else {
-                velocity.y = 0f;
-            }
-        } else {
-            velocity.y -= movementProperties.gravity * Time.deltaTime;
-        }
+        UpdateVelocity();
 
         Vector2 adjVelo = new Vector2(velocity.x, velocity.y) * Time.deltaTime;
 
@@ -54,35 +39,18 @@ public class MovementSystem : MonoBehaviour {
         RaycastHit2D leftHit = Physics2D.Raycast(leftRay.origin, leftRay.direction, 100f, grounded.mask);
         RaycastHit2D rightHit = Physics2D.Raycast(rightRay.origin, rightRay.direction, 100f, grounded.mask);
 
-        //Debug.DrawRay(leftRay.origin, leftRay.direction, Color.yellow);
-        //Debug.DrawRay(rightRay.origin, rightRay.direction, Color.red);
-
-        //Debug.DrawRay(leftRay.origin, -transform.right * overrideRayLength, Color.green);
-        //Debug.DrawRay(rightRay.origin, transform.right * overrideRayLength, Color.green);
-        if (velocity.x < 0f) {
-            RaycastHit2D leftOverrideHit = Physics2D.Raycast(leftRay.origin, -transform.right, movementProperties.overrideRayLength * Mathf.Abs(velocity.x), grounded.mask);
-            Debug.DrawRay(leftRay.origin, transform.right * movementProperties.overrideRayLength * velocity.x, Color.green);
-            if (leftOverrideHit.collider != null) {
-                leftHit = leftOverrideHit;
-            }
+        // Use override hit to prevent clipping
+        RaycastHit2D overrideHit = Physics2D.Raycast((leftRay.origin + rightRay.origin) / 2, transform.right, movementProperties.overrideRayLength * velocity.x, grounded.mask);
+        if (velocity.x < 0f && overrideHit.collider != null) {
+            leftHit = overrideHit;
+        } else if (velocity.x > 0f && overrideHit.collider != null) {
+            rightHit = overrideHit;
         }
 
-        if (velocity.x > 0f) {
-            RaycastHit2D rightOverrideHit = Physics2D.Raycast(rightRay.origin, transform.right, movementProperties.overrideRayLength * Mathf.Abs(velocity.x), grounded.mask);
-            Debug.DrawRay(leftRay.origin, transform.right * movementProperties.overrideRayLength * velocity.x, Color.green);
-            if (rightOverrideHit.collider != null) {
-                rightHit = rightOverrideHit;
-            }
-        }
-
+        // Apply rotation to orient body to match ground
         if (leftHit && rightHit) {
             Vector2 avgPoint = (leftHit.point + rightHit.point) / 2;
             Vector2 avgNorm = (leftHit.normal + rightHit.normal) / 2;
-
-            //Debug.DrawRay(leftHit.point, leftHit.normal, Color.green);
-            //Debug.DrawRay(rightHit.point, rightHit.normal, Color.magenta);
-
-            //Debug.DrawRay(avgPoint, avgNorm, Color.cyan);
 
             Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, avgNorm);
             Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, movementProperties.maxRotationDegrees);
@@ -90,9 +58,7 @@ public class MovementSystem : MonoBehaviour {
             transform.rotation = Quaternion.Euler(0f, 0f, finalRotation.eulerAngles.z);
         }
 
-        // Apply movement
         transform.Translate(adjVelo);
-
     }
 
     void UpdateRaycastOrigins() {
@@ -102,7 +68,27 @@ public class MovementSystem : MonoBehaviour {
 		raycastOrigins.topRight = transform.position + (transform.right / 2) + (transform.up / 2);
     }
 
-    RaycastHit2D GetGroundedHit() {
-        return Physics2D.Raycast(transform.position, -transform.up, movementProperties.groundedHeight, grounded.mask);
+    void UpdateGrounded() {
+        RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, movementProperties.groundedHeight, grounded.mask);
+        grounded.isGrounded = groundedHit.collider != null;
+        grounded.groundDistance = groundedHit.distance;
     }
+
+    void UpdateVelocity() {
+        velocity.x = input.horizontalMovementInput * movementProperties.moveSpeed;
+
+        if (grounded.isGrounded) {
+            if (grounded.groundDistance < 0.75f) {
+                velocity.y += 0.25f; 
+            } else if (grounded.groundDistance > 1.25f) {
+                velocity.y -= 0.25f; 
+            } else {
+                velocity.y = 0f;
+            }
+        } else {
+            velocity.y -= movementProperties.gravity * Time.deltaTime;
+        }
+    }
+
+
 }
