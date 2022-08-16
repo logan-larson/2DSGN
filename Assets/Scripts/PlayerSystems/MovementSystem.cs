@@ -19,6 +19,9 @@ public class MovementSystem : MonoBehaviour {
         public Vector2 topLeft, topRight, bottomLeft, bottomRight;
     }
 
+    Vector3 predictPos = new Vector3();
+    public float step = 0.25f;
+
     public void OnStart() {
         input = GetComponent<PlayerInput>();
         velocity = GetComponent<PlayerVelocity>();
@@ -38,6 +41,7 @@ public class MovementSystem : MonoBehaviour {
 
         UpdateVelocity();
 
+        // This is a velocity relative to the player not the world
         Vector2 adjVelo = new Vector2(velocity.x, velocity.y) * Time.deltaTime;
 
         // If grounded, match body to ground
@@ -66,41 +70,48 @@ public class MovementSystem : MonoBehaviour {
 
                 transform.rotation = Quaternion.Euler(0f, 0f, finalRotation.eulerAngles.z);
             }
+
+            transform.Translate(adjVelo);
         } else { // Otherwise, predict landing location and match body to that
             RaycastHit2D predictHit = new RaycastHit2D();
             Vector2 pos = transform.position;
             Vector2 velo = adjVelo;
 
-            while (predictHit.collider == null) {
+            int count = 0;
+            Color[] rayColors = new Color[] {
+                Color.black, Color.blue, Color.green, Color.magenta, Color.cyan,
+                Color.yellow, Color.red, Color.white, Color.gray, Color.green
+            };
+            while (predictHit.collider == null && count < 10) {
+
                 // Generate new ray
                 Ray2D ray = new Ray2D(pos, velo.normalized);
 
-                Debug.DrawRay(ray.origin, ray.direction);
+                Debug.DrawRay(ray.origin, ray.direction, rayColors[count]);
 
                 // Update predictHit
-                predictHit = Physics2D.Raycast(ray.origin, ray.direction, velo.magnitude, grounded.mask);
+                predictHit = Physics2D.Raycast(ray.origin, ray.direction, 1f, grounded.mask);
 
-                // Update velo each cycle to 
-                float angle = Vector3.SignedAngle(Vector3.up, transform.up, Vector3.forward);
-
-                float xMult = Mathf.Sin(angle * Mathf.Deg2Rad) * movementProperties.gravity;
-                float yMult = Mathf.Cos(angle * Mathf.Deg2Rad) * movementProperties.gravity;
-
-                velo.x -= xMult * Time.deltaTime;
-                velo.y -= yMult * Time.deltaTime;
+                velo += Vector2.down * step;
 
                 // Update position to end of predictHit ray
-                pos += ray.direction * velo.magnitude;
+                pos += ray.direction;
 
+                count++;
             }
 
-            Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, predictHit.normal);
-            Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, movementProperties.maxRotationDegrees);
+            if (predictHit.collider != null) {
+                predictPos = predictHit.point;
 
-            transform.rotation = Quaternion.Euler(0f, 0f, finalRotation.eulerAngles.z);
+                Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, predictHit.normal);
+                Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, movementProperties.maxRotationDegrees);
+
+                transform.rotation = Quaternion.Euler(0f, 0f, finalRotation.eulerAngles.z);
+            }
+
+            transform.position += new Vector3(velocity.veloOffGround.x, velocity.veloOffGround.y, 0f) * Time.deltaTime;
         }
 
-        transform.Translate(adjVelo);
     }
 
     void UpdateRaycastOrigins() {
@@ -155,6 +166,7 @@ public class MovementSystem : MonoBehaviour {
                 }
             }
         } else {
+            /*
             // Add gravity in downward direction relative to worldspace
             float angle = Vector3.SignedAngle(Vector3.up, transform.up, Vector3.forward);
 
@@ -163,6 +175,16 @@ public class MovementSystem : MonoBehaviour {
 
             velocity.x -= xMult * Time.deltaTime;
             velocity.y -= yMult * Time.deltaTime;
+            Vector2 velo = new Vector2(velocity.x, velocity.y);
+            velo += Vector2.down * movementProperties.gravity * Time.deltaTime;
+
+            velocity.x = velo.x;
+            velocity.y = velo.y;
+            */
+            //float angle = Vector3.SignedAngle(Vector3.up, transform.up, Vector3.forward);
+            velocity.veloOffGround += (Vector2.down * movementProperties.gravity * Time.deltaTime);
+            //velocity.x = velocity.veloOffGround.x * Mathf.Cos(velocity.angleOffGround * Mathf.Deg2Rad);
+            //velocity.y = velocity.veloOffGround.y * Mathf.Sin(velocity.angleOffGround * Mathf.Deg2Rad);
         }
 
         // Set sprint multiplier
@@ -176,5 +198,15 @@ public class MovementSystem : MonoBehaviour {
 
         // Limit top speed
         velocity.x = Mathf.Clamp(velocity.x, -movementProperties.maxXSpeed - movementProperties.sprintMultiplier, movementProperties.maxXSpeed + movementProperties.sprintMultiplier);
+
+        if (!grounded.isGrounded && movementProperties.timeSinceGrounded == 0f) {
+            velocity.veloOffGround = new Vector2(velocity.x, velocity.y);
+            //velocity.angleOffGround = transform.rotation.eulerAngles.z + 90f;
+        }
+    }
+
+    void OnDrawGizmos() {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(predictPos, 0.25f);
     }
 }
