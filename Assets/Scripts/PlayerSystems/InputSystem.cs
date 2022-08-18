@@ -1,12 +1,15 @@
 using UnityEngine;
 
 [RequireComponent (typeof(PlayerInput))]
+[RequireComponent (typeof(MovementSystem))]
 public class InputSystem : MonoBehaviour {
 
     PlayerInput input;
+    MovementSystem movement;
 
     public void OnStart() {
         input = GetComponent<PlayerInput>();
+        movement = GetComponent<MovementSystem>();
 
         InitializeInput();
     }
@@ -41,6 +44,9 @@ public class InputSystem : MonoBehaviour {
 
     void UpdateJump() {
         input.isJumpKeyPressed = Input.GetKeyDown(KeyCode.W);
+        if (input.isJumpKeyPressed) {
+            movement.Jump();
+        }
     }
 
     void UpdateSprint() {

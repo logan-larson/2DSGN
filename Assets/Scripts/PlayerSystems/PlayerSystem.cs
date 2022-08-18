@@ -23,7 +23,10 @@ public class PlayerSystem : MonoBehaviour {
 
     void Update() {
         inputSystem.OnUpdate();
-        movementSystem.OnUpdate();
         animationSystem.OnUpdate();
+    }
+
+    void FixedUpdate() {
+        movementSystem.OnUpdate();
     }
 }

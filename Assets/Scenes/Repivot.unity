@@ -226,7 +226,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 164458076}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 30.34, y: 9.49, z: 0}
+  m_LocalPosition: {x: 30.16, y: -15.96, z: 0}
   m_LocalScale: {x: 2, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -384,7 +384,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 10
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -513,7 +513,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1103057550}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 29.96, y: 12.89, z: 0}
+  m_LocalPosition: {x: 29.96, y: 17.68, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 530537979}
@@ -556,7 +556,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f06d7b9ad8a0d4d4fb9d1285272fea24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  step: 1
+  fFactor: 6.75
+  minJumpTime: 0
 --- !u!114 &1103057557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -570,7 +571,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   horizontalSpeed: 0
-  jumpVelocity: 12
+  jumpVelocity: 10
   maxSprintSpeed: 10
   sprintMultiplier: 0
   timeSinceGrounded: 0
@@ -579,11 +580,11 @@ MonoBehaviour:
   timeToJumpApex: 0
   maxXSpeed: 6
   maxYSpeed: 5
-  acceleration: 0.1
-  friction: 0.1
-  gravity: 3
-  maxRotationDegrees: 1
-  groundedHeight: 2
+  acceleration: 2.5
+  friction: 0.4
+  gravity: 9.81
+  maxRotationDegrees: 5
+  groundedHeight: 1
   overrideRayLength: 0.5
 --- !u!114 &1103057558
 MonoBehaviour:

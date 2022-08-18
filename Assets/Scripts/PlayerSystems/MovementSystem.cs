@@ -19,11 +19,14 @@ public class MovementSystem : MonoBehaviour {
         public Vector2 topLeft, topRight, bottomLeft, bottomRight;
     }
 
+    bool jumpNow = false;
+
     Vector3 predictPos = new Vector3();
     Vector3 predictNorm = new Vector3();
 
     bool recalculateLanding = false;
-    public float step = 0.25f;
+    public float fFactor = 6.75f;
+    public float minJumpTime = 1f;
 
     public void OnStart() {
         input = GetComponent<PlayerInput>();
@@ -36,16 +39,16 @@ public class MovementSystem : MonoBehaviour {
     public void OnUpdate() {
         UpdateRaycastOrigins();
 
-        if (movementProperties.timeSinceGrounded > 1f)  {
+        if (movementProperties.timeSinceGrounded > minJumpTime)  {
             UpdateGrounded();
         } else {
-            movementProperties.timeSinceGrounded += Time.deltaTime;
+            movementProperties.timeSinceGrounded += Time.fixedDeltaTime;
         }
 
         UpdateVelocity();
 
         // This is a velocity relative to the player not the world
-        Vector2 adjVelo = new Vector2(velocity.x, velocity.y) * Time.deltaTime;
+        Vector2 adjVelo = new Vector2(velocity.x, velocity.y) * Time.fixedDeltaTime;
 
         // If grounded, match body to ground
         if (grounded.isGrounded) {
@@ -77,7 +80,7 @@ public class MovementSystem : MonoBehaviour {
             transform.Translate(adjVelo);
         } else { 
             // We are in the air, so move according to worldspace not self
-            transform.position += new Vector3(velocity.veloOffGround.x, velocity.veloOffGround.y, 0f) * Time.deltaTime;
+            transform.position += new Vector3(velocity.veloOffGround.x, velocity.veloOffGround.y, 0f) * Time.fixedDeltaTime;
 
             // And rotate to the predicted landing spots normal
             Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, predictNorm);
@@ -98,6 +101,12 @@ public class MovementSystem : MonoBehaviour {
         RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, movementProperties.groundedHeight, grounded.mask);
         grounded.isGrounded = groundedHit.collider != null;
         grounded.groundDistance = groundedHit.distance;
+    }
+
+    public void Jump() {
+        if (grounded.isGrounded) {
+            jumpNow = true;
+        }
     }
 
     void UpdateVelocity() {
@@ -125,20 +134,22 @@ public class MovementSystem : MonoBehaviour {
 
         // Set height above ground
         if (grounded.isGrounded) {
-            if (input.isJumpKeyPressed) {
+            if (jumpNow) {
+                jumpNow = false;
                 grounded.isGrounded = false;
                 movementProperties.timeSinceGrounded = 0f;
                 velocity.y = movementProperties.jumpVelocity;
-
-            } else {
+            } else { // This needs a lot of work to make player landings smoother
                 if (grounded.groundDistance < 0.75f) {
-                    velocity.y += 0.25f; 
-                } else if (grounded.groundDistance > 1.25f) {
-                    velocity.y -= 0.25f; 
+                    velocity.y += 0.1f; 
+                } else if (grounded.groundDistance > 2f) {
+                    velocity.y -= 0.2f; 
                 } else {
                     velocity.y = 0f;
                 }
             }
+
+            velocity.veloOffGround = new Vector2(0f, 0f);
         } else {
             // Add gravity in downward direction relative to worldspace
             velocity.veloOffGround += (Vector2.down * movementProperties.gravity * Time.fixedDeltaTime);
@@ -165,7 +176,27 @@ public class MovementSystem : MonoBehaviour {
         if (!grounded.isGrounded && movementProperties.timeSinceGrounded == 0f) {
             // Get the velocity directly after the jump because we don't allow
             // airborne movement controls besides using a weapon to move
-            velocity.veloOffGround = new Vector2(velocity.x, velocity.y);
+
+            /*
+            Theta = yAngleFromRight
+            X1 = xComponentOfYVelo
+            Y1 = yComponentOfYVelo
+
+            Gamma = xAngleFromRight
+            X2 = xComponentOfXVelo
+            Y2 = yComponentOfXVelo 
+            */
+
+            float theta = Vector2.SignedAngle(Vector2.right, transform.up) * Mathf.Deg2Rad;
+            float gamma = Vector2.SignedAngle(Vector2.right, transform.right) * Mathf.Deg2Rad;
+
+            float xComponentOfYVelo = Mathf.Cos(theta) * velocity.y;
+            float yComponentOfYVelo = Mathf.Sin(theta) * velocity.y;
+
+            float xComponentOfXVelo = Mathf.Cos(gamma) * velocity.x;
+            float yComponentOfXVelo = Mathf.Sin(gamma) * velocity.x;
+
+            velocity.veloOffGround = new Vector2(xComponentOfXVelo + xComponentOfYVelo, yComponentOfXVelo + yComponentOfYVelo);
 
             Debug.Log("Initial velo off ground: (" + velocity.veloOffGround.x + ", " + velocity.veloOffGround.y + ")");
 
@@ -178,25 +209,31 @@ public class MovementSystem : MonoBehaviour {
     void RecalculateLandingPos() {
             // Predict the landing spot 
             RaycastHit2D predictHit = new RaycastHit2D();
-            Vector2 pos = transform.position;
+            RaycastHit2D predictHit2 = new RaycastHit2D();
+            Vector2 pos = transform.position - (transform.up * 0.7f);
+            Vector2 pos2 = transform.position + (transform.up * 0.7f);
 
-            Vector2 velo = new Vector2(velocity.veloOffGround.x, velocity.veloOffGround.y) * Time.fixedDeltaTime;
+            Vector2 velo = new Vector2(velocity.veloOffGround.x, velocity.veloOffGround.y) * Time.fixedDeltaTime * fFactor;
 
             int count = 0;
-            while (predictHit.collider == null && count < 100) {
+            while ((predictHit.collider == null && predictHit2.collider == null) && count < 100) {
 
                 // Generate new ray
                 Ray2D ray = new Ray2D(pos, velo.normalized);
+                Ray2D ray2 = new Ray2D(pos2, velo.normalized);
 
                 Color randColor = Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
 
                 Debug.DrawRay(ray.origin, ray.direction * velo.magnitude, randColor, 2f);
+                Debug.DrawRay(ray2.origin, ray2.direction * velo.magnitude, randColor, 2f);
 
                 // Update predictHit
                 predictHit = Physics2D.Raycast(ray.origin, ray.direction, velo.magnitude, grounded.mask);
+                predictHit2 = Physics2D.Raycast(ray2.origin, ray2.direction, velo.magnitude, grounded.mask);
 
                 // Update position to end of predictHit ray
                 pos += (ray.direction * velo.magnitude);
+                pos2 += (ray2.direction * velo.magnitude);
 
                 velo += (Vector2.down * movementProperties.gravity * Time.fixedDeltaTime);
 
@@ -205,12 +242,17 @@ public class MovementSystem : MonoBehaviour {
 
             // If landing position is spotted
             if (predictHit.collider != null) {
-
                 // Set the predicted landing position
                 predictPos = predictHit.point;
 
                 // And the predicted landing normal
                 predictNorm = predictHit.normal;
+            } else if (predictHit2.collider != null) {
+                // Set the predicted landing position
+                predictPos = predictHit2.point;
+
+                // And the predicted landing normal
+                predictNorm = predictHit2.normal;
             } else {
                 Debug.Log("Hit the max count");
             }

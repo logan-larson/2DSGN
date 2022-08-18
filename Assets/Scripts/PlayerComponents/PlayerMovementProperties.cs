@@ -9,7 +9,7 @@ public class PlayerMovementProperties : MonoBehaviour
     public float maxSprintSpeed = 10f;
     public float sprintMultiplier;
 
-    public float timeSinceGrounded;
+    public float timeSinceGrounded = 1;
     public float coyoteTime;
 
     public float jumpHeight;
