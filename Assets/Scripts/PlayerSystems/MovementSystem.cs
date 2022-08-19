@@ -46,12 +46,15 @@ public class MovementSystem : MonoBehaviour {
         }
 
         UpdateVelocity();
+            
 
         // This is a velocity relative to the player not the world
         Vector2 adjVelo = new Vector2(velocity.x, velocity.y) * Time.fixedDeltaTime;
 
         // If grounded, match body to ground
         if (grounded.isGrounded) {
+            ShowPredictedTrajectory();
+
             Ray2D leftRay = new Ray2D(raycastOrigins.bottomLeft + adjVelo, -transform.up);
             Ray2D rightRay = new Ray2D(raycastOrigins.bottomRight + adjVelo, -transform.up);
 
@@ -78,6 +81,7 @@ public class MovementSystem : MonoBehaviour {
             }
 
             transform.Translate(adjVelo);
+
         } else { 
             // We are in the air, so move according to worldspace not self
             transform.position += new Vector3(velocity.veloOffGround.x, velocity.veloOffGround.y, 0f) * Time.fixedDeltaTime;
@@ -98,9 +102,15 @@ public class MovementSystem : MonoBehaviour {
     }
 
     void UpdateGrounded() {
-        RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, movementProperties.groundedHeight, grounded.mask);
-        grounded.isGrounded = groundedHit.collider != null;
-        grounded.groundDistance = groundedHit.distance;
+        if (grounded.isGrounded) {
+            RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, movementProperties.groundedHeight * 1.5f, grounded.mask);
+            grounded.isGrounded = groundedHit.collider != null;
+            grounded.groundDistance = groundedHit.distance;
+        } else {
+            RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, movementProperties.groundedHeight, grounded.mask);
+            grounded.isGrounded = groundedHit.collider != null;
+            grounded.groundDistance = groundedHit.distance;
+        }
     }
 
     public void Jump() {
@@ -141,9 +151,9 @@ public class MovementSystem : MonoBehaviour {
                 velocity.y = movementProperties.jumpVelocity;
             } else { // This needs a lot of work to make player landings smoother
                 if (grounded.groundDistance < 0.75f) {
-                    velocity.y += 0.1f; 
-                } else if (grounded.groundDistance > 2f) {
-                    velocity.y -= 0.2f; 
+                    velocity.y += 0.25f; 
+                } else if (grounded.groundDistance > 1.25f) {
+                    velocity.y -= 0.25f; 
                 } else {
                     velocity.y = 0f;
                 }
@@ -256,6 +266,50 @@ public class MovementSystem : MonoBehaviour {
             } else {
                 Debug.Log("Hit the max count");
             }
+    }
+
+    void ShowPredictedTrajectory() {
+
+        if (velocity.x == 0f) {
+            return;
+        }
+
+        float theta = Vector2.SignedAngle(Vector2.right, transform.up) * Mathf.Deg2Rad;
+        float gamma = Vector2.SignedAngle(Vector2.right, transform.right) * Mathf.Deg2Rad;
+
+        float xComponentOfYVelo = Mathf.Cos(theta) * movementProperties.jumpVelocity;
+        float yComponentOfYVelo = Mathf.Sin(theta) * movementProperties.jumpVelocity;
+
+        float xComponentOfXVelo = Mathf.Cos(gamma) * velocity.x;
+        float yComponentOfXVelo = Mathf.Sin(gamma) * velocity.x;
+
+        Vector2 predVelo = new Vector2(xComponentOfXVelo + xComponentOfYVelo, yComponentOfXVelo + yComponentOfYVelo);
+
+        RaycastHit2D predictHit = new RaycastHit2D();
+        Vector2 pos = transform.position;
+
+        Vector2 velo = new Vector2(predVelo.x, predVelo.y) * Time.fixedDeltaTime * fFactor;
+
+        int count = 0;
+        while (predictHit.collider == null && count < 100) {
+
+            // Generate new ray
+            Ray2D ray = new Ray2D(pos, velo.normalized);
+
+            if (count % 2 == 1) {
+                Debug.DrawRay(ray.origin, ray.direction * velo.magnitude, Color.gray);
+            }
+
+            // Update predictHit
+            predictHit = Physics2D.Raycast(ray.origin, ray.direction, velo.magnitude, grounded.mask);
+
+            // Update position to end of predictHit ray
+            pos += (ray.direction * velo.magnitude);
+
+            velo += (Vector2.down * movementProperties.gravity * Time.fixedDeltaTime);
+
+            count++;
+        }
     }
 
     void OnDrawGizmos() {
