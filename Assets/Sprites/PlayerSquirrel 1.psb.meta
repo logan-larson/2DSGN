@@ -25,6 +25,7 @@ ScriptedImporter:
     streamingMipmaps: 1
     streamingMipmapsPriority: 0
     vTOnly: 0
+    ignoreMasterTextureLimit: 0
     nPOTScale: 1
     sRGBTexture: 1
     spriteMode: 2
@@ -79,7 +80,6 @@ ScriptedImporter:
       width: 0
       height: 0
     spriteID: 
-    internalID: 0
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -103,13 +103,16 @@ ScriptedImporter:
       width: 10
       height: 4
     spriteID: 65771fa85b14b7247b84920c1743660f
-    internalID: 0
     spriteBone:
     - name: bone_3
+      guid: 
       position: {x: 0.48443794, y: 2.0193405, z: 0}
       rotation: {x: 0, y: 0, z: -0.0076919263, w: 0.9999705}
       length: 7.0724626
       parentId: -1
+      color:
+        serializedVersion: 2
+        rgba: 0
     spriteOutline: []
     vertices:
     - position: {x: 10, y: 4}
@@ -302,13 +305,16 @@ ScriptedImporter:
       width: 10
       height: 4
     spriteID: b50ea70d785eb9543b97b516d9f24129
-    internalID: 0
     spriteBone:
     - name: bone_5
+      guid: 
       position: {x: 0.48443794, y: 1.9658508, z: 0}
       rotation: {x: 0, y: 0, z: -0.0000000842937, w: 1}
       length: 6.8540344
       parentId: -1
+      color:
+        serializedVersion: 2
+        rgba: 0
     spriteOutline: []
     vertices:
     - position: {x: 10, y: 4}
@@ -501,13 +507,16 @@ ScriptedImporter:
       width: 8
       height: 5
     spriteID: 553c4968ae6a81c4a90125e5367acbdc
-    internalID: 0
     spriteBone:
     - name: bone_4
+      guid: 
       position: {x: -0.4439354, y: 1.9105453, z: 0}
       rotation: {x: 0, y: 0, z: 0.02141418, w: 0.9997707}
       length: 7.6225796
       parentId: -1
+      color:
+        serializedVersion: 2
+        rgba: 0
     spriteOutline: []
     vertices:
     - position: {x: 6.873001, y: 0.3430004}
@@ -668,13 +677,16 @@ ScriptedImporter:
       width: 8
       height: 5
     spriteID: af282c7256d993f4886d6dd04d494ee2
-    internalID: 0
     spriteBone:
     - name: bone_6
+      guid: 
       position: {x: 0.33847046, y: 1.9658527, z: 0}
       rotation: {x: 0, y: 0, z: 0.0316978, w: 0.9994975}
       length: 6.867831
       parentId: -1
+      color:
+        serializedVersion: 2
+        rgba: 0
     spriteOutline: []
     vertices:
     - position: {x: 6.873001, y: 0.3430004}
@@ -835,13 +847,16 @@ ScriptedImporter:
       width: 18
       height: 18
     spriteID: 1b8c19d30cfdfe04190502ac89875d5d
-    internalID: 0
     spriteBone:
     - name: bone_2
+      guid: 
       position: {x: 7.894226, y: 1.4055614, z: 0}
       rotation: {x: 0, y: 0, z: 0.70984197, w: 0.704361}
       length: 14.034871
       parentId: -1
+      color:
+        serializedVersion: 2
+        rgba: 0
     spriteOutline: []
     vertices:
     - position: {x: 14.041, y: 0.27900028}
@@ -1015,13 +1030,16 @@ ScriptedImporter:
       width: 16
       height: 27
     spriteID: f5ac425fd0c23534aaf5190c49dba8f8
-    internalID: 0
     spriteBone:
     - name: bone_1
+      guid: 
       position: {x: 7.894229, y: 0.8180733, z: 0}
       rotation: {x: 0, y: 0, z: 0.7071069, w: 0.7071067}
       length: 24.587488
       parentId: -1
+      color:
+        serializedVersion: 2
+        rgba: 0
     spriteOutline: []
     vertices:
     - position: {x: 13.191999, y: 0.19299984}
@@ -1256,121 +1274,62 @@ ScriptedImporter:
     tessellationDetail: 0
     parentGroupIndex: -1
     uvTransform: {x: -2, y: 3}
-  platformSettings:
-  - name: DefaultTexturePlatform
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
-  - name: Standalone
-    overridden: 0
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    androidETC2FallbackOverride: 0
-  mosaicLayers: 1
-  documentPivot: {x: 0.15, y: 0}
-  documentAlignment: 0
-  importHiddenLayers: 0
-  importedTextureWidth: 64
-  importedTextureHeight: 64
-  documentSize: {x: 48, y: 48}
-  paperDollMode: 0
-  keepDupilcateSpriteName: 0
-  spriteCategoryList:
-    categories: []
-  textureActualWidth: 64
-  textureActualHeight: 64
-  spritePackingTag: 
-  resliceFromLayer: 0
-  characterMode: 1
-  mosaicPSDLayers: []
-  rigPSDLayers:
-  - name: BR_Arm
-    spriteName: BR_Arm
-    isGroup: 0
-    parentIndex: -1
-    spriteID: 65771fa85b14b7247b84920c1743660f
-    layerID: 0
-    mosaicPosition: {x: 4, y: 39}
-  - name: FR_Arm
-    spriteName: FR_Arm
-    isGroup: 0
-    parentIndex: -1
-    spriteID: b50ea70d785eb9543b97b516d9f24129
-    layerID: 1600624949
-    mosaicPosition: {x: 4, y: 51}
-  - name: BR_Paw
-    spriteName: BR_Paw
-    isGroup: 0
-    parentIndex: -1
-    spriteID: 553c4968ae6a81c4a90125e5367acbdc
-    layerID: 7435593
-    mosaicPosition: {x: 28, y: 30}
-  - name: FR_Paw
-    spriteName: FR_Paw
-    isGroup: 0
-    parentIndex: -1
-    spriteID: af282c7256d993f4886d6dd04d494ee2
-    layerID: 7431501
-    mosaicPosition: {x: 44, y: 30}
-  - name: Head
-    spriteName: Head
-    isGroup: 0
-    parentIndex: -1
-    spriteID: 1b8c19d30cfdfe04190502ac89875d5d
-    layerID: -158744160
-    mosaicPosition: {x: 28, y: 4}
-  - name: Body
-    spriteName: Body
-    isGroup: 0
-    parentIndex: -1
-    spriteID: f5ac425fd0c23534aaf5190c49dba8f8
-    layerID: -911352830
-    mosaicPosition: {x: 4, y: 4}
   characterData:
     bones:
     - name: bone_1
+      guid: 
       position: {x: 13.894229, y: 1.8180733, z: 0}
       rotation: {x: 0, y: 0, z: 0.7071069, w: 0.7071067}
       length: 24.587488
       parentId: -1
+      color:
+        serializedVersion: 2
+        rgba: 0
     - name: bone_2
+      guid: 
       position: {x: 24.587488, y: -0.000005628667, z: 0}
       rotation: {x: 0, y: 0, z: 0.003875487, w: 0.99999255}
       length: 14.034872
       parentId: 0
+      color:
+        serializedVersion: 2
+        rgba: 0
     - name: bone_3
+      guid: 
       position: {x: 6.2012677, y: -3.590211, z: 0}
       rotation: {x: 0, y: -0, z: -0.712525, w: 0.7016468}
       length: 7.072461
       parentId: 0
+      color:
+        serializedVersion: 2
+        rgba: 0
     - name: bone_4
+      guid: 
       position: {x: 7.072463, y: 0.000003054762, z: 0}
       rotation: {x: 0, y: 0, z: 0.02910371, w: 0.99957645}
       length: 7.6225777
       parentId: 2
+      color:
+        serializedVersion: 2
+        rgba: 0
     - name: bone_5
+      guid: 
       position: {x: 19.147778, y: -3.5902154, z: 0}
       rotation: {x: 0, y: -0, z: -0.70710695, w: 0.70710665}
       length: 6.8540344
       parentId: 0
+      color:
+        serializedVersion: 2
+        rgba: 0
     - name: bone_6
+      guid: 
       position: {x: 6.854034, y: 0.0000009940234, z: 0}
       rotation: {x: 0, y: 0, z: 0.031697884, w: 0.99949753}
       length: 6.8678317
       parentId: 4
+      color:
+        serializedVersion: 2
+        rgba: 0
     parts:
     - spritePosition:
         x: 17
@@ -1428,8 +1387,118 @@ ScriptedImporter:
       order: 0
     dimension: {x: 0, y: 0}
     characterGroups: []
+    boneReadOnly: 0
+  sharedRigSpriteImportData: []
+  sharedRigCharacterData:
+    bones: []
+    parts: []
+    dimension: {x: 0, y: 0}
+    characterGroups: []
+    boneReadOnly: 0
+  platformSettings:
+  - name: DefaultTexturePlatform
+    overridden: 0
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    androidETC2FallbackOverride: 0
+  - name: Standalone
+    overridden: 0
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    androidETC2FallbackOverride: 0
+  mosaicLayers: 1
+  characterMode: 1
+  documentPivot: {x: 0.15, y: 0}
+  documentAlignment: 0
+  importHiddenLayers: 0
+  layerMappingOption: 2
+  generatePhysicsShape: 0
+  paperDollMode: 0
+  keepDupilcateSpriteName: 0
+  skeletonAssetReferenceID: 
+  spriteCategoryList:
+    categories: []
+  spritePackingTag: 
+  resliceFromLayer: 0
+  mosaicPSDLayers: []
+  rigPSDLayers:
+  - name: BR_Arm
+    spriteName: BR_Arm
+    isGroup: 0
+    parentIndex: -1
+    spriteID: 65771fa85b14b7247b84920c1743660f
+    layerID: 0
+    mosaicPosition: {x: 4, y: 39}
+    flatten: 0
+    isImported: 1
+    isVisible: 1
+  - name: FR_Arm
+    spriteName: FR_Arm
+    isGroup: 0
+    parentIndex: -1
+    spriteID: b50ea70d785eb9543b97b516d9f24129
+    layerID: 1600624949
+    mosaicPosition: {x: 4, y: 51}
+    flatten: 0
+    isImported: 1
+    isVisible: 1
+  - name: BR_Paw
+    spriteName: BR_Paw
+    isGroup: 0
+    parentIndex: -1
+    spriteID: 553c4968ae6a81c4a90125e5367acbdc
+    layerID: 7435593
+    mosaicPosition: {x: 28, y: 30}
+    flatten: 0
+    isImported: 1
+    isVisible: 1
+  - name: FR_Paw
+    spriteName: FR_Paw
+    isGroup: 0
+    parentIndex: -1
+    spriteID: af282c7256d993f4886d6dd04d494ee2
+    layerID: 7431501
+    mosaicPosition: {x: 44, y: 30}
+    flatten: 0
+    isImported: 1
+    isVisible: 1
+  - name: Head
+    spriteName: Head
+    isGroup: 0
+    parentIndex: -1
+    spriteID: 1b8c19d30cfdfe04190502ac89875d5d
+    layerID: -158744160
+    mosaicPosition: {x: 28, y: 4}
+    flatten: 0
+    isImported: 1
+    isVisible: 1
+  - name: Body
+    spriteName: Body
+    isGroup: 0
+    parentIndex: -1
+    spriteID: f5ac425fd0c23534aaf5190c49dba8f8
+    layerID: -911352830
+    mosaicPosition: {x: 4, y: 4}
+    flatten: 0
+    isImported: 1
+    isVisible: 1
+  sharedRigPSDLayers: []
+  pSDLayerImportSetting: []
   generateGOHierarchy: 0
   textureAssetName: PlayerSquirrel 1 Texture
   prefabAssetName: PlayerSquirrel 1 Prefab
   spriteLibAssetName: PlayerSquirrel 1 Sprite Lib
+  skeletonAssetName: 
   secondarySpriteTextures: []

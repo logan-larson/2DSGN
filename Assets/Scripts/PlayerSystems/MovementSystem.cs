@@ -53,6 +53,8 @@ public class MovementSystem : MonoBehaviour {
 
         // If grounded, match body to ground
         if (grounded.isGrounded) {
+            movementProperties.maxRotationDegrees = 2f;
+
             ShowPredictedTrajectory();
 
             Ray2D leftRay = new Ray2D(raycastOrigins.bottomLeft + adjVelo, -transform.up);
@@ -83,6 +85,7 @@ public class MovementSystem : MonoBehaviour {
             transform.Translate(adjVelo);
 
         } else { 
+            movementProperties.maxRotationDegrees = 8f;
             // We are in the air, so move according to worldspace not self
             transform.position += new Vector3(velocity.veloOffGround.x, velocity.veloOffGround.y, 0f) * Time.fixedDeltaTime;
 
@@ -270,9 +273,9 @@ public class MovementSystem : MonoBehaviour {
 
     void ShowPredictedTrajectory() {
 
-        if (velocity.x == 0f) {
-            return;
-        }
+        //if (velocity.x == 0f) {
+            //return;
+        //}
 
         float theta = Vector2.SignedAngle(Vector2.right, transform.up) * Mathf.Deg2Rad;
         float gamma = Vector2.SignedAngle(Vector2.right, transform.right) * Mathf.Deg2Rad;
@@ -297,7 +300,7 @@ public class MovementSystem : MonoBehaviour {
             Ray2D ray = new Ray2D(pos, velo.normalized);
 
             if (count % 2 == 1) {
-                Debug.DrawRay(ray.origin, ray.direction * velo.magnitude, Color.gray);
+                Debug.DrawRay(ray.origin, ray.direction * velo.magnitude, Color.green);
             }
 
             // Update predictHit

@@ -13,10 +13,10 @@ public class AnimationSystem : MonoBehaviour {
     }
 
     public void OnUpdate() {
-        if (velocity.x < 0f) {
-            playerAnimation.isFacingLeft = true;
-        } else if (velocity.x > 0f) {
+        if (velocity.x > 1f) {
             playerAnimation.isFacingLeft = false;
+        } else if (velocity.x < -1f) {
+            playerAnimation.isFacingLeft = true;
         }
             
         if (playerAnimation.isFacingLeft == true) {
