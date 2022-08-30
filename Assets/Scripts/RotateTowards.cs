@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent (typeof(SpriteRenderer))]
-public class RotateTowardMouse : MonoBehaviour
+public class RotateTowards : MonoBehaviour
 {
 
     SpriteRenderer head;

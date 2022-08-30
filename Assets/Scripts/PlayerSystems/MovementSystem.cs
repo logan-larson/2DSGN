@@ -1,6 +1,7 @@
 using UnityEngine;
 
 [RequireComponent (typeof(PlayerInput))]
+[RequireComponent (typeof(PlayerPosition))]
 [RequireComponent (typeof(PlayerVelocity))]
 [RequireComponent (typeof(PlayerMovementProperties))]
 [RequireComponent (typeof(PlayerGrounded))]
@@ -8,6 +9,7 @@ using UnityEngine;
 public class MovementSystem : MonoBehaviour {
 
     PlayerInput input;
+    PlayerPosition position;
     PlayerVelocity velocity;
     PlayerMovementProperties movementProperties;
     PlayerGrounded grounded;
@@ -30,6 +32,7 @@ public class MovementSystem : MonoBehaviour {
 
     public void OnStart() {
         input = GetComponent<PlayerInput>();
+        position = GetComponent<PlayerPosition>();
         velocity = GetComponent<PlayerVelocity>();
         movementProperties = GetComponent<PlayerMovementProperties>();
         grounded = GetComponent<PlayerGrounded>();
@@ -53,7 +56,7 @@ public class MovementSystem : MonoBehaviour {
 
         // If grounded, match body to ground
         if (grounded.isGrounded) {
-            movementProperties.maxRotationDegrees = 2f;
+            //movementProperties.maxRotationDegrees = 2f;
 
             ShowPredictedTrajectory();
 
@@ -80,20 +83,26 @@ public class MovementSystem : MonoBehaviour {
                 Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, movementProperties.maxRotationDegrees);
 
                 transform.rotation = Quaternion.Euler(0f, 0f, finalRotation.eulerAngles.z);
+                position.rotation = finalRotation.eulerAngles.z;
             }
 
             transform.Translate(adjVelo);
-
+            position.x = transform.position.x;
+            position.y = transform.position.y;
         } else { 
-            movementProperties.maxRotationDegrees = 8f;
+            //movementProperties.maxRotationDegrees = 8f;
             // We are in the air, so move according to worldspace not self
             transform.position += new Vector3(velocity.veloOffGround.x, velocity.veloOffGround.y, 0f) * Time.fixedDeltaTime;
+
+            position.x = transform.position.x;
+            position.y = transform.position.y;
 
             // And rotate to the predicted landing spots normal
             Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, predictNorm);
             Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, movementProperties.maxRotationDegrees);
 
             transform.rotation = Quaternion.Euler(0f, 0f, finalRotation.eulerAngles.z);
+            position.rotation = finalRotation.eulerAngles.z;
         }
     }
 
@@ -130,6 +139,9 @@ public class MovementSystem : MonoBehaviour {
             } else {
                 velocity.x += input.horizontalMovementInput * movementProperties.acceleration;
             }
+
+            predictPos = new Vector3();
+            predictNorm = new Vector3();
         }
 
         // Apply friction when no input is held
@@ -213,6 +225,10 @@ public class MovementSystem : MonoBehaviour {
 
             Debug.Log("Initial velo off ground: (" + velocity.veloOffGround.x + ", " + velocity.veloOffGround.y + ")");
 
+            RecalculateLandingPos();
+        } else if (!grounded.isGrounded && predictNorm == new Vector3() && predictPos == new Vector3()) {
+            // Ideally this never gets called because the player should never detach
+            // from a surface unless they jump
             RecalculateLandingPos();
         } else if (recalculateLanding) {
             RecalculateLandingPos();
