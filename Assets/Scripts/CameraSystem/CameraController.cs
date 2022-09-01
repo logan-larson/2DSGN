@@ -18,6 +18,10 @@ public class CameraController : MonoBehaviour
         float lerpValue = speed * Time.deltaTime;
         transform.position = Vector3.Lerp(transform.position, new Vector3(playerPosition.x, playerPosition.y, -10f), lerpValue);
 
-        transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0f, 0f, playerPosition.rotation), lerpValue);
+        if (Input.GetKey(KeyCode.Space)) {
+            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0f, 0f, 0f), lerpValue);
+        } else {
+            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0f, 0f, playerPosition.rotation), lerpValue);
+        }
     }
 }

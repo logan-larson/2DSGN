@@ -2,14 +2,17 @@ using UnityEngine;
 
 [RequireComponent (typeof(PlayerInput))]
 [RequireComponent (typeof(MovementSystem))]
+[RequireComponent (typeof(CombatSystem))]
 public class InputSystem : MonoBehaviour {
 
     PlayerInput input;
     MovementSystem movement;
+    CombatSystem combat;
 
     public void OnStart() {
         input = GetComponent<PlayerInput>();
         movement = GetComponent<MovementSystem>();
+        combat = GetComponent<CombatSystem>();
 
         InitializeInput();
     }
@@ -20,6 +23,10 @@ public class InputSystem : MonoBehaviour {
         UpdateJump();
 
         UpdateSprint();
+
+        if (Input.GetButtonDown("Fire1")) {
+            combat.ShootPrimary();
+        }
     }
 
     void InitializeInput() {

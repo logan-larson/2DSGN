@@ -40,6 +40,9 @@ public class MovementSystem : MonoBehaviour {
     }
 
     public void OnUpdate() {
+
+        UpdateMode();
+
         UpdateRaycastOrigins();
 
         if (movementProperties.timeSinceGrounded > minJumpTime)  {
@@ -103,6 +106,13 @@ public class MovementSystem : MonoBehaviour {
 
             transform.rotation = Quaternion.Euler(0f, 0f, finalRotation.eulerAngles.z);
             position.rotation = finalRotation.eulerAngles.z;
+        }
+    }
+
+    void UpdateMode() {
+        if (input.isSprintKeyPressed) {
+            mode.inCombatMode = false;
+            mode.inParkourMode = true;
         }
     }
 
@@ -222,6 +232,10 @@ public class MovementSystem : MonoBehaviour {
             float yComponentOfXVelo = Mathf.Sin(gamma) * velocity.x;
 
             velocity.veloOffGround = new Vector2(xComponentOfXVelo + xComponentOfYVelo, yComponentOfXVelo + yComponentOfYVelo);
+
+            // Reset ground velocities
+            velocity.x = 0f;
+            velocity.y = 0f;
 
             Debug.Log("Initial velo off ground: (" + velocity.veloOffGround.x + ", " + velocity.veloOffGround.y + ")");
 
