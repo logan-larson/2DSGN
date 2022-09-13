@@ -70,10 +70,12 @@ public class AnimationSystem : MonoBehaviour {
     }
 
     void SetMode() {
+        /*
         if (mode.inCombatMode) {
             boneBody.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
         } else if (mode.inParkourMode) {
             boneBody.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
         }
+        */
     }
 }
