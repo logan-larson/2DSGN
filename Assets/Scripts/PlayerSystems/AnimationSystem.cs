@@ -24,7 +24,7 @@ public class AnimationSystem : MonoBehaviour {
         playerAnimation = GetComponent<PlayerAnimation>();
         mode = GetComponent<PlayerMode>();
 
-        staticAnimations = GameObject.Find("PlayerStaticAnimation");
+        staticAnimations = GameObject.Find("PlayerAnimation");
         boneBody = GameObject.Find("Bone_Body");
 
         staticAnimations.transform.position = transform.position;
@@ -50,17 +50,19 @@ public class AnimationSystem : MonoBehaviour {
 
         Vector2 lerpedPos = Vector2.Lerp(staticAnimations.transform.position, posInUnits, lerpValue);
 
-        //staticAnimations.transform.Translate(veloInUnits * Time.deltaTime); 
-        Quaternion lerpedRot = Quaternion.Lerp(staticAnimations.transform.rotation, transform.rotation, lerpValue);
-
+        // Adjust the targeted rotation by 90 degrees if in combat mode
+        Quaternion tRot = mode.inCombatMode ? transform.rotation * Quaternion.Euler(0f, 0f, 90f) : transform.rotation;
+        Quaternion lerpedRot = Quaternion.Lerp(staticAnimations.transform.rotation, tRot, lerpValue);
 
         staticAnimations.transform.SetPositionAndRotation(new Vector3(lerpedPos.x, lerpedPos.y), lerpedRot);
             
         if (playerAnimation.isFacingLeft == true) {
-            //transform.localScale = new Vector3(-1f, 1f, 1f);
-            staticAnimations.transform.localScale = new Vector3(-1f, 1f, 1f);
+            if (mode.inParkourMode) {
+                staticAnimations.transform.localScale = new Vector3(-1f, 1f, 1f);
+            } else if (mode.inCombatMode) {
+                staticAnimations.transform.localScale = new Vector3(1f, -1f, 1f);
+            }
         } else {
-            //transform.localScale = new Vector3(1f, 1f, 1f);
             staticAnimations.transform.localScale = new Vector3(1f, 1f, 1f);
         }
 
