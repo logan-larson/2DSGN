@@ -31,7 +31,6 @@ public class AnimationSystem : MonoBehaviour {
     }
 
     public void OnUpdate() {
-        SetMode();
 
         if (velocity.x > 1f || velocity.veloOffGround.x > 1f) {
             playerAnimation.isFacingLeft = false;
@@ -65,19 +64,5 @@ public class AnimationSystem : MonoBehaviour {
         } else {
             staticAnimations.transform.localScale = new Vector3(1f, 1f, 1f);
         }
-
-        //staticAnimations.transform.position = Vector3.Lerp(staticAnimations.transform.position, transform.position, lerpValue);
-
-        //staticAnimations.transform.localRotation = Quaternion.Lerp(staticAnimations.transform.localRotation, transform.rotation, lerpValue);
-    }
-
-    void SetMode() {
-        /*
-        if (mode.inCombatMode) {
-            boneBody.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
-        } else if (mode.inParkourMode) {
-            boneBody.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-        }
-        */
     }
 }
