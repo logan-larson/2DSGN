@@ -10,6 +10,8 @@ public class AnimationSystem : MonoBehaviour {
     PlayerMode mode;
     PlayerAnimation playerAnimation;
 
+    Animator animator;
+
     // Child game objects
     GameObject staticAnimations;
 
@@ -27,10 +29,14 @@ public class AnimationSystem : MonoBehaviour {
         staticAnimations = GameObject.Find("PlayerAnimation");
         boneBody = GameObject.Find("Bone_Body");
 
+        animator = staticAnimations.GetComponent<Animator>();
+
         staticAnimations.transform.position = transform.position;
     }
 
     public void OnUpdate() {
+
+        animator.SetFloat("speed", Mathf.Abs(velocity.x));
 
         if (velocity.x > 1f || velocity.veloOffGround.x > 1f) {
             playerAnimation.isFacingLeft = false;
