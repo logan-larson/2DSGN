@@ -70,7 +70,7 @@ public class MovementSystem : MonoBehaviour {
             RaycastHit2D rightHit = Physics2D.Raycast(rightRay.origin, rightRay.direction, movementProperties.groundedHeight, grounded.mask);
 
             // Use override hit to prevent clipping
-            RaycastHit2D overrideHit = Physics2D.Raycast((leftRay.origin + rightRay.origin) / 2, transform.right, movementProperties.overrideRayLength * velocity.x, grounded.mask);
+            RaycastHit2D overrideHit = Physics2D.Raycast((leftRay.origin + rightRay.origin) / 2, transform.right, movementProperties.overrideRayLength * Mathf.Sign(velocity.x), grounded.mask);
             if (velocity.x < 0f && overrideHit.collider != null) {
                 leftHit = overrideHit;
             } else if (velocity.x > 0f && overrideHit.collider != null) {
