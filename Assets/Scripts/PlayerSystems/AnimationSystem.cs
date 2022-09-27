@@ -37,6 +37,8 @@ public class AnimationSystem : MonoBehaviour {
     public void OnUpdate() {
 
         animator.SetFloat("speed", Mathf.Abs(velocity.x));
+        
+        animator.SetBool("inCombat", mode.inCombatMode);
 
         if (velocity.x > 1f || velocity.veloOffGround.x > 1f) {
             playerAnimation.isFacingLeft = false;

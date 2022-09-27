@@ -1385,7 +1385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inParkourMode: 1
-  inCombatMode: 1
+  inCombatMode: 0
 --- !u!114 &1103057552
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2275,6 +2275,14 @@ PrefabInstance:
     m_TransformParent: {fileID: 992133105}
     m_Modifications:
     - target: {fileID: -7743992457794010698, guid: bed49ad38ce929a4fa1a25139417fad7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.2687844
+      objectReference: {fileID: 0}
+    - target: {fileID: -7743992457794010698, guid: bed49ad38ce929a4fa1a25139417fad7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.07941353
+      objectReference: {fileID: 0}
+    - target: {fileID: -7743992457794010698, guid: bed49ad38ce929a4fa1a25139417fad7, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.6935998
       objectReference: {fileID: 0}
@@ -2665,7 +2673,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1726743883}
   m_LocalRotation: {x: -0, y: -0, z: 0.998154, w: 0.060735423}
-  m_LocalPosition: {x: 0.1629579, y: 0.068484664, z: 0}
+  m_LocalPosition: {x: 0.1629579, y: 0.06848466, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2932,7 +2940,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893567335}
   m_LocalRotation: {x: -0, y: -0, z: -0.65220726, w: 0.75804067}
-  m_LocalPosition: {x: -0.23538327, y: 0.5830915, z: 0}
+  m_LocalPosition: {x: -0.2353833, y: 0.5830915, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
