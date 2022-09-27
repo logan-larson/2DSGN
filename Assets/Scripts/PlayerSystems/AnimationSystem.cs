@@ -3,11 +3,13 @@ using UnityEngine;
 [RequireComponent (typeof(PlayerVelocity))]
 [RequireComponent (typeof(PlayerAnimation))]
 [RequireComponent (typeof(PlayerMode))]
+[RequireComponent (typeof(PlayerGrounded))]
 public class AnimationSystem : MonoBehaviour {
 
     PlayerPosition position;
     PlayerVelocity velocity;
     PlayerMode mode;
+    PlayerGrounded grounded;
     PlayerAnimation playerAnimation;
 
     Animator animator;
@@ -25,6 +27,7 @@ public class AnimationSystem : MonoBehaviour {
         velocity = GetComponent<PlayerVelocity>();
         playerAnimation = GetComponent<PlayerAnimation>();
         mode = GetComponent<PlayerMode>();
+        grounded = GetComponent<PlayerGrounded>();
 
         staticAnimations = GameObject.Find("PlayerAnimation");
         boneBody = GameObject.Find("Bone_Body");
@@ -39,6 +42,9 @@ public class AnimationSystem : MonoBehaviour {
         animator.SetFloat("speed", Mathf.Abs(velocity.x));
         
         animator.SetBool("inCombat", mode.inCombatMode);
+
+        animator.SetBool("isJumping", !grounded.isGrounded);
+
 
         if (velocity.x > 1f || velocity.veloOffGround.x > 1f) {
             playerAnimation.isFacingLeft = false;
