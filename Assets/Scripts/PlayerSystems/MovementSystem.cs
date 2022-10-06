@@ -175,10 +175,10 @@ public class MovementSystem : MonoBehaviour {
                 movementProperties.timeSinceGrounded = 0f;
                 velocity.y = movementProperties.jumpVelocity;
             } else { // This needs a lot of work to make player landings smoother
-                if (grounded.groundDistance < 0.75f) {
-                    velocity.y += 0.25f; 
-                } else if (grounded.groundDistance > 1.25f) {
-                    velocity.y -= 0.25f; 
+                if (grounded.groundDistance < 0.9f) {
+                    velocity.y += 0.05f; 
+                } else if (grounded.groundDistance > 1f) {
+                    velocity.y -= 0.05f; 
                 } else {
                     velocity.y = 0f;
                 }
