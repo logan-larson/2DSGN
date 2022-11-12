@@ -1,10 +1,11 @@
+using FishNet.Object;
 using UnityEngine;
 
 [RequireComponent (typeof(PlayerVelocity))]
 [RequireComponent (typeof(PlayerAnimation))]
 [RequireComponent (typeof(PlayerMode))]
 [RequireComponent (typeof(PlayerGrounded))]
-public class AnimationSystem : MonoBehaviour {
+public class AnimationSystem : NetworkBehaviour {
 
     PlayerPosition position;
     PlayerVelocity velocity;
@@ -20,6 +21,9 @@ public class AnimationSystem : MonoBehaviour {
     // Bones
     GameObject boneBody;
 
+    // Child sprite
+    public Transform childSprite;
+
     public float lerpValue = 0.1f;
 
     void Start() { // public void OnStart
@@ -29,12 +33,13 @@ public class AnimationSystem : MonoBehaviour {
         mode = GetComponent<PlayerMode>();
         grounded = GetComponent<PlayerGrounded>();
 
-        staticAnimations = GameObject.Find("PlayerAnimation");
+        //staticAnimations = GameObject.Find("PlayerAnimation");
         boneBody = GameObject.Find("Bone_Body");
 
-        animator = staticAnimations.GetComponent<Animator>();
+        //animator = staticAnimations.GetComponent<Animator>();
+        animator = GetComponentInChildren<Animator>();
 
-        staticAnimations.transform.position = transform.position;
+        //staticAnimations.transform.position = transform.position;
     }
 
     void Update() { // public void OnUpdate
@@ -45,7 +50,13 @@ public class AnimationSystem : MonoBehaviour {
 
         animator.SetBool("isJumping", !grounded.isGrounded);
 
+        if (velocity.x > 1f || velocity.veloOffGround.x > 1f) {
+            childSprite.localScale = new Vector3(1f, 1f, 1f);
+        } else if (velocity.x < -1f || velocity.veloOffGround.x < -1f) {
+            childSprite.localScale = new Vector3(-1f, 1f, 1f);
+        }
 
+        /*
         if (velocity.x > 1f || velocity.veloOffGround.x > 1f) {
             playerAnimation.isFacingLeft = false;
         } else if (velocity.x < -1f || velocity.veloOffGround.x < -1f) {
@@ -78,5 +89,6 @@ public class AnimationSystem : MonoBehaviour {
         } else {
             staticAnimations.transform.localScale = new Vector3(1f, 1f, 1f);
         }
+        */
     }
 }
