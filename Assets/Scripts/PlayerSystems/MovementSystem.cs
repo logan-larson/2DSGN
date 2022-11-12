@@ -1,3 +1,4 @@
+using FishNet.Object;
 using UnityEngine;
 
 [RequireComponent (typeof(PlayerInput))]
@@ -6,7 +7,7 @@ using UnityEngine;
 [RequireComponent (typeof(PlayerMovementProperties))]
 [RequireComponent (typeof(PlayerGrounded))]
 [RequireComponent (typeof(PlayerMode))]
-public class MovementSystem : MonoBehaviour {
+public class MovementSystem : NetworkBehaviour {
 
     PlayerInput input;
     PlayerPosition position;
@@ -30,7 +31,7 @@ public class MovementSystem : MonoBehaviour {
     public float fFactor = 6.75f;
     public float minJumpTime = 1f;
 
-    void Start() { // public void OnStart
+    private void Start() { // public void OnStart
         input = GetComponent<PlayerInput>();
         position = GetComponent<PlayerPosition>();
         velocity = GetComponent<PlayerVelocity>();
@@ -39,7 +40,10 @@ public class MovementSystem : MonoBehaviour {
         mode = GetComponent<PlayerMode>();
     }
 
-    void FixedUpdate() { // public void OnUpdate
+    private void FixedUpdate() { // public void OnUpdate
+
+        if (!base.IsOwner)
+            return;
 
         UpdateMode();
 
