@@ -22,7 +22,7 @@ public class AnimationSystem : MonoBehaviour {
 
     public float lerpValue = 0.1f;
 
-    public void OnStart() {
+    void Start() { // public void OnStart
         position = GetComponent<PlayerPosition>();
         velocity = GetComponent<PlayerVelocity>();
         playerAnimation = GetComponent<PlayerAnimation>();
@@ -37,7 +37,7 @@ public class AnimationSystem : MonoBehaviour {
         staticAnimations.transform.position = transform.position;
     }
 
-    public void OnUpdate() {
+    void Update() { // public void OnUpdate
 
         animator.SetFloat("speed", Mathf.Abs(velocity.x));
         

@@ -30,7 +30,7 @@ public class MovementSystem : MonoBehaviour {
     public float fFactor = 6.75f;
     public float minJumpTime = 1f;
 
-    public void OnStart() {
+    void Start() { // public void OnStart
         input = GetComponent<PlayerInput>();
         position = GetComponent<PlayerPosition>();
         velocity = GetComponent<PlayerVelocity>();
@@ -39,7 +39,7 @@ public class MovementSystem : MonoBehaviour {
         mode = GetComponent<PlayerMode>();
     }
 
-    public void OnUpdate() {
+    void FixedUpdate() { // public void OnUpdate
 
         UpdateMode();
 

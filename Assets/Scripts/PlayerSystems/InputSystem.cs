@@ -9,7 +9,7 @@ public class InputSystem : MonoBehaviour {
     MovementSystem movement;
     CombatSystem combat;
 
-    public void OnStart() {
+    void Start() { // public void OnStart
         input = GetComponent<PlayerInput>();
         movement = GetComponent<MovementSystem>();
         combat = GetComponent<CombatSystem>();
@@ -17,7 +17,7 @@ public class InputSystem : MonoBehaviour {
         InitializeInput();
     }
 
-    public void OnUpdate() {
+    void Update() { // public void OnUpdate
         UpdateHorizontalMovement();
 
         UpdateJump();

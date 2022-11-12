@@ -5,13 +5,11 @@ public class CombatSystem : MonoBehaviour
 {
     PlayerMode mode;
 
-    public void OnStart()
-    {
+    void Start() { // public void OnStart
         mode = GetComponent<PlayerMode>();
     }
 
-    public void OnUpdate()
-    {
+    void Update() { // public void OnUpdate
         
     }
 
