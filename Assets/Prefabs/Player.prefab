@@ -756,7 +756,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4268827610097334079}
-  - component: {fileID: 4268827610097334076}
   - component: {fileID: 4268827610097334073}
   - component: {fileID: 4268827610097334074}
   - component: {fileID: 4268827610097334077}
@@ -796,18 +795,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4268827610097334076
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4268827610097334048}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b0f006e6297613e4397c3a8d3227caa1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &4268827610097334073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -835,6 +822,15 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
+  Position: {x: 0, y: 0}
+  Rotation: 0
+  Velocity: {x: 0, y: 0}
+  AirborneVelocity: {x: 0, y: 0}
+  IsGrounded: 0
+  GroundDistance: 0
+  Mask:
+    serializedVersion: 2
+    m_Bits: 64
   fFactor: 6.75
   minJumpTime: 0
 --- !u!114 &4268827610097334077
@@ -888,7 +884,6 @@ MonoBehaviour:
   x: 0
   y: 0
   veloOffGround: {x: 0, y: 0}
-  angleOffGround: 90
 --- !u!114 &4268827610097334075
 MonoBehaviour:
   m_ObjectHideFlags: 0
