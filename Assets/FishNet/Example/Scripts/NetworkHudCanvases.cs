@@ -3,6 +3,9 @@ using FishNet.Transporting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using FishNet.Configuring;
+using FishNet.Transporting.Tugboat;
+//using TMPro;
 
 public class NetworkHudCanvases : MonoBehaviour
 {
@@ -57,6 +60,9 @@ public class NetworkHudCanvases : MonoBehaviour
     [Tooltip("Indicator for client state.")]
     [SerializeField]
     private Image _clientIndicator;
+
+    [SerializeField]
+    //private TMP_InputField _ipInputField;
     #endregion
 
     #region Private.
@@ -64,6 +70,12 @@ public class NetworkHudCanvases : MonoBehaviour
     /// Found NetworkManager.
     /// </summary>
     private NetworkManager _networkManager;
+
+    /// <summary>
+    /// Found TugBoat.
+    /// </summary>
+    private Tugboat _tugboat;
+
     /// <summary>
     /// Current state of client socket.
     /// </summary>
@@ -148,6 +160,7 @@ public class NetworkHudCanvases : MonoBehaviour
             UpdateColor(LocalConnectionState.Stopped, ref _clientIndicator);
             _networkManager.ServerManager.OnServerConnectionState += ServerManager_OnServerConnectionState;
             _networkManager.ClientManager.OnClientConnectionState += ClientManager_OnClientConnectionState;
+            _tugboat = _networkManager.GetComponent<Tugboat>();
         }
 
         if (_autoStartType == AutoStartType.Host || _autoStartType == AutoStartType.Server)
@@ -217,6 +230,12 @@ public class NetworkHudCanvases : MonoBehaviour
     {
         if (_networkManager == null)
             return;
+
+        if (_tugboat != null)
+            Debug.Log("Tugboat is not null");
+            //_tugboat.SetClientAddress(_ipInputField.text);
+        else
+            _tugboat.SetClientAddress("localhost");
 
         if (_clientState != LocalConnectionState.Stopped)
             _networkManager.ClientManager.StopConnection();

@@ -43,6 +43,7 @@ public class MovementSystem : NetworkBehaviour
 
     PlayerInput input;
     PlayerMovementProperties movementProperties;
+    private AnimationSystem _animationSystem;
 
     #endregion
 
@@ -85,12 +86,21 @@ public class MovementSystem : NetworkBehaviour
 
     #endregion
 
+    private void Awake()
+    {
+        _animationSystem = GetComponent<AnimationSystem>();
+    }
+
     private void Start() { // public void OnStart
         input = GetComponent<PlayerInput>();
         movementProperties = GetComponent<PlayerMovementProperties>();
     }
 
     private void Update() {
+        if (!base.IsOwner)
+            return;
+        
+        float horizontal = input.horizontalMovementInput;
 
     }
 

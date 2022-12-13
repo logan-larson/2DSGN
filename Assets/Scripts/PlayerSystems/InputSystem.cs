@@ -1,71 +1,28 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent (typeof(PlayerInput))]
 [RequireComponent (typeof(MovementSystem))]
-[RequireComponent (typeof(CombatSystem))]
 public class InputSystem : MonoBehaviour {
 
     PlayerInput input;
     MovementSystem movement;
-    CombatSystem combat;
 
     void Start() { // public void OnStart
         input = GetComponent<PlayerInput>();
         movement = GetComponent<MovementSystem>();
-        combat = GetComponent<CombatSystem>();
-
-        InitializeInput();
     }
 
-    void Update() { // public void OnUpdate
-        UpdateHorizontalMovement();
-
-        UpdateJump();
-
-        UpdateSprint();
-
-        if (Input.GetButtonDown("Fire1")) {
-            combat.ShootPrimary();
-        }
+    public void OnMove(InputValue value) {
+        input.horizontalMovementInput = value.Get<Vector2>().x;
     }
 
-    void InitializeInput() {
-        input.horizontalMovementInput = 0f;
-        input.verticalMovementInput = 0f;
-        input.isJumpKeyPressed = false;
-        input.isSprintKeyPressed = false;
-        input.horizontalAimInput = 0f;
-        input.verticalAimInput = 0f;
+    public void OnSprint(InputValue value) {
+        input.isSprintKeyPressed = value.Get<float>() == 1f;
+    }
+    
+    public void OnJump(InputValue value) {
+        movement.Jump();
     }
 
-    // Movement Input Subsystem
-    void UpdateHorizontalMovement() {
-        input.horizontalMovementInput = Input.GetAxisRaw("Horizontal");
-        //input.horizontalMovementInput = Input.GetAxis("Horizontal");
-    }
-
-    void UpdateVerticalMovement() {
-        input.verticalMovementInput = Input.GetAxisRaw("Vertical");
-        //input.verticalMovementInput = Input.GetAxis("Vertical");
-    }
-
-    void UpdateJump() {
-        input.isJumpKeyPressed = Input.GetKeyDown(KeyCode.W);
-        if (input.isJumpKeyPressed) {
-            movement.Jump();
-        }
-    }
-
-    void UpdateSprint() {
-        input.isSprintKeyPressed = Input.GetKey(KeyCode.LeftShift);
-    }
-
-    // Aim Input Subsystem
-    void UpdateHorizontalAim() {
-        input.horizontalAimInput = Input.GetAxisRaw("Mouse X");
-    }
-
-    void UpdateVerticalAim() {
-        input.verticalAimInput = Input.GetAxisRaw("Mouse Y");
-    }
 }

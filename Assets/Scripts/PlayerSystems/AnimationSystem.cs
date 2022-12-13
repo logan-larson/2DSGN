@@ -13,7 +13,7 @@ public class AnimationSystem : NetworkBehaviour {
     PlayerGrounded grounded;
     PlayerAnimation playerAnimation;
 
-    Animator animator;
+    Animator _animator;
 
     // Child game objects
     GameObject staticAnimations;
@@ -22,9 +22,39 @@ public class AnimationSystem : NetworkBehaviour {
     GameObject boneBody;
 
     // Child sprite
-    public Transform childSprite;
+    //public Transform childSprite;
 
     public float lerpValue = 0.1f;
+
+    private MovementSystem _movementSystem;
+    private PlayerInput _playerInput;
+
+
+    /* States */
+    private static readonly int Idle_Parkour = Animator.StringToHash("Idle_Parkour");
+    private static readonly int Idle_Combat = Animator.StringToHash("Idle_Combat");
+    private static readonly int Walking_Parkour = Animator.StringToHash("Walking_Parkour");
+    private static readonly int Walking_Combat = Animator.StringToHash("Walking_Combat");
+    private static readonly int Running_Parkour = Animator.StringToHash("Running_Parkour");
+    private static readonly int Jump_Parkour = Animator.StringToHash("Jump_Parkour");
+    private static readonly int Jump_Combat = Animator.StringToHash("Jump_Combat");
+
+    private bool _idleParkour;
+    private bool _idleCombat;
+    private bool _walkingParkour;
+    private bool _walkingCombat;
+    private bool _runningParkour;
+    private bool _jumpParkour;
+    private bool _jumpCombat;
+
+    private int _currentState;
+
+    private void Awake()
+    {
+        _animator = GetComponentInChildren<Animator>();
+        _movementSystem = GetComponent<MovementSystem>();
+        _playerInput = GetComponent<PlayerInput>();
+    }
 
     void Start() { // public void OnStart
         position = GetComponent<PlayerPosition>();
@@ -37,24 +67,103 @@ public class AnimationSystem : NetworkBehaviour {
         boneBody = GameObject.Find("Bone_Body");
 
         //animator = staticAnimations.GetComponent<Animator>();
-        animator = GetComponentInChildren<Animator>();
+        //animator = GetComponentInChildren<Animator>();
 
         //staticAnimations.transform.position = transform.position;
     }
 
-    void Update() { // public void OnUpdate
+    /*
+    public void SetSpeed(float speed) {
+        _animator.SetFloat("speed", speed);
+    }
 
-        animator.SetFloat("speed", Mathf.Abs(velocity.x));
-        
-        animator.SetBool("inCombat", mode.inCombatMode);
+    public void SetInCombat(bool inCombat) {
+        _animator.SetBool("inCombat", inCombat);
+    }
 
-        animator.SetBool("isJumping", !grounded.isGrounded);
+    public void SetIsJumping(bool isJumping) {
+        _animator.SetBool("isJumping", isJumping);
+    }
+    */
+
+    private int GetState()
+    {
+        if (_movementSystem.InCombatMode)
+        {
+            if (!_movementSystem.IsGrounded) return Jump_Combat;
+
+            if (_movementSystem.Velocity != Vector2.zero) return  Walking_Combat;
+
+            return Idle_Combat;
+        }
+        else if (_movementSystem.InParkourMode)
+        {
+            if (!_movementSystem.IsGrounded) return Jump_Parkour;
+
+            if (_movementSystem.Velocity != Vector2.zero) return _playerInput.isSprintKeyPressed ? Running_Parkour : Walking_Parkour;
+
+            return Idle_Parkour;
+        }
+
+        return _currentState;
+    }
+
+    private void Update()
+    { // public void OnUpdate
+        if (!base.IsOwner) return;
+
+        if (_movementSystem.Velocity.x > 1f || _movementSystem.AirborneVelocity.x > 1f) {
+            //_animator.CrossFade("Right", 0f, 0);
+            _animator.SetBool("IsFacingRight", true);
+        } else if (_movementSystem.Velocity.x < -1f || _movementSystem.AirborneVelocity.x < -1f) {
+            //childSprite.localScale = new Vector3(-1f, 1f, 1f);
+            //_animator.CrossFade("Left", 0f, 0);
+            _animator.SetBool("IsFacingRight", false);
+        }
+        //childSprite.localScale = _movementSystem.Velocity.x > 1f ? new Vector3(1f, 1f, 1f) : new Vector3(-1f, 1f, 1f);
+
+
+        /*
+        var state = GetState();
+
+        if (state == _currentState) return;
+
+        Debug.Log("State: " + state);
+
+        _animator.CrossFade(state, 0f, 0);
+
+        _currentState = state;
+        */
+
+        /*
+        if (_movementSystem.InCombatMode)
+        {
+            if (_movementSystem.AirborneVelocity != Vector2.zero)
+            {
+                _animator.CrossFade("", );
+            }
+
+            if (_movementSystem.Velocity != Vector2.zero)
+            {
+                _animator.CrossFade("", );
+            }
+
+        }
+        */
+
+        /*
+        SetSpeed(Mathf.Abs(velocity.x));
+
+        SetInCombat(mode.inCombatMode);
+
+        SetIsJumping(!grounded.isGrounded);
 
         if (velocity.x > 1f || velocity.veloOffGround.x > 1f) {
             childSprite.localScale = new Vector3(1f, 1f, 1f);
         } else if (velocity.x < -1f || velocity.veloOffGround.x < -1f) {
             childSprite.localScale = new Vector3(-1f, 1f, 1f);
         }
+        */
 
         /*
         if (velocity.x > 1f || velocity.veloOffGround.x > 1f) {
