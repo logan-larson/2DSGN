@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using FishNet.Object;
 using UnityEngine;
 
@@ -71,7 +73,7 @@ public class MovementSystem : NetworkBehaviour
 
     #region Private Variables
 
-
+    private LineRenderer _line;
 
 
     bool jumpNow = false;
@@ -89,6 +91,7 @@ public class MovementSystem : NetworkBehaviour
     private void Awake()
     {
         _animationSystem = GetComponent<AnimationSystem>();
+        _line = GetComponent<LineRenderer>();
     }
 
     private void Start() { // public void OnStart
@@ -125,11 +128,11 @@ public class MovementSystem : NetworkBehaviour
         // This is a velocity relative to the player not the world
         Vector2 adjVelo = new Vector2(Velocity.x, Velocity.y) * Time.fixedDeltaTime;
 
+        ShowPredictedTrajectory();
         // If grounded, match body to ground
         if (IsGrounded) {
             //movementProperties.maxRotationDegrees = 2f;
 
-            ShowPredictedTrajectory();
 
             Ray2D leftRay = new Ray2D(raycastOrigins.bottomLeft + adjVelo, -transform.up);
             Ray2D rightRay = new Ray2D(raycastOrigins.bottomRight + adjVelo, -transform.up);
@@ -375,6 +378,7 @@ public class MovementSystem : NetworkBehaviour
             //return;
         //}
 
+
         float theta = Vector2.SignedAngle(Vector2.right, transform.up) * Mathf.Deg2Rad;
         float gamma = Vector2.SignedAngle(Vector2.right, transform.right) * Mathf.Deg2Rad;
 
@@ -384,7 +388,12 @@ public class MovementSystem : NetworkBehaviour
         float xComponentOfXVelo = Mathf.Cos(gamma) * Velocity.x;
         float yComponentOfXVelo = Mathf.Sin(gamma) * Velocity.x;
 
-        Vector2 predVelo = new Vector2(xComponentOfXVelo + xComponentOfYVelo, yComponentOfXVelo + yComponentOfYVelo);
+        Vector2 predVelo;
+        if (IsGrounded) {
+            predVelo = new Vector2(xComponentOfXVelo + xComponentOfYVelo, yComponentOfXVelo + yComponentOfYVelo);
+        } else {
+            predVelo = AirborneVelocity;
+        }
 
         RaycastHit2D predictHit = new RaycastHit2D();
         Vector2 pos = transform.position;
@@ -392,10 +401,14 @@ public class MovementSystem : NetworkBehaviour
         Vector2 velo = new Vector2(predVelo.x, predVelo.y) * Time.fixedDeltaTime * fFactor;
 
         int count = 0;
+        List<Vector3> points = new List<Vector3>();
+
         while (predictHit.collider == null && count < 100) {
 
             // Generate new ray
             Ray2D ray = new Ray2D(pos, velo.normalized);
+            
+            points.Add(pos);
 
             if (count % 2 == 1) {
                 Debug.DrawRay(ray.origin, ray.direction * velo.magnitude, Color.green);
@@ -410,6 +423,12 @@ public class MovementSystem : NetworkBehaviour
             velo += (Vector2.down * movementProperties.gravity * Time.fixedDeltaTime);
 
             count++;
+        }
+
+        _line.positionCount = points.Count;
+
+        for (int i = 0; i < points.Count; i++) {
+            _line.SetPosition(i, points[i]);
         }
     }
 
