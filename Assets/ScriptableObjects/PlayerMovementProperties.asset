@@ -12,6 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d54b80546cdc34498a57645e8d7a487, type: 3}
   m_Name: PlayerMovementProperties
   m_EditorClassIdentifier: 
-  Acceleration: 1
-  Friction: 0
-  MaxSpeed: 10
+  Acceleration: 2
+  Friction: 1
+  MaxSpeed: 5
+  SprintMultiplier: 2
+  Gravity: 5
+  MaxRotationDegrees: 10
+  GroundedHeight: 1.5
+  ObstacleMask:
+    serializedVersion: 2
+    m_Bits: 64
+  OverrideRayLength: 0

@@ -20,9 +20,9 @@ public class MovementSystem : NetworkBehaviour
     public struct MoveData
     {
         public float Horizontal;
+        public bool Sprint;
         /*
         public bool Jump;
-        public bool Sprint;
         public bool ChangeToCombat; // Fire key
         public bool ChangeToParkour; // Sprint key
         public bool InParkourMode;
@@ -34,29 +34,40 @@ public class MovementSystem : NetworkBehaviour
     /// </summary>
     public struct ReconcileData
     {
-        public Vector2 Position;
-        public Vector2 Velocity;
-        /*
-        public float Rotation;
-        public Vector2 AirborneVelocity;
+        public Vector3 Position;
+        public Vector3 Velocity;
+        public Quaternion Rotation;
         public bool IsGrounded;
+        public Vector2 AirborneVelocity;
+        /*
         public bool InParkourMode;
         public bool InCombatMode;
         */
     }
 
+    /// <summary>
+    /// The origins of the raycasts used to determine if the player is grounded.
+    /// </summary>
+    public struct RaycastOrigins
+    {
+        public Vector2 topLeft, topRight, bottomLeft, bottomRight;
+    }
+
     #endregion
+
 
     #region Script References
 
     [HideInInspector]
     public PlayerInputValues Input;
+
     [SerializeField]
     private PlayerMovementProperties MovementProperties;
 
     #endregion
 
-    #region Public Variables
+
+    #region Public Variables // All commented out for now.
 
     /*
     public Vector2 Position; 
@@ -70,16 +81,12 @@ public class MovementSystem : NetworkBehaviour
     public bool InParkourMode;
     public bool InCombatMode;
 
-    RaycastOrigins raycastOrigins;
-
-    public struct RaycastOrigins {
-        public Vector2 topLeft, topRight, bottomLeft, bottomRight;
-    }
     */
 
     #endregion
 
-    #region Private Variables
+
+    #region Private Variables // _currentVelocity, _subscribedToTimeManager, _raycastOrigins
 
     /// <summary>
     /// The current velocity of the player.
@@ -87,21 +94,46 @@ public class MovementSystem : NetworkBehaviour
     private Vector3 _currentVelocity = new Vector3();
 
     /// <summary>
+    /// The current airborne velocity of the player.
+    /// </summary>
+    private Vector3 _currentAirborneVelocity = new Vector3();
+
+    /// <summary>
+    /// The current rotation of the player.
+    /// </summary>
+    //private Quaternion _currentRotation = Quaternion.identity;
+
+    /// <summary>
     /// True if subscribed to the TimeManager.
+    /// </summary>
     private bool _subscribedToTimeManager = false;
 
+    /// <summary>
+    /// The raycast origins of the player.
+    /// </summary>
+    private RaycastOrigins _raycastOrigins;
 
-    /*
+    /// <summary>
+    /// True if the player is currently grounded.
+    /// </summary>
+    private bool _isGrounded = false;
+
+    /// <summary>
+    /// The distance from the player to the ground.
+    /// </summary>
+    private float _groundDistance = 0f;
+
+    /* JumpNow, PredictPos, PredictNorm, and RecalculateLanding are all commented out for now.
     /// <summary>
     /// True if the player is currently jumping.
     /// </summary>
     private bool jumpNow = false;
-    */
 
     //private Vector3 predictPos = new Vector3();
     //private Vector3 predictNorm = new Vector3();
 
     //private bool recalculateLanding = false;
+    */
 
     #endregion
 
@@ -171,8 +203,8 @@ public class MovementSystem : NetworkBehaviour
             {
                 Position = transform.position,
                 Velocity = _currentVelocity,
+                Rotation = transform.rotation,
                 /*
-                Rotation = Rotation,
                 AirborneVelocity = AirborneVelocity,
                 IsGrounded = IsGrounded,
                 InParkourMode = InParkourMode,
@@ -184,6 +216,10 @@ public class MovementSystem : NetworkBehaviour
         }
     }
 
+    /// <summary>
+    /// Use player input to build move data that will be used in the move function.
+    /// </summary>
+    /// <param name="moveData"></param>
     private void BuildActions(out MoveData moveData)
     {
         moveData = default;
@@ -191,9 +227,9 @@ public class MovementSystem : NetworkBehaviour
         //if (moveData.Horizontal == Input.HorizontalMovementInput) return;
 
         moveData.Horizontal = Input.HorizontalMovementInput;
+        moveData.Sprint = Input.IsSprintKeyPressed;
         /*
         moveData.Jump = input.isJumpKeyPressed;
-        moveData.Sprint = input.isSprintKeyPressed;
 
         if (input.isSprintKeyPressed && !moveData.InParkourMode)
         {
@@ -209,22 +245,30 @@ public class MovementSystem : NetworkBehaviour
         */
     }
 
+    /// <summary>
+    /// Move the player using the provided moveData.
+    /// This function is replicated on both the server and client.
+    /// </summary>
+    /// <param name="moveData"></param>
+    /// <param name="asServer"></param>
+    /// <param name="replaying"></param>
     [Replicate]
     private void Move(MoveData moveData, bool asServer, bool replaying = false)
     {
-        /*
-        UpdateMode(moveData);
+        //UpdateMode(moveData);
 
         UpdateRaycastOrigins();
 
-        if (movementProperties.timeSinceGrounded > minJumpTime)  {
+        //if (movementProperties.timeSinceGrounded > minJumpTime)  {
             UpdateGrounded();
-        } else {
-            movementProperties.timeSinceGrounded += Time.fixedDeltaTime;
-        }
-        */
+        //} else {
+            //movementProperties.timeSinceGrounded += Time.fixedDeltaTime;
+        //}
 
         UpdateVelocity(moveData);
+
+
+        UpdatePosition();
             
         /*
         // This is a velocity relative to the player not the world
@@ -282,21 +326,27 @@ public class MovementSystem : NetworkBehaviour
         */
     }
 
+    /// <summary>
+    /// Reconcile the player's data.
+    /// This function is only called on the client.
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="asServer"></param>
     [Reconcile]
     private void Reconciliation(ReconcileData data, bool asServer)
     {
         transform.position = data.Position;
         _currentVelocity = data.Velocity;
+        transform.rotation = data.Rotation;
+        _currentAirborneVelocity = data.AirborneVelocity;
+        _isGrounded = data.IsGrounded;
         /*
-        transform.rotation = Quaternion.Euler(0, 0, data.Rotation);
-        AirborneVelocity = data.AirborneVelocity;
-        IsGrounded = data.IsGrounded;
         InParkourMode = data.InParkourMode;
         InCombatMode = data.InCombatMode;
         */
     }
 
-    /*
+    /* Fixed Update is commented out for reference
     private void FixedUpdate() { // public void OnUpdate
 
         if (!base.IsOwner)
@@ -387,26 +437,24 @@ public class MovementSystem : NetworkBehaviour
     }
 
     void UpdateRaycastOrigins() {
-        /*
-		raycastOrigins.bottomLeft = transform.position - (transform.right / 2) - (transform.up / 2);
-		raycastOrigins.bottomRight = transform.position + (transform.right / 2) - (transform.up / 2);
-		raycastOrigins.topLeft = transform.position - (transform.right / 2) + (transform.up / 2);
-		raycastOrigins.topRight = transform.position + (transform.right / 2) + (transform.up / 2);
-        */
+		_raycastOrigins.bottomLeft = transform.position - (transform.right / 2) - (transform.up / 2);
+		_raycastOrigins.bottomRight = transform.position + (transform.right / 2) - (transform.up / 2);
+		_raycastOrigins.topLeft = transform.position - (transform.right / 2) + (transform.up / 2);
+		_raycastOrigins.topRight = transform.position + (transform.right / 2) + (transform.up / 2);
     }
 
     void UpdateGrounded() {
-        /*
-        if (IsGrounded) {
-            RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, movementProperties.groundedHeight * 1.5f, Mask);
-            IsGrounded = groundedHit.collider != null;
-            GroundDistance = groundedHit.distance;
+        if (_isGrounded) {
+            // I think I multiply by 1.25f to give the player a little bit of leeway for being grounded
+            // TODO: Validate the statement above
+            RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, MovementProperties.GroundedHeight * 1.25f, MovementProperties.ObstacleMask);
+            _isGrounded = groundedHit.collider != null;
+            _groundDistance = groundedHit.distance;
         } else {
-            RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, movementProperties.groundedHeight, Mask);
-            IsGrounded = groundedHit.collider != null;
-            GroundDistance = groundedHit.distance;
+            RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, MovementProperties.GroundedHeight, MovementProperties.ObstacleMask);
+            _isGrounded = groundedHit.collider != null;
+            _groundDistance = groundedHit.distance;
         }
-        */
     }
 
     public void Jump() {
@@ -417,22 +465,61 @@ public class MovementSystem : NetworkBehaviour
         */
     }
 
-    void UpdateVelocity(MoveData moveData = new MoveData()) {
+    private void UpdateVelocity(MoveData moveData = new MoveData())
+    {
+
+        // Add velo based on horizontal input, increase top speed when sprint key is pressed
+        
+        float sprintMultiplier = moveData.Sprint ? MovementProperties.SprintMultiplier : 1f;
 
         if (moveData.Horizontal != 0f)
         {
-            _currentVelocity += new Vector3(moveData.Horizontal, 0f, 0f) * MovementProperties.Acceleration;
+            _currentVelocity += new Vector3(moveData.Horizontal, 0f, 0f) * MovementProperties.Acceleration * sprintMultiplier;
         }
         else
         {
             _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, MovementProperties.Friction);
         }
 
-        if (_currentVelocity.magnitude > MovementProperties.MaxSpeed) {
-            _currentVelocity = _currentVelocity.normalized * MovementProperties.MaxSpeed;
+        if (_currentVelocity.magnitude > MovementProperties.MaxSpeed * sprintMultiplier) {
+            _currentVelocity = _currentVelocity.normalized * MovementProperties.MaxSpeed * sprintMultiplier;
         }
 
-        transform.position += _currentVelocity * (float) TimeManager.TickDelta;
+
+        if (_isGrounded)
+        {
+            /*
+            if (jumpNow)
+            {
+                jumpNow = false;
+                IsGrounded = false;
+                movementProperties.timeSinceGrounded = 0f;
+                Velocity.y = movementProperties.jumpVelocity;
+            }
+            else
+            */
+            {
+                if (_groundDistance < 0.95f) {
+                    _currentVelocity.y += 1f;
+                    //MovementProperties.Gravity; 
+                } else if (_groundDistance > 1.05f) {
+                    _currentVelocity.y -= 1f;
+                    //MovementProperties.Gravity; 
+                } else {
+                    _currentVelocity.y = 0f;
+                }
+            }
+            _currentAirborneVelocity = Vector3.zero;
+        }
+        else
+        {
+            _currentAirborneVelocity += (Vector3.down * MovementProperties.Gravity * (float) TimeManager.TickDelta);
+
+            // This is where airborne movement forces can be applied
+
+            // If forces were applied then we need to recalculate the landing
+            //recalculateLanding = false;
+        }
 
         // Add velo based on horizontal input, accelerate faster when sprint key is pressed
         /*
@@ -540,6 +627,54 @@ public class MovementSystem : NetworkBehaviour
             RecalculateLandingPos();
         }
         */
+    }
+
+    private void UpdatePosition()
+    {
+        if (_isGrounded)
+        {
+            UpdatePositionRelativeToSelf();
+        }
+        else
+        {
+            UpdatePositionRelativeToWorld();
+        }
+    }
+
+    private void UpdatePositionRelativeToSelf()
+    {
+        Vector2 velocity = new Vector2(_currentVelocity.x, _currentVelocity.y);
+
+        Ray2D leftRay = new Ray2D(_raycastOrigins.bottomLeft + (velocity * (float) TimeManager.TickDelta), -transform.up);
+        Ray2D rightRay = new Ray2D(_raycastOrigins.bottomRight + (velocity * (float) TimeManager.TickDelta), -transform.up);
+
+        RaycastHit2D leftHit = Physics2D.Raycast(leftRay.origin, leftRay.direction, MovementProperties.GroundedHeight, MovementProperties.ObstacleMask);
+        RaycastHit2D rightHit = Physics2D.Raycast(rightRay.origin, rightRay.direction, MovementProperties.GroundedHeight, MovementProperties.ObstacleMask);
+
+        // Use override hit to prevent clipping
+        RaycastHit2D overrideHit = Physics2D.Raycast((leftRay.origin + rightRay.origin) / 2, transform.right, MovementProperties.OverrideRayLength * Mathf.Sign(_currentVelocity.x), MovementProperties.ObstacleMask);
+        if (_currentVelocity.x < 0f && overrideHit.collider != null) {
+            leftHit = overrideHit;
+        } else if (_currentVelocity.x > 0f && overrideHit.collider != null) {
+            rightHit = overrideHit;
+        }
+
+        // Apply rotation to orient body to match ground
+        Quaternion finalRotation = transform.rotation;
+        if (leftHit && rightHit) {
+            Vector2 avgNorm = (leftHit.normal + rightHit.normal) / 2;
+
+            finalRotation = Quaternion.FromToRotation(Vector3.up, avgNorm);
+        }
+
+        Vector3 finalPosition = transform.position + (finalRotation * _currentVelocity) * (float) TimeManager.TickDelta;
+
+        transform.SetPositionAndRotation(finalPosition, finalRotation);
+    }
+
+    private void UpdatePositionRelativeToWorld()
+    {
+        transform.position += _currentAirborneVelocity * (float) TimeManager.TickDelta;
     }
 
     void RecalculateLandingPos() {
