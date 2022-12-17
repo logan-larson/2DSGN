@@ -4832,7 +4832,7 @@ MonoBehaviour:
   m_TargetMovementOnly: 1
   m_ScreenX: 0.5
   m_ScreenY: 0.5
-  m_CameraDistance: 10
+  m_CameraDistance: 12.5
   m_DeadZoneWidth: 0
   m_DeadZoneHeight: 0
   m_DeadZoneDepth: 0
@@ -12318,6 +12318,7 @@ GameObject:
   - component: {fileID: 5313784219897215938}
   - component: {fileID: 3382790915900136170}
   - component: {fileID: 5313784219897215939}
+  - component: {fileID: 5313784219897215940}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -12408,8 +12409,22 @@ MonoBehaviour:
   _ipv6BindAddress: 
   _port: 14103
   _maximumClients: 4095
-  _clientAddress: localhost
+  _clientAddress: 3.221.150.152
   _timeout: 15
+--- !u!114 &5313784219897215940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3382790915900136165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72904caff6746bd43866baf51fac4a43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UserInfo: {fileID: 11400000, guid: 643573264b41f1240997b14195ca096f, type: 2}
+  NetworkInfo: {fileID: 11400000, guid: 493434df7f0dddc4caf35666a53dc9f4, type: 2}
 --- !u!114 &6520479198509120614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12764,7 +12779,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &8451476576649307864
 MonoBehaviour:
   m_ObjectHideFlags: 0

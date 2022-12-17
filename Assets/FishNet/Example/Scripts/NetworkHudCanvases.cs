@@ -231,12 +231,6 @@ public class NetworkHudCanvases : MonoBehaviour
         if (_networkManager == null)
             return;
 
-        if (_tugboat != null)
-            Debug.Log("Tugboat is not null");
-            //_tugboat.SetClientAddress(_ipInputField.text);
-        else
-            _tugboat.SetClientAddress("localhost");
-
         if (_clientState != LocalConnectionState.Stopped)
             _networkManager.ClientManager.StopConnection();
         else
