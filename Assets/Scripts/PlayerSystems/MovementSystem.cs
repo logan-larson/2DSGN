@@ -21,8 +21,8 @@ public class MovementSystem : NetworkBehaviour
     {
         public float Horizontal;
         public bool Sprint;
-        /*
         public bool Jump;
+        /*
         public bool ChangeToCombat; // Fire key
         public bool ChangeToParkour; // Sprint key
         public bool InParkourMode;
@@ -67,25 +67,6 @@ public class MovementSystem : NetworkBehaviour
     #endregion
 
 
-    #region Public Variables // All commented out for now.
-
-    /*
-    public Vector2 Position; 
-    public float Rotation;
-    public Vector2 Velocity;
-    public Vector2 AirborneVelocity;
-
-    public bool IsGrounded;
-    public float GroundDistance;
-    public LayerMask Mask;
-    public bool InParkourMode;
-    public bool InCombatMode;
-
-    */
-
-    #endregion
-
-
     #region Private Variables // _currentVelocity, _subscribedToTimeManager, _raycastOrigins
 
     /// <summary>
@@ -97,11 +78,6 @@ public class MovementSystem : NetworkBehaviour
     /// The current airborne velocity of the player.
     /// </summary>
     private Vector3 _currentAirborneVelocity = new Vector3();
-
-    /// <summary>
-    /// The current rotation of the player.
-    /// </summary>
-    //private Quaternion _currentRotation = Quaternion.identity;
 
     /// <summary>
     /// True if subscribed to the TimeManager.
@@ -123,17 +99,30 @@ public class MovementSystem : NetworkBehaviour
     /// </summary>
     private float _groundDistance = 0f;
 
-    /* JumpNow, PredictPos, PredictNorm, and RecalculateLanding are all commented out for now.
     /// <summary>
-    /// True if the player is currently jumping.
+    /// Time since player has been grounded, used for jumping and re-enabling grounded.
     /// </summary>
-    private bool jumpNow = false;
+    private float _timeSinceGrounded = 0f;
 
-    //private Vector3 predictPos = new Vector3();
-    //private Vector3 predictNorm = new Vector3();
+    /// <summary>
+    /// True if the player is allowed to jump.
+    /// </summary>
+    private bool _canJump = true;
 
-    //private bool recalculateLanding = false;
-    */
+    /// <summary>
+    /// The predicted landing position for airborne player.
+    /// </summary>
+    private Vector3 _predictedPosition = new Vector3();
+
+    /// <summary>
+    /// The predicted normal of surface of landing position for airborne player.
+    /// </summary>
+    private Vector3 _predictedNormal = new Vector3();
+
+    /// <summary>
+    /// True if the predicted landing position and normal should be recalculated.
+    /// </summary>
+    private bool _recalculateLanding = false;
 
     #endregion
 
@@ -177,7 +166,8 @@ public class MovementSystem : NetworkBehaviour
 
     #region Movement
 
-    private void Awake() { // public void OnStart
+    private void Awake()
+    {
         Input = GetComponent<PlayerInputValues>();
 
         if (Input == null)
@@ -204,9 +194,9 @@ public class MovementSystem : NetworkBehaviour
                 Position = transform.position,
                 Velocity = _currentVelocity,
                 Rotation = transform.rotation,
+                AirborneVelocity = _currentAirborneVelocity,
+                IsGrounded = _isGrounded,
                 /*
-                AirborneVelocity = AirborneVelocity,
-                IsGrounded = IsGrounded,
                 InParkourMode = InParkourMode,
                 InCombatMode = InCombatMode
                 */
@@ -224,12 +214,10 @@ public class MovementSystem : NetworkBehaviour
     {
         moveData = default;
 
-        //if (moveData.Horizontal == Input.HorizontalMovementInput) return;
-
         moveData.Horizontal = Input.HorizontalMovementInput;
         moveData.Sprint = Input.IsSprintKeyPressed;
+        moveData.Jump = Input.IsJumpKeyPressed;
         /*
-        moveData.Jump = input.isJumpKeyPressed;
 
         if (input.isSprintKeyPressed && !moveData.InParkourMode)
         {
@@ -259,11 +247,11 @@ public class MovementSystem : NetworkBehaviour
 
         UpdateRaycastOrigins();
 
-        //if (movementProperties.timeSinceGrounded > minJumpTime)  {
+        if (_timeSinceGrounded > MovementProperties.MinimumJumpTime)  {
             UpdateGrounded();
-        //} else {
-            //movementProperties.timeSinceGrounded += Time.fixedDeltaTime;
-        //}
+        } else {
+            _timeSinceGrounded += (float) TimeManager.TickDelta;
+        }
 
         UpdateVelocity(moveData);
 
@@ -450,6 +438,7 @@ public class MovementSystem : NetworkBehaviour
             RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, MovementProperties.GroundedHeight * 1.25f, MovementProperties.ObstacleMask);
             _isGrounded = groundedHit.collider != null;
             _groundDistance = groundedHit.distance;
+            _canJump = true;
         } else {
             RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, MovementProperties.GroundedHeight, MovementProperties.ObstacleMask);
             _isGrounded = groundedHit.collider != null;
@@ -488,16 +477,14 @@ public class MovementSystem : NetworkBehaviour
 
         if (_isGrounded)
         {
-            /*
-            if (jumpNow)
+            if (moveData.Jump && _canJump)
             {
-                jumpNow = false;
-                IsGrounded = false;
-                movementProperties.timeSinceGrounded = 0f;
-                Velocity.y = movementProperties.jumpVelocity;
+                _canJump = false;
+                _isGrounded = false;
+                _timeSinceGrounded = 0f;
+                _currentVelocity.y = MovementProperties.JumpVelocity;
             }
             else
-            */
             {
                 if (_groundDistance < 0.95f) {
                     _currentVelocity.y += 1f;
@@ -520,113 +507,47 @@ public class MovementSystem : NetworkBehaviour
             // If forces were applied then we need to recalculate the landing
             //recalculateLanding = false;
         }
-
-        // Add velo based on horizontal input, accelerate faster when sprint key is pressed
-        /*
-        if (IsGrounded) {
-            
-            if (moveData.Sprint) {
-                Velocity.x += moveData.Horizontal * (movementProperties.acceleration * 2f);
-            } else {
-                Velocity.x += moveData.Horizontal * movementProperties.acceleration;
-            }
-
-            predictPos = new Vector3();
-            predictNorm = new Vector3();
-        }
-
-        // Apply friction when no input is held
-        if (IsGrounded && moveData.Horizontal == 0f) {
-            if (Mathf.Abs(Velocity.x - movementProperties.friction) < 0.5f) {
-                Velocity.x = 0f;
-            } else {
-                if (Velocity.x > 0f) {
-                    Velocity.x = Mathf.Clamp(Velocity.x, 0f, Velocity.x - movementProperties.friction);
-                } else {
-                    Velocity.x = Mathf.Clamp(Velocity.x, Velocity.x + movementProperties.friction, 0f);
-                }
-            }
-        }
-
-        // Set height above ground
-        if (IsGrounded) {
-            if (jumpNow) {
-                jumpNow = false;
-                IsGrounded = false;
-                movementProperties.timeSinceGrounded = 0f;
-                Velocity.y = movementProperties.jumpVelocity;
-            } else { // This needs a lot of work to make player landings smoother
-                if (GroundDistance < 0.9f) {
-                    Velocity.y += 0.05f; 
-                } else if (GroundDistance > 1f) {
-                    Velocity.y -= 0.05f; 
-                } else {
-                    Velocity.y = 0f;
-                }
-            }
-
-            AirborneVelocity = new Vector2(0f, 0f);
-        } else {
-            // Add gravity in downward direction relative to worldspace
-            AirborneVelocity += (Vector2.down * movementProperties.gravity * Time.fixedDeltaTime);
-
-            // This is where airborne movement forces can be applied
-
-            // If forces were applied then we need to recalculate the landing
-            recalculateLanding = false;
-        }
-
-        // Set sprint multiplier
-        if (moveData.Sprint && moveData.InParkourMode) {
-            movementProperties.sprintMultiplier += movementProperties.acceleration * 2f;
-            movementProperties.sprintMultiplier = Mathf.Clamp(movementProperties.sprintMultiplier, 0f, movementProperties.maxSprintSpeed);
-        } else {
-            movementProperties.sprintMultiplier -= movementProperties.friction;
-            movementProperties.sprintMultiplier = Mathf.Clamp(movementProperties.sprintMultiplier, 0f, movementProperties.maxSprintSpeed);
-        }
-
-        // Limit top speed
-        Velocity.x = Mathf.Clamp(Velocity.x, -movementProperties.maxXSpeed - movementProperties.sprintMultiplier, movementProperties.maxXSpeed + movementProperties.sprintMultiplier);
+        
 
         // This is triggered directly after the jump is initialized
-        if (!IsGrounded && movementProperties.timeSinceGrounded == 0f) {
-            // Get the velocity directly after the jump because we don't allow
-            // airborne movement controls besides using a weapon to move
-
-            // Theta = yAngleFromRight
-            // X1 = xComponentOfYVelo
-            // Y1 = yComponentOfYVelo
-
-            // Gamma = xAngleFromRight
-            // X2 = xComponentOfXVelo
-            // Y2 = yComponentOfXVelo 
-
-            float theta = Vector2.SignedAngle(Vector2.right, transform.up) * Mathf.Deg2Rad;
-            float gamma = Vector2.SignedAngle(Vector2.right, transform.right) * Mathf.Deg2Rad;
-
-            float xComponentOfYVelo = Mathf.Cos(theta) * Velocity.y;
-            float yComponentOfYVelo = Mathf.Sin(theta) * Velocity.y;
-
-            float xComponentOfXVelo = Mathf.Cos(gamma) * Velocity.x;
-            float yComponentOfXVelo = Mathf.Sin(gamma) * Velocity.x;
-
-            AirborneVelocity = new Vector2(xComponentOfXVelo + xComponentOfYVelo, yComponentOfXVelo + yComponentOfYVelo);
-
-            // Reset ground velocities
-            Velocity.x = 0f;
-            Velocity.y = 0f;
-
-            //Debug.Log("Initial velo off ground: (" + AirborneVelocity.x + ", " + AirborneVelocity.y + ")");
-
-            RecalculateLandingPos();
-        } else if (!IsGrounded && predictNorm == new Vector3() && predictPos == new Vector3()) {
-            // Ideally this never gets called because the player should never detach
-            // from a surface unless they jump
-            RecalculateLandingPos();
-        } else if (recalculateLanding) {
-            RecalculateLandingPos();
+        if (!_isGrounded && _timeSinceGrounded == 0f)
+        {
+            SetupAirborneMovement();
         }
-        */
+        else if ((!_isGrounded && _predictedNormal == Vector3.zero && _predictedPosition == Vector3.zero) || _recalculateLanding)
+        {
+            RecalculateLandingPosition();
+        }
+    }
+
+    private void SetupAirborneMovement()
+    {
+        // Get the velocity directly after the jump because we don't allow
+        // airborne movement controls besides using a weapon to move
+
+        // Theta = yAngleFromRight
+        // X1 = xComponentOfYVelo
+        // Y1 = yComponentOfYVelo
+
+        // Gamma = xAngleFromRight
+        // X2 = xComponentOfXVelo
+        // Y2 = yComponentOfXVelo 
+
+        float theta = Vector2.SignedAngle(Vector2.right, transform.up) * Mathf.Deg2Rad;
+        float gamma = Vector2.SignedAngle(Vector2.right, transform.right) * Mathf.Deg2Rad;
+
+        float xComponentOfYVelo = Mathf.Cos(theta) * _currentVelocity.y;
+        float yComponentOfYVelo = Mathf.Sin(theta) * _currentVelocity.y;
+
+        float xComponentOfXVelo = Mathf.Cos(gamma) * _currentVelocity.x;
+        float yComponentOfXVelo = Mathf.Sin(gamma) * _currentVelocity.x;
+
+        _currentAirborneVelocity = new Vector2(xComponentOfXVelo + xComponentOfYVelo, yComponentOfXVelo + yComponentOfYVelo);
+
+        // Reset ground velocity
+        _currentVelocity = Vector3.zero;
+
+        RecalculateLandingPosition();
     }
 
     private void UpdatePosition()
@@ -674,18 +595,25 @@ public class MovementSystem : NetworkBehaviour
 
     private void UpdatePositionRelativeToWorld()
     {
-        transform.position += _currentAirborneVelocity * (float) TimeManager.TickDelta;
+        Vector3 finalPosition = transform.position + _currentAirborneVelocity * (float) TimeManager.TickDelta;
+
+        // And rotate to the predicted landing spots normal
+        Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, _predictedNormal);
+        Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, MovementProperties.MaxRotationDegrees);
+
+        transform.SetPositionAndRotation(finalPosition, finalRotation);
+        //transform.rotation = Quaternion.Euler(0f, 0f, finalRotation.eulerAngles.z);
+        //Rotation = finalRotation.eulerAngles.z;
     }
 
-    void RecalculateLandingPos() {
-        /*
+    private void RecalculateLandingPosition() {
         // Predict the landing spot 
         RaycastHit2D predictHit = new RaycastHit2D();
         RaycastHit2D predictHit2 = new RaycastHit2D();
         Vector2 pos = transform.position - (transform.up * 0.7f);
         Vector2 pos2 = transform.position + (transform.up * 0.7f);
 
-        Vector2 velo = new Vector2(AirborneVelocity.x, AirborneVelocity.y) * Time.fixedDeltaTime * fFactor;
+        Vector2 velo = new Vector2(_currentAirborneVelocity.x, _currentAirborneVelocity.y) * Time.fixedDeltaTime * MovementProperties.FFactor;
 
         int count = 0;
         while ((predictHit.collider == null && predictHit2.collider == null) && count < 100) {
@@ -700,14 +628,14 @@ public class MovementSystem : NetworkBehaviour
             Debug.DrawRay(ray2.origin, ray2.direction * velo.magnitude, randColor, 2f);
 
             // Update predictHit
-            predictHit = Physics2D.Raycast(ray.origin, ray.direction, velo.magnitude, Mask);
-            predictHit2 = Physics2D.Raycast(ray2.origin, ray2.direction, velo.magnitude, Mask);
+            predictHit = Physics2D.Raycast(ray.origin, ray.direction, velo.magnitude, MovementProperties.ObstacleMask);
+            predictHit2 = Physics2D.Raycast(ray2.origin, ray2.direction, velo.magnitude, MovementProperties.ObstacleMask);
 
             // Update position to end of predictHit ray
             pos += (ray.direction * velo.magnitude);
             pos2 += (ray2.direction * velo.magnitude);
 
-            velo += (Vector2.down * movementProperties.gravity * Time.fixedDeltaTime);
+            velo += (Vector2.down * MovementProperties.Gravity * Time.fixedDeltaTime);
 
             count++;
         }
@@ -715,20 +643,19 @@ public class MovementSystem : NetworkBehaviour
         // If landing position is spotted
         if (predictHit.collider != null) {
             // Set the predicted landing position
-            predictPos = predictHit.point;
+            _predictedPosition = predictHit.point;
 
             // And the predicted landing normal
-            predictNorm = predictHit.normal;
+            _predictedNormal = predictHit.normal;
         } else if (predictHit2.collider != null) {
             // Set the predicted landing position
-            predictPos = predictHit2.point;
+            _predictedPosition = predictHit2.point;
 
             // And the predicted landing normal
-            predictNorm = predictHit2.normal;
+            _predictedNormal = predictHit2.normal;
         } else {
             //Debug.Log("Hit the max count");
         }
-        */
     }
 
     #endregion

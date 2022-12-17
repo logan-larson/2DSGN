@@ -16,8 +16,11 @@ MonoBehaviour:
   Friction: 1
   MaxSpeed: 5
   SprintMultiplier: 2
-  Gravity: 5
-  MaxRotationDegrees: 10
+  Gravity: 9.81
+  MaxRotationDegrees: 24.83
+  JumpVelocity: 10
+  MinimumJumpTime: 0.1
+  FFactor: 5.25
   GroundedHeight: 1.5
   ObstacleMask:
     serializedVersion: 2

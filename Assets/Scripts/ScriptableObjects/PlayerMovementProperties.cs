@@ -27,8 +27,21 @@ public class PlayerMovementProperties : ScriptableObject
     public float Gravity = 5f;
     /// <summary>
     /// The maximum angle the player can rotate at.
-    /// </summary>
     public float MaxRotationDegrees = 1f;
+
+    [Header("Jumping")]
+    /// <summary>
+    /// The amount of force applied to the player when they jump.
+    /// </summary>
+    public float JumpVelocity = 5f;
+    /// <summary>
+    /// The amount of time the player has to jump for before being able to be grounded again.
+    /// </summary>
+    public float MinimumJumpTime = 0.1f;
+    /// <summary>
+    /// Fudge factor for predicting landings
+    /// </summary>
+    public float FFactor = 6.75f;
 
     [Header("Grounded")]
     /// <summary>
