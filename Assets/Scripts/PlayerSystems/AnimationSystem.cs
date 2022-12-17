@@ -27,7 +27,7 @@ public class AnimationSystem : NetworkBehaviour {
     public float lerpValue = 0.1f;
 
     private MovementSystem _movementSystem;
-    private PlayerInput _playerInput;
+    private PlayerInputValues _playerInput;
 
 
     /* States */
@@ -53,7 +53,7 @@ public class AnimationSystem : NetworkBehaviour {
     {
         _animator = GetComponentInChildren<Animator>();
         _movementSystem = GetComponent<MovementSystem>();
-        _playerInput = GetComponent<PlayerInput>();
+        _playerInput = GetComponent<PlayerInputValues>();
     }
 
     void Start() { // public void OnStart
@@ -88,6 +88,7 @@ public class AnimationSystem : NetworkBehaviour {
 
     private int GetState()
     {
+        /*
         if (_movementSystem.InCombatMode)
         {
             if (!_movementSystem.IsGrounded) return Jump_Combat;
@@ -104,6 +105,7 @@ public class AnimationSystem : NetworkBehaviour {
 
             return Idle_Parkour;
         }
+        */
 
         return _currentState;
     }
@@ -112,6 +114,7 @@ public class AnimationSystem : NetworkBehaviour {
     { // public void OnUpdate
         if (!base.IsOwner) return;
 
+        /*
         if (_movementSystem.Velocity.x > 1f || _movementSystem.AirborneVelocity.x > 1f) {
             //_animator.CrossFade("Right", 0f, 0);
             _animator.SetBool("IsFacingRight", true);
@@ -123,12 +126,11 @@ public class AnimationSystem : NetworkBehaviour {
         //childSprite.localScale = _movementSystem.Velocity.x > 1f ? new Vector3(1f, 1f, 1f) : new Vector3(-1f, 1f, 1f);
 
 
-        /*
         var state = GetState();
 
         if (state == _currentState) return;
 
-        Debug.Log("State: " + state);
+        //Debug.Log("State: " + state);
 
         _animator.CrossFade(state, 0f, 0);
 

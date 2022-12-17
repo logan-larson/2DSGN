@@ -1,28 +1,30 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent (typeof(PlayerInput))]
+[RequireComponent (typeof(PlayerInputValues))]
 [RequireComponent (typeof(MovementSystem))]
 public class InputSystem : MonoBehaviour {
 
-    PlayerInput input;
+    PlayerInputValues input;
     MovementSystem movement;
 
     void Start() { // public void OnStart
-        input = GetComponent<PlayerInput>();
+        input = GetComponent<PlayerInputValues>();
         movement = GetComponent<MovementSystem>();
     }
 
-    public void OnMove(InputValue value) {
-        input.horizontalMovementInput = value.Get<Vector2>().x;
+    public void OnMove(InputValue value)
+    {
+        input.HorizontalMovementInput = value.Get<Vector2>().x;
     }
 
     public void OnSprint(InputValue value) {
-        input.isSprintKeyPressed = value.Get<float>() == 1f;
+        input.IsSprintKeyPressed = value.Get<float>() == 1f;
     }
     
     public void OnJump(InputValue value) {
-        movement.Jump();
+        input.IsJumpKeyPressed = value.Get<float>() == 1f;
+        //movement.Jump();
     }
 
 }
