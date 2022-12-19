@@ -4954,9 +4954,9 @@ MonoBehaviour:
   m_LookaheadTime: 0
   m_LookaheadSmoothing: 0
   m_LookaheadIgnoreY: 0
-  m_XDamping: 1
-  m_YDamping: 1
-  m_ZDamping: 1
+  m_XDamping: 0
+  m_YDamping: 0
+  m_ZDamping: 0
   m_TargetMovementOnly: 1
   m_ScreenX: 0.5
   m_ScreenY: 0.5
@@ -12573,7 +12573,7 @@ MonoBehaviour:
   _ipv6BindAddress: 
   _port: 14103
   _maximumClients: 4095
-  _clientAddress: localhost
+  _clientAddress: 44.211.184.128
   _timeout: 15
 --- !u!114 &5313784219897215940
 MonoBehaviour:
@@ -12604,7 +12604,7 @@ MonoBehaviour:
   _updateOrder: 0
   _allowTickDropping: 0
   _maximumFrameTicks: 2
-  _tickRate: 30
+  _tickRate: 60
   _pingInterval: 1
   _timingInterval: 2
   _physicsMode: 1

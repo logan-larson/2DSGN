@@ -8,7 +8,7 @@ public class PlayerInputValues : MonoBehaviour
     public bool IsSprintKeyPressed = false;
     public float HorizontalAimInput = 0f;
     public float VerticalAimInput = 0f;
-    public bool IsShootingKeyPressed = false;
+    public bool IsFirePressed = false;
 
     // Testing purposes only
     public bool IsResetKeyPressed;

@@ -23,9 +23,12 @@ public class InputSystem : MonoBehaviour {
     }
     
     public void OnJump(InputValue value) {
-        Debug.Log(value.Get<float>());
         input.IsJumpKeyPressed = value.Get<float>() == 1f;
-        //movement.Jump();
+    }
+
+    public void OnFire(InputValue value) {
+        input.IsFirePressed = value.Get<float>() == 1f;
+        //movement.Fire();
     }
 
 }

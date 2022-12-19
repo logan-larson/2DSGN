@@ -21,6 +21,14 @@ public class PlayerMovementProperties : ScriptableObject
     /// </summary>
     public float SprintMultiplier = 1.5f; 
     /// <summary>
+    /// The amount by which the player's speed is changed when they are in parkour mode.
+    /// </summary>
+    public float ParkourMultiplier = 1.5f; 
+    /// <summary>
+    /// The amount by which the player's speed is changed when they are in combat mode.
+    /// </summary>
+    public float CombatMultiplier = 1f; 
+    /// <summary>
     /// The worlds gravity
     /// TODO: test with 9.81f and higher jump velocity.
     /// </summary>
