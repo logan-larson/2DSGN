@@ -1,22 +1,15 @@
 using UnityEngine;
 
-[RequireComponent (typeof(PlayerMode))]
 public class CombatSystem : MonoBehaviour
 {
-    PlayerMode mode;
 
-    public void OnStart()
-    {
-        mode = GetComponent<PlayerMode>();
+    void Start() { // public void OnStart
     }
 
-    public void OnUpdate()
-    {
+    void Update() { // public void OnUpdate
         
     }
 
     public void ShootPrimary() {
-        mode.inCombatMode = true;
-        mode.inParkourMode = false;
     }
 }

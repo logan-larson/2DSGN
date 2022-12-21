@@ -1,71 +1,43 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-[RequireComponent (typeof(PlayerInput))]
+[RequireComponent (typeof(PlayerInputValues))]
 [RequireComponent (typeof(MovementSystem))]
-[RequireComponent (typeof(CombatSystem))]
 public class InputSystem : MonoBehaviour {
 
-    PlayerInput input;
-    MovementSystem movement;
-    CombatSystem combat;
 
-    public void OnStart() {
-        input = GetComponent<PlayerInput>();
-        movement = GetComponent<MovementSystem>();
-        combat = GetComponent<CombatSystem>();
+    // TODO: At some point I think I would like to make these events
+    // So other systems can subscribe to them without having
+    // to know about the input system
 
-        InitializeInput();
+    [HideInInspector]
+    public PlayerInputValues InputValues;
+
+    private MovementSystem _movement;
+
+    private void Awake() {
+        _movement = _movement ?? GetComponent<MovementSystem>();
+
+        InputValues = (PlayerInputValues) ScriptableObject.CreateInstance(typeof(PlayerInputValues));
     }
 
-    public void OnUpdate() {
-        UpdateHorizontalMovement();
-
-        UpdateJump();
-
-        UpdateSprint();
-
-        if (Input.GetButtonDown("Fire1")) {
-            combat.ShootPrimary();
-        }
+    public void OnMove(InputValue value)
+    {
+        InputValues.HorizontalMovementInput = value.Get<Vector2>().x;
     }
 
-    void InitializeInput() {
-        input.horizontalMovementInput = 0f;
-        input.verticalMovementInput = 0f;
-        input.isJumpKeyPressed = false;
-        input.isSprintKeyPressed = false;
-        input.horizontalAimInput = 0f;
-        input.verticalAimInput = 0f;
+    public void OnSprint(InputValue value) {
+        InputValues.IsSprintKeyPressed = value.Get<float>() == 1f;
+    }
+    
+    // TODO: Move these events to triggers
+    public void OnJump(InputValue value) {
+        InputValues.IsJumpKeyPressed = value.Get<float>() == 1f;
     }
 
-    // Movement Input Subsystem
-    void UpdateHorizontalMovement() {
-        input.horizontalMovementInput = Input.GetAxisRaw("Horizontal");
-        //input.horizontalMovementInput = Input.GetAxis("Horizontal");
+    public void OnFire(InputValue value) {
+        InputValues.IsFirePressed = value.Get<float>() == 1f;
+        //movement.Fire();
     }
 
-    void UpdateVerticalMovement() {
-        input.verticalMovementInput = Input.GetAxisRaw("Vertical");
-        //input.verticalMovementInput = Input.GetAxis("Vertical");
-    }
-
-    void UpdateJump() {
-        input.isJumpKeyPressed = Input.GetKeyDown(KeyCode.W);
-        if (input.isJumpKeyPressed) {
-            movement.Jump();
-        }
-    }
-
-    void UpdateSprint() {
-        input.isSprintKeyPressed = Input.GetKey(KeyCode.LeftShift);
-    }
-
-    // Aim Input Subsystem
-    void UpdateHorizontalAim() {
-        input.horizontalAimInput = Input.GetAxisRaw("Mouse X");
-    }
-
-    void UpdateVerticalAim() {
-        input.verticalAimInput = Input.GetAxisRaw("Mouse Y");
-    }
 }

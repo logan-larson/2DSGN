@@ -1,352 +1,520 @@
+using FishNet.Object;
+using FishNet.Object.Prediction;
 using UnityEngine;
 
-[RequireComponent (typeof(PlayerInput))]
-[RequireComponent (typeof(PlayerPosition))]
-[RequireComponent (typeof(PlayerVelocity))]
-[RequireComponent (typeof(PlayerMovementProperties))]
-[RequireComponent (typeof(PlayerGrounded))]
-[RequireComponent (typeof(PlayerMode))]
-public class MovementSystem : MonoBehaviour {
+public class MovementSystem : NetworkBehaviour
+{
 
-    PlayerInput input;
-    PlayerPosition position;
-    PlayerVelocity velocity;
-    PlayerMovementProperties movementProperties;
-    PlayerGrounded grounded;
-    PlayerMode mode;
+    #region Types
 
-    RaycastOrigins raycastOrigins;
+    /// <summary>
+    /// All the data needed to move the player on the client and server.
+    /// </summary>
+    public struct MoveData
+    {
+        public float Horizontal;
+        public bool Sprint;
+        public bool Jump;
+        public bool ChangeToCombat; // Fire key
+        public bool ChangeToParkour; // Sprint key
+    }
 
-    public struct RaycastOrigins {
+    /// <summary>
+    /// All the data needed to reconcile the player on the client and server.
+    /// </summary>
+    public struct ReconcileData
+    {
+        public Vector3 Position;
+        public Vector3 Velocity;
+        public Quaternion Rotation;
+        public bool IsGrounded;
+        public bool InParkourMode;
+        public bool InCombatMode;
+    }
+
+    /// <summary>
+    /// The origins of the raycasts used to determine if the player is grounded.
+    /// </summary>
+    public struct RaycastOrigins
+    {
         public Vector2 topLeft, topRight, bottomLeft, bottomRight;
     }
 
-    bool jumpNow = false;
-
-    Vector3 predictPos = new Vector3();
-    Vector3 predictNorm = new Vector3();
-
-    bool recalculateLanding = false;
-    public float fFactor = 6.75f;
-    public float minJumpTime = 1f;
-
-    public void OnStart() {
-        input = GetComponent<PlayerInput>();
-        position = GetComponent<PlayerPosition>();
-        velocity = GetComponent<PlayerVelocity>();
-        movementProperties = GetComponent<PlayerMovementProperties>();
-        grounded = GetComponent<PlayerGrounded>();
-        mode = GetComponent<PlayerMode>();
+    public struct PublicMovementData
+    {
+        //public Vector3 Position;
+        public Vector3 Velocity;
+        //public Quaternion Rotation;
+        public bool IsGrounded;
     }
 
-    public void OnUpdate() {
+    public PublicMovementData PublicData;
 
-        UpdateMode();
+    #endregion
+
+
+    #region Script References
+
+    [SerializeField]
+    private InputSystem InputSystem;
+
+    [SerializeField]
+    private PlayerInputValues _input;
+
+    [SerializeField]
+    private Animator _animator;
+
+    [SerializeField]
+    private PlayerMovementProperties MovementProperties;
+
+    #endregion
+
+
+    #region Private Variables
+
+    /// <summary>
+    /// The current airborne velocity of the player.
+    /// </summary>
+    private Vector3 _currentVelocity = new Vector3();
+
+    /// <summary>
+    /// True if subscribed to the TimeManager.
+    /// </summary>
+    private bool _subscribedToTimeManager = false;
+
+    /// <summary>
+    /// The raycast origins of the player.
+    /// </summary>
+    private RaycastOrigins _raycastOrigins;
+
+    /// <summary>
+    /// True if the player is currently grounded.
+    /// </summary>
+    private bool _isGrounded = false;
+
+    /// <summary>
+    /// The distance from the player to the ground.
+    /// </summary>
+    private float _groundDistance = 0f;
+
+    /// <summary>
+    /// Time since player has been grounded, used for jumping and re-enabling grounded.
+    /// </summary>
+    [SerializeField]
+    private float _timeSinceGrounded = 0f;
+
+    /// <summary>
+    /// True if the player is allowed to jump.
+    /// </summary>
+    private bool _canJump = true;
+
+    /// <summary>
+    /// The predicted landing position for airborne player.
+    /// </summary>
+    private Vector3 _predictedPosition = new Vector3();
+
+    /// <summary>
+    /// The predicted normal of surface of landing position for airborne player.
+    /// </summary>
+    private Vector3 _predictedNormal = new Vector3();
+
+    /// <summary>
+    /// True if the predicted landing position and normal should be recalculated.
+    /// </summary>
+    private bool _recalculateLanding = false;
+
+    /// <summary>
+    /// True if the player is in parkour mode.
+    /// </summary>
+    [SerializeField]
+    private bool _inParkourMode = true;
+
+    /// <summary>
+    /// True if the player is in combat mode.
+    /// </summary>
+    [SerializeField]
+    private bool _inCombatMode = false;
+
+
+
+    /// TODO: Move to combat when ready
+
+    /// <summary>
+    /// True if the player is firing.
+    /// </summary>
+    [SerializeField]
+    private bool _isFiring = false;
+
+
+    #endregion
+
+
+    #region Time Management
+
+    private void SubscribeToTimeManager(bool subscribe)
+    {
+        if (base.TimeManager == null)
+            return;
+
+        if (subscribe == _subscribedToTimeManager)
+            return;
+
+        _subscribedToTimeManager = subscribe;
+
+        if (subscribe)
+        {
+            base.TimeManager.OnTick += OnTick;
+        }
+        else
+        {
+            base.TimeManager.OnTick -= OnTick;
+        }
+    }
+
+    public override void OnStartNetwork()
+    {
+        base.OnStartNetwork();
+        SubscribeToTimeManager(true);
+    }
+
+    public override void OnStopNetwork()
+    {
+        base.OnStopNetwork();
+        SubscribeToTimeManager(false);
+    }
+
+    #endregion
+
+
+    #region Movement
+
+    private void Awake()
+    {
+        InputSystem = InputSystem ?? GetComponent<InputSystem>();
+    }
+
+    private void Start()
+    {
+        _input = InputSystem.InputValues;
+
+        if (_input == null)
+            Debug.LogError("InputValues not found on InputSystem.");
+    }
+
+    private void Update()
+    {
+        PerformAnimation();
+    }
+
+    private void OnTick()
+    {
+        if (base.IsOwner)
+        {
+            Reconciliation(default, false);
+
+            BuildActions(out MoveData moveData);
+
+            Move(moveData, false);
+        }
+
+        if (base.IsServer)
+        {
+            Move(default, true);
+            
+            ReconcileData reconcileData = new ReconcileData()
+            {
+                Position = transform.position,
+                Velocity = _currentVelocity,
+                Rotation = transform.rotation,
+                IsGrounded = _isGrounded,
+                InParkourMode = _inParkourMode,
+                InCombatMode = _inCombatMode
+            };
+
+            Reconciliation(reconcileData, true);
+        }
+
+
+        SetPublicMovementData();
+    }
+
+    public void Fire()
+    {
+        _isFiring = true;
+    }
+
+    /// <summary>
+    /// Use player input to build move data that will be used in the move function.
+    /// </summary>
+    /// <param name="moveData"></param>
+    private void BuildActions(out MoveData moveData)
+    {
+        moveData = default;
+
+        moveData.Horizontal = _input.HorizontalMovementInput;
+        moveData.Sprint = _input.IsSprintKeyPressed;
+        moveData.Jump = _input.IsJumpKeyPressed;
+        moveData.ChangeToCombat = _input.IsFirePressed;
+        if (!moveData.ChangeToCombat)
+            moveData.ChangeToParkour = _input.IsSprintKeyPressed;
+    }
+
+    /// <summary>
+    /// Move the player using the provided moveData.
+    /// This function is replicated on both the server and client.
+    /// </summary>
+    /// <param name="moveData"></param>
+    /// <param name="asServer"></param>
+    /// <param name="replaying"></param>
+    [Replicate]
+    private void Move(MoveData moveData, bool asServer, bool replaying = false)
+    {
+        UpdateMode(moveData);
 
         UpdateRaycastOrigins();
 
-        if (movementProperties.timeSinceGrounded > minJumpTime)  {
-            UpdateGrounded();
-        } else {
-            movementProperties.timeSinceGrounded += Time.fixedDeltaTime;
+        UpdateGrounded();
+
+        UpdateVelocity(moveData, asServer);
+
+        UpdatePosition();
+    }
+
+    /// <summary>
+    /// Reconcile the player's data.
+    /// This function is only called on the client.
+    /// </summary>
+    /// <param name="data"></param>
+    /// <param name="asServer"></param>
+    [Reconcile]
+    private void Reconciliation(ReconcileData data, bool asServer)
+    {
+        transform.position = data.Position;
+        transform.rotation = data.Rotation;
+        _currentVelocity = data.Velocity;
+        _isGrounded = data.IsGrounded;
+        _inParkourMode = data.InParkourMode;
+        _inCombatMode = data.InCombatMode;
+    }
+
+    private void UpdateMode(MoveData moveData = new MoveData())
+    {
+        if (moveData.ChangeToParkour)
+        {
+            _inCombatMode = false;
+            _inParkourMode = true;
+        }
+        
+        if (moveData.ChangeToCombat)
+        {
+            _inCombatMode = true;
+            _inParkourMode = false;
+        }
+    }
+
+    private void UpdateRaycastOrigins() {
+		_raycastOrigins.bottomLeft = transform.position - (transform.right / 2) - (transform.up / 2);
+		_raycastOrigins.bottomRight = transform.position + (transform.right / 2) - (transform.up / 2);
+		_raycastOrigins.topLeft = transform.position - (transform.right / 2) + (transform.up / 2);
+		_raycastOrigins.topRight = transform.position + (transform.right / 2) + (transform.up / 2);
+    }
+
+    private void UpdateGrounded() {
+        // If the player is currently grounded, check if they are still grounded and set ground distance
+        if (_isGrounded || _timeSinceGrounded > MovementProperties.MinimumJumpTime)
+        {
+            RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, MovementProperties.GroundedHeight, MovementProperties.ObstacleMask);
+            _isGrounded = groundedHit.collider != null;
+            _groundDistance = groundedHit.distance;
+            if (_isGrounded)
+                _canJump = true;
+        }
+        // Otherwise, increase the time since grounded
+        else
+        {
+            _timeSinceGrounded += (float) TimeManager.TickDelta;
+        }
+    }
+
+    private void UpdateVelocity(MoveData moveData, bool asServer)
+    {
+
+        
+        // Increase top speed when sprint key is pressed
+        float sprintMultiplier = moveData.Sprint && !_inCombatMode ? MovementProperties.SprintMultiplier : 1f;
+        // Set top speed based on mode
+        float modeMultiplier = _inParkourMode ? MovementProperties.ParkourMultiplier : MovementProperties.CombatMultiplier;
+
+        // If grounded, change velocity
+        if (_isGrounded)
+        {
+            // If horizontal input is given, add velocity
+            if (moveData.Horizontal != 0f)
+                _currentVelocity += transform.right * moveData.Horizontal * MovementProperties.Acceleration * sprintMultiplier * modeMultiplier;
+            // If no horizontal input is given, decrease velocity by friction
+            else
+                _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, MovementProperties.Friction);
         }
 
-        UpdateVelocity();
-            
+        // Limit top speed
+        float maxSpeed = _isGrounded ? MovementProperties.MaxSpeed : MovementProperties.MaxAirborneSpeed;
+        if (_isGrounded && _currentVelocity.magnitude > maxSpeed * sprintMultiplier * modeMultiplier) {
+            _currentVelocity = _currentVelocity.normalized * maxSpeed * sprintMultiplier * modeMultiplier;
+        }
 
-        // This is a velocity relative to the player not the world
-        Vector2 adjVelo = new Vector2(velocity.x, velocity.y) * Time.fixedDeltaTime;
+        if (_isGrounded)
+        {
+            // Jump
+            if (moveData.Jump && _canJump)
+            {
+                _canJump = false;
+                _isGrounded = false;
+                _timeSinceGrounded = 0f;
 
-        // If grounded, match body to ground
-        if (grounded.isGrounded) {
-            //movementProperties.maxRotationDegrees = 2f;
+                _currentVelocity += transform.up * MovementProperties.JumpVelocity;
 
-            ShowPredictedTrajectory();
-
-            Ray2D leftRay = new Ray2D(raycastOrigins.bottomLeft + adjVelo, -transform.up);
-            Ray2D rightRay = new Ray2D(raycastOrigins.bottomRight + adjVelo, -transform.up);
-
-            RaycastHit2D leftHit = Physics2D.Raycast(leftRay.origin, leftRay.direction, movementProperties.groundedHeight, grounded.mask);
-            RaycastHit2D rightHit = Physics2D.Raycast(rightRay.origin, rightRay.direction, movementProperties.groundedHeight, grounded.mask);
-
-            // Use override hit to prevent clipping
-            RaycastHit2D overrideHit = Physics2D.Raycast((leftRay.origin + rightRay.origin) / 2, transform.right, movementProperties.overrideRayLength * Mathf.Sign(velocity.x), grounded.mask);
-            if (velocity.x < 0f && overrideHit.collider != null) {
-                leftHit = overrideHit;
-            } else if (velocity.x > 0f && overrideHit.collider != null) {
-                rightHit = overrideHit;
+                RecalculateLandingPosition();
             }
-
-            // Apply rotation to orient body to match ground
-            if (leftHit && rightHit) {
-                Vector2 avgPoint = (leftHit.point + rightHit.point) / 2;
-                Vector2 avgNorm = (leftHit.normal + rightHit.normal) / 2;
-
-                Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, avgNorm);
-                Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, movementProperties.maxRotationDegrees);
-
-                transform.rotation = Quaternion.Euler(0f, 0f, finalRotation.eulerAngles.z);
-                position.rotation = finalRotation.eulerAngles.z;
-            }
-
-            transform.Translate(adjVelo);
-            position.x = transform.position.x;
-            position.y = transform.position.y;
-        } else { 
-            //movementProperties.maxRotationDegrees = 8f;
-            // We are in the air, so move according to worldspace not self
-            transform.position += new Vector3(velocity.veloOffGround.x, velocity.veloOffGround.y, 0f) * Time.fixedDeltaTime;
-
-            position.x = transform.position.x;
-            position.y = transform.position.y;
-
-            // And rotate to the predicted landing spots normal
-            Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, predictNorm);
-            Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, movementProperties.maxRotationDegrees);
-
-            transform.rotation = Quaternion.Euler(0f, 0f, finalRotation.eulerAngles.z);
-            position.rotation = finalRotation.eulerAngles.z;
-        }
-    }
-
-    void UpdateMode() {
-        if (input.isSprintKeyPressed) {
-            mode.inCombatMode = false;
-            mode.inParkourMode = true;
-        }
-    }
-
-    void UpdateRaycastOrigins() {
-		raycastOrigins.bottomLeft = transform.position - (transform.right / 2) - (transform.up / 2);
-		raycastOrigins.bottomRight = transform.position + (transform.right / 2) - (transform.up / 2);
-		raycastOrigins.topLeft = transform.position - (transform.right / 2) + (transform.up / 2);
-		raycastOrigins.topRight = transform.position + (transform.right / 2) + (transform.up / 2);
-    }
-
-    void UpdateGrounded() {
-        if (grounded.isGrounded) {
-            RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, movementProperties.groundedHeight * 1.5f, grounded.mask);
-            grounded.isGrounded = groundedHit.collider != null;
-            grounded.groundDistance = groundedHit.distance;
-        } else {
-            RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, movementProperties.groundedHeight, grounded.mask);
-            grounded.isGrounded = groundedHit.collider != null;
-            grounded.groundDistance = groundedHit.distance;
-        }
-    }
-
-    public void Jump() {
-        if (grounded.isGrounded) {
-            jumpNow = true;
-        }
-    }
-
-    void UpdateVelocity() {
-        // Add velo based on horizontal input, accelerate faster when sprint key is pressed
-        if (grounded.isGrounded) {
-            if (input.isSprintKeyPressed) {
-                velocity.x += input.horizontalMovementInput * (movementProperties.acceleration * 2f);
-            } else {
-                velocity.x += input.horizontalMovementInput * movementProperties.acceleration;
-            }
-
-            predictPos = new Vector3();
-            predictNorm = new Vector3();
-        }
-
-        // Apply friction when no input is held
-        if (grounded.isGrounded && input.horizontalMovementInput == 0f) {
-            if (Mathf.Abs(velocity.x - movementProperties.friction) < 0.5f) {
-                velocity.x = 0f;
-            } else {
-                if (velocity.x > 0f) {
-                    velocity.x = Mathf.Clamp(velocity.x, 0f, velocity.x - movementProperties.friction);
-                } else {
-                    velocity.x = Mathf.Clamp(velocity.x, velocity.x + movementProperties.friction, 0f);
+            // Set height relative to ground
+            else
+            {
+                if (_groundDistance < 0.95f)
+                {
+                    _currentVelocity += transform.up * 3f;
+                }
+                else if (_groundDistance > 1.05f)
+                {
+                    _currentVelocity -= transform.up * 3f;
                 }
             }
         }
-
-        // Set height above ground
-        if (grounded.isGrounded) {
-            if (jumpNow) {
-                jumpNow = false;
-                grounded.isGrounded = false;
-                movementProperties.timeSinceGrounded = 0f;
-                velocity.y = movementProperties.jumpVelocity;
-            } else { // This needs a lot of work to make player landings smoother
-                if (grounded.groundDistance < 0.9f) {
-                    velocity.y += 0.05f; 
-                } else if (grounded.groundDistance > 1f) {
-                    velocity.y -= 0.05f; 
-                } else {
-                    velocity.y = 0f;
-                }
-            }
-
-            velocity.veloOffGround = new Vector2(0f, 0f);
-        } else {
-            // Add gravity in downward direction relative to worldspace
-            velocity.veloOffGround += (Vector2.down * movementProperties.gravity * Time.fixedDeltaTime);
+        else
+        {
+            // Apply gravity
+            _currentVelocity += (Vector3.down * MovementProperties.Gravity * (float) TimeManager.TickDelta);
 
             // This is where airborne movement forces can be applied
 
             // If forces were applied then we need to recalculate the landing
-            recalculateLanding = false;
+            //recalculateLanding = false;
         }
+        
 
-        // Set sprint multiplier
-        if (input.isSprintKeyPressed && mode.inParkourMode) {
-            movementProperties.sprintMultiplier += movementProperties.acceleration * 2f;
-            movementProperties.sprintMultiplier = Mathf.Clamp(movementProperties.sprintMultiplier, 0f, movementProperties.maxSprintSpeed);
-        } else {
-            movementProperties.sprintMultiplier -= movementProperties.friction;
-            movementProperties.sprintMultiplier = Mathf.Clamp(movementProperties.sprintMultiplier, 0f, movementProperties.maxSprintSpeed);
-        }
-
-        // Limit top speed
-        velocity.x = Mathf.Clamp(velocity.x, -movementProperties.maxXSpeed - movementProperties.sprintMultiplier, movementProperties.maxXSpeed + movementProperties.sprintMultiplier);
-
-        // This is triggered directly after the jump is initialized
-        if (!grounded.isGrounded && movementProperties.timeSinceGrounded == 0f) {
-            // Get the velocity directly after the jump because we don't allow
-            // airborne movement controls besides using a weapon to move
-
-            /*
-            Theta = yAngleFromRight
-            X1 = xComponentOfYVelo
-            Y1 = yComponentOfYVelo
-
-            Gamma = xAngleFromRight
-            X2 = xComponentOfXVelo
-            Y2 = yComponentOfXVelo 
-            */
-
-            float theta = Vector2.SignedAngle(Vector2.right, transform.up) * Mathf.Deg2Rad;
-            float gamma = Vector2.SignedAngle(Vector2.right, transform.right) * Mathf.Deg2Rad;
-
-            float xComponentOfYVelo = Mathf.Cos(theta) * velocity.y;
-            float yComponentOfYVelo = Mathf.Sin(theta) * velocity.y;
-
-            float xComponentOfXVelo = Mathf.Cos(gamma) * velocity.x;
-            float yComponentOfXVelo = Mathf.Sin(gamma) * velocity.x;
-
-            velocity.veloOffGround = new Vector2(xComponentOfXVelo + xComponentOfYVelo, yComponentOfXVelo + yComponentOfYVelo);
-
-            // Reset ground velocities
-            velocity.x = 0f;
-            velocity.y = 0f;
-
-            Debug.Log("Initial velo off ground: (" + velocity.veloOffGround.x + ", " + velocity.veloOffGround.y + ")");
-
-            RecalculateLandingPos();
-        } else if (!grounded.isGrounded && predictNorm == new Vector3() && predictPos == new Vector3()) {
-            // Ideally this never gets called because the player should never detach
-            // from a surface unless they jump
-            RecalculateLandingPos();
-        } else if (recalculateLanding) {
-            RecalculateLandingPos();
+        // If we are not grounded and we have not predicted a landing position then we need to calculate it
+        // Or if we manually trigger a recalculation
+        if ((!_isGrounded && _predictedNormal == Vector3.zero && _predictedPosition == Vector3.zero) || _recalculateLanding)
+        {
+            RecalculateLandingPosition();
         }
     }
 
-    void RecalculateLandingPos() {
-            // Predict the landing spot 
-            RaycastHit2D predictHit = new RaycastHit2D();
-            RaycastHit2D predictHit2 = new RaycastHit2D();
-            Vector2 pos = transform.position - (transform.up * 0.7f);
-            Vector2 pos2 = transform.position + (transform.up * 0.7f);
+    private void UpdatePosition()
+    {
+        Vector3 finalPosition = transform.position + _currentVelocity * (float) TimeManager.TickDelta;
 
-            Vector2 velo = new Vector2(velocity.veloOffGround.x, velocity.veloOffGround.y) * Time.fixedDeltaTime * fFactor;
 
-            int count = 0;
-            while ((predictHit.collider == null && predictHit2.collider == null) && count < 100) {
+        if (_isGrounded)
+        {
+            Vector2 velocity = new Vector2(_currentVelocity.x, _currentVelocity.y);
 
-                // Generate new ray
-                Ray2D ray = new Ray2D(pos, velo.normalized);
-                Ray2D ray2 = new Ray2D(pos2, velo.normalized);
+            Ray2D leftRay = new Ray2D(_raycastOrigins.bottomLeft + (velocity * (float) TimeManager.TickDelta), -transform.up);
+            Ray2D rightRay = new Ray2D(_raycastOrigins.bottomRight + (velocity * (float) TimeManager.TickDelta), -transform.up);
 
-                Color randColor = Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
+            RaycastHit2D leftHit = Physics2D.Raycast(leftRay.origin, leftRay.direction, MovementProperties.GroundedHeight, MovementProperties.ObstacleMask);
+            RaycastHit2D rightHit = Physics2D.Raycast(rightRay.origin, rightRay.direction, MovementProperties.GroundedHeight, MovementProperties.ObstacleMask);
 
-                Debug.DrawRay(ray.origin, ray.direction * velo.magnitude, randColor, 2f);
-                Debug.DrawRay(ray2.origin, ray2.direction * velo.magnitude, randColor, 2f);
-
-                // Update predictHit
-                predictHit = Physics2D.Raycast(ray.origin, ray.direction, velo.magnitude, grounded.mask);
-                predictHit2 = Physics2D.Raycast(ray2.origin, ray2.direction, velo.magnitude, grounded.mask);
-
-                // Update position to end of predictHit ray
-                pos += (ray.direction * velo.magnitude);
-                pos2 += (ray2.direction * velo.magnitude);
-
-                velo += (Vector2.down * movementProperties.gravity * Time.fixedDeltaTime);
-
-                count++;
+            // Use override hit to prevent clipping
+            RaycastHit2D overrideHit = Physics2D.Raycast((leftRay.origin + rightRay.origin) / 2, transform.right, MovementProperties.OverrideRayLength * Mathf.Sign(_currentVelocity.x), MovementProperties.ObstacleMask);
+            if (_currentVelocity.x < 0f && overrideHit.collider != null) {
+                leftHit = overrideHit;
+            } else if (_currentVelocity.x > 0f && overrideHit.collider != null) {
+                rightHit = overrideHit;
             }
 
-            // If landing position is spotted
-            if (predictHit.collider != null) {
-                // Set the predicted landing position
-                predictPos = predictHit.point;
+            // Apply rotation to orient body to match ground
+            Quaternion finalRotation = transform.rotation;
+            if (leftHit && rightHit) {
+                Vector2 avgNorm = (leftHit.normal + rightHit.normal) / 2;
 
-                // And the predicted landing normal
-                predictNorm = predictHit.normal;
-            } else if (predictHit2.collider != null) {
-                // Set the predicted landing position
-                predictPos = predictHit2.point;
-
-                // And the predicted landing normal
-                predictNorm = predictHit2.normal;
-            } else {
-                Debug.Log("Hit the max count");
+                Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, avgNorm);
+                finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, MovementProperties.MaxRotationDegrees);
             }
+
+            transform.SetPositionAndRotation(finalPosition, finalRotation);
+        }
+        else
+        {
+            // And rotate to the predicted landing spots normal
+            Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, _predictedNormal);
+            Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, MovementProperties.MaxRotationDegrees);
+
+            transform.SetPositionAndRotation(finalPosition, finalRotation);
+        }
     }
 
-    void ShowPredictedTrajectory() {
-
-        //if (velocity.x == 0f) {
-            //return;
-        //}
-
-        float theta = Vector2.SignedAngle(Vector2.right, transform.up) * Mathf.Deg2Rad;
-        float gamma = Vector2.SignedAngle(Vector2.right, transform.right) * Mathf.Deg2Rad;
-
-        float xComponentOfYVelo = Mathf.Cos(theta) * movementProperties.jumpVelocity;
-        float yComponentOfYVelo = Mathf.Sin(theta) * movementProperties.jumpVelocity;
-
-        float xComponentOfXVelo = Mathf.Cos(gamma) * velocity.x;
-        float yComponentOfXVelo = Mathf.Sin(gamma) * velocity.x;
-
-        Vector2 predVelo = new Vector2(xComponentOfXVelo + xComponentOfYVelo, yComponentOfXVelo + yComponentOfYVelo);
-
+    private void RecalculateLandingPosition() {
+        // Predict the landing spot 
         RaycastHit2D predictHit = new RaycastHit2D();
-        Vector2 pos = transform.position;
+        RaycastHit2D predictHit2 = new RaycastHit2D();
+        Vector2 pos = transform.position - (transform.up * 0.7f);
+        Vector2 pos2 = transform.position + (transform.up * 0.7f);
 
-        Vector2 velo = new Vector2(predVelo.x, predVelo.y) * Time.fixedDeltaTime * fFactor;
+        Vector2 velo = new Vector2(_currentVelocity.x, _currentVelocity.y) * Time.fixedDeltaTime * MovementProperties.FFactor;
 
         int count = 0;
-        while (predictHit.collider == null && count < 100) {
+        while ((predictHit.collider == null && predictHit2.collider == null) && count < 100) {
 
             // Generate new ray
             Ray2D ray = new Ray2D(pos, velo.normalized);
+            Ray2D ray2 = new Ray2D(pos2, velo.normalized);
 
-            if (count % 2 == 1) {
-                Debug.DrawRay(ray.origin, ray.direction * velo.magnitude, Color.green);
-            }
+            Color randColor = Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
+
+            Debug.DrawRay(ray.origin, ray.direction * velo.magnitude, randColor, 2f);
+            Debug.DrawRay(ray2.origin, ray2.direction * velo.magnitude, randColor, 2f);
 
             // Update predictHit
-            predictHit = Physics2D.Raycast(ray.origin, ray.direction, velo.magnitude, grounded.mask);
+            predictHit = Physics2D.Raycast(ray.origin, ray.direction, velo.magnitude, MovementProperties.ObstacleMask);
+            predictHit2 = Physics2D.Raycast(ray2.origin, ray2.direction, velo.magnitude, MovementProperties.ObstacleMask);
 
             // Update position to end of predictHit ray
             pos += (ray.direction * velo.magnitude);
+            pos2 += (ray2.direction * velo.magnitude);
 
-            velo += (Vector2.down * movementProperties.gravity * Time.fixedDeltaTime);
+            velo += (Vector2.down * MovementProperties.Gravity * Time.fixedDeltaTime);
 
             count++;
         }
+
+        // Set the predicted landing position and normal
+        // By nature this will get the closer of the two landing positions
+        if (predictHit.collider != null) {
+            _predictedPosition = predictHit.point;
+
+            _predictedNormal = predictHit.normal;
+        } else if (predictHit2.collider != null) {
+            _predictedPosition = predictHit2.point;
+
+            _predictedNormal = predictHit2.normal;
+        }
     }
 
-    void OnDrawGizmos() {
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(predictPos, 0.25f);
+    private void PerformAnimation()
+    {
+        if (_input.HorizontalMovementInput > 0f)
+            _animator.SetBool("IsFacingRight", true);
+        else if (_input.HorizontalMovementInput < 0f)
+            _animator.SetBool("IsFacingRight", false);
+
+        _animator.SetBool("InCombatMode", _inCombatMode);
     }
+
+    private void SetPublicMovementData()
+    {
+        PublicData.Velocity = _currentVelocity;
+        PublicData.IsGrounded = _isGrounded;
+    }
+
+    #endregion
+
 }

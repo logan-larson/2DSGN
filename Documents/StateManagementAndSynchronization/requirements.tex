@@ -1,0 +1,76 @@
+\documentclass{article}
+
+\title{State Management and Synchronization Requirements}
+\author{Logan Larson}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Client actions}
+\begin{itemize}
+		\item Multiple clients connect to a local server
+    \begin{itemize}
+		    \item Server logs show client connected
+    \end{itemize}
+		\item Multiple clients connect to the remote test server
+    \begin{itemize}
+				\item Server logs show client connected
+    \end{itemize}
+	  \item Client inputs are sent to the server
+    \begin{itemize}
+				\item When input events that affect the game state are triggered, the input is sent to the server
+				\item Server logs show data transferred by each client
+    \end{itemize}
+		\item Client predicts game state based on user input
+    \begin{itemize}
+				\item When input events that affect the game state are triggered, the client uses the input to predict the game state
+				\item Without server responses, the game's movement functions properly
+    \end{itemize}
+		\item Client reconciles predicted state with authoritative server state
+    \begin{itemize}
+				\item Client receives server game state on server tick
+				\item Client compares client game state to server game state for time stamp in past
+				\item If not matching, client game state gets overridden to  match server game state
+    \end{itemize}
+		\item Client interpolates entity positions given the game states provided by the server
+    \begin{itemize}
+				\item Client receives server game state on server tick
+				\item Client interpolates from client game state to server game state to reduce jitter
+    \end{itemize}
+\end{itemize}
+
+\section{Server actions}
+\begin{itemize}
+		\item When a client connects, a player is spawned for the corresponding client
+    \begin{itemize}
+				\item Server receives client connection
+				\item Server spawns client object into server game state
+    \end{itemize}
+		\item Server determines game state based on clients' inputs
+    \begin{itemize}
+				\item Server receives client input event
+				\item Server determines game state based on input and timestamps it
+    \end{itemize}
+		\item Server sends updated game state to all clients at regular intervals
+		\item When a client disconnects, their player is removed
+    \begin{itemize}
+			  \item Server receives client disconnection
+				\item Server removes client object from server game state
+    \end{itemize}
+		\item Server compensates authoritative state for client latency
+    \begin{itemize}
+				\item Server receives client input
+				\item Server compares input to server game state when client input was performed
+				\item Server updates game state to match client's expected results of game state based on inputs
+    \end{itemize}
+\end{itemize}
+
+\section{Environment}
+\begin{itemize}
+		\item Set up a local test server
+		\item Set up a persistent remote test server
+\end{itemize}
+
+\end{document}
