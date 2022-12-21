@@ -1,14 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using FishNet.Object;
 using FishNet.Object.Prediction;
 using UnityEngine;
 
-[RequireComponent (typeof(PlayerInputValues))]
-[RequireComponent (typeof(PlayerPosition))]
-[RequireComponent (typeof(PlayerVelocity))]
-[RequireComponent (typeof(PlayerGrounded))]
-[RequireComponent (typeof(PlayerMode))]
 public class MovementSystem : NetworkBehaviour
 {
 
@@ -62,8 +55,11 @@ public class MovementSystem : NetworkBehaviour
 
     #region Script References
 
-    [HideInInspector]
-    public PlayerInputValues Input;
+    [SerializeField]
+    private InputSystem InputSystem;
+
+    [SerializeField]
+    private PlayerInputValues _input;
 
     [SerializeField]
     private Animator _animator;
@@ -194,10 +190,15 @@ public class MovementSystem : NetworkBehaviour
 
     private void Awake()
     {
-        Input = GetComponent<PlayerInputValues>();
+        InputSystem = InputSystem ?? GetComponent<InputSystem>();
+    }
 
-        if (Input == null)
-            Debug.LogError("PlayerInput not found on " + gameObject.name);
+    private void Start()
+    {
+        _input = InputSystem.InputValues;
+
+        if (_input == null)
+            Debug.LogError("InputValues not found on InputSystem.");
     }
 
     private void Update()
@@ -250,12 +251,12 @@ public class MovementSystem : NetworkBehaviour
     {
         moveData = default;
 
-        moveData.Horizontal = Input.HorizontalMovementInput;
-        moveData.Sprint = Input.IsSprintKeyPressed;
-        moveData.Jump = Input.IsJumpKeyPressed;
-        moveData.ChangeToCombat = Input.IsFirePressed;
+        moveData.Horizontal = _input.HorizontalMovementInput;
+        moveData.Sprint = _input.IsSprintKeyPressed;
+        moveData.Jump = _input.IsJumpKeyPressed;
+        moveData.ChangeToCombat = _input.IsFirePressed;
         if (!moveData.ChangeToCombat)
-            moveData.ChangeToParkour = Input.IsSprintKeyPressed;
+            moveData.ChangeToParkour = _input.IsSprintKeyPressed;
     }
 
     /// <summary>
@@ -500,9 +501,9 @@ public class MovementSystem : NetworkBehaviour
 
     private void PerformAnimation()
     {
-        if (Input.HorizontalMovementInput > 0f)
+        if (_input.HorizontalMovementInput > 0f)
             _animator.SetBool("IsFacingRight", true);
-        else if (Input.HorizontalMovementInput < 0f)
+        else if (_input.HorizontalMovementInput < 0f)
             _animator.SetBool("IsFacingRight", false);
 
         _animator.SetBool("InCombatMode", _inCombatMode);

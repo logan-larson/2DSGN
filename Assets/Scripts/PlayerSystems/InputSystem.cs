@@ -5,29 +5,38 @@ using UnityEngine.InputSystem;
 [RequireComponent (typeof(MovementSystem))]
 public class InputSystem : MonoBehaviour {
 
-    PlayerInputValues input;
-    MovementSystem movement;
 
-    void Start() { // public void OnStart
-        input = GetComponent<PlayerInputValues>();
-        movement = GetComponent<MovementSystem>();
+    // TODO: At some point I think I would like to make these events
+    // So other systems can subscribe to them without having
+    // to know about the input system
+
+    [HideInInspector]
+    public PlayerInputValues InputValues;
+
+    private MovementSystem _movement;
+
+    private void Awake() {
+        _movement = _movement ?? GetComponent<MovementSystem>();
+
+        InputValues = (PlayerInputValues) ScriptableObject.CreateInstance(typeof(PlayerInputValues));
     }
 
     public void OnMove(InputValue value)
     {
-        input.HorizontalMovementInput = value.Get<Vector2>().x;
+        InputValues.HorizontalMovementInput = value.Get<Vector2>().x;
     }
 
     public void OnSprint(InputValue value) {
-        input.IsSprintKeyPressed = value.Get<float>() == 1f;
+        InputValues.IsSprintKeyPressed = value.Get<float>() == 1f;
     }
     
+    // TODO: Move these events to triggers
     public void OnJump(InputValue value) {
-        input.IsJumpKeyPressed = value.Get<float>() == 1f;
+        InputValues.IsJumpKeyPressed = value.Get<float>() == 1f;
     }
 
     public void OnFire(InputValue value) {
-        input.IsFirePressed = value.Get<float>() == 1f;
+        InputValues.IsFirePressed = value.Get<float>() == 1f;
         //movement.Fire();
     }
 

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "PlayerMovementProperties", menuName = "Settings/PlayerMovementProperties", order = 1)]
+[CreateAssetMenu(fileName = "PlayerMovementProperties", menuName = "Player/PlayerMovementProperties", order = 1)]
 public class PlayerMovementProperties : ScriptableObject
 {
     [Header("Movement")]

@@ -1,17 +1,7 @@
 using FishNet.Object;
 using UnityEngine;
 
-[RequireComponent (typeof(PlayerVelocity))]
-[RequireComponent (typeof(PlayerAnimation))]
-[RequireComponent (typeof(PlayerMode))]
-[RequireComponent (typeof(PlayerGrounded))]
 public class AnimationSystem : NetworkBehaviour {
-
-    PlayerPosition position;
-    PlayerVelocity velocity;
-    PlayerMode mode;
-    PlayerGrounded grounded;
-    PlayerAnimation playerAnimation;
 
     Animator _animator;
 
@@ -53,15 +43,9 @@ public class AnimationSystem : NetworkBehaviour {
     {
         _animator = GetComponentInChildren<Animator>();
         _movementSystem = GetComponent<MovementSystem>();
-        _playerInput = GetComponent<PlayerInputValues>();
     }
 
     void Start() { // public void OnStart
-        position = GetComponent<PlayerPosition>();
-        velocity = GetComponent<PlayerVelocity>();
-        playerAnimation = GetComponent<PlayerAnimation>();
-        mode = GetComponent<PlayerMode>();
-        grounded = GetComponent<PlayerGrounded>();
 
         //staticAnimations = GameObject.Find("PlayerAnimation");
         boneBody = GameObject.Find("Bone_Body");
