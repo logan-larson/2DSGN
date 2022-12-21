@@ -17,6 +17,10 @@ public class PlayerMovementProperties : ScriptableObject
     /// </summary>
     public float MaxSpeed = 7f;
     /// <summary>
+    /// The maximum speed at which the player can move while in the air.
+    /// </summary>
+    public float MaxAirborneSpeed = 10f;
+    /// <summary>
     /// The amount by which the player's speed is changed when they sprint.
     /// </summary>
     public float SprintMultiplier = 1.5f; 

@@ -113,12 +113,11 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: RightParkour
+  m_Name: Right
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -2099976045373972170}
-  - {fileID: -6809966346184295838}
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
@@ -258,12 +257,6 @@ AnimatorStateMachine:
   - serializedVersion: 1
     m_State: {fileID: 4360760250305763522}
     m_Position: {x: 330, y: 50, z: 0}
-  - serializedVersion: 1
-    m_State: {fileID: -3474435092104411605}
-    m_Position: {x: 580, y: 50, z: 0}
-  - serializedVersion: 1
-    m_State: {fileID: -7836292851989068745}
-    m_Position: {x: 590, y: 180, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -306,12 +299,11 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: LeftParkour
+  m_Name: Left
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 6522557134530534864}
-  - {fileID: -5992722061304316380}
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0

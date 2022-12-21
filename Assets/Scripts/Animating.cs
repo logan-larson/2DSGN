@@ -10,6 +10,7 @@ public class Animating : MonoBehaviour
     // PlayerAnimation playerAnimation;
 
     public float lerpValue = 0.1f;
+    public float positionLerpValue = 0.1f;
 
     private void Awake()
     {
@@ -32,9 +33,11 @@ public class Animating : MonoBehaviour
         */
 
         // Update animation position based on player velocity
+        Vector2 positionLerped = Vector2.Lerp(transform.position, transform.parent.transform.position, positionLerpValue);
+
         Vector2 vectorInPixels = new Vector2(
-            Mathf.RoundToInt(transform.parent.transform.position.x * 32),
-            Mathf.RoundToInt(transform.parent.transform.position.y * 32)
+            Mathf.RoundToInt(positionLerped.x * 32),
+            Mathf.RoundToInt(positionLerped.y * 32)
         );
 
         //return vectorInPixels / 32;

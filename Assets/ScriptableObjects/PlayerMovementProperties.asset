@@ -15,14 +15,15 @@ MonoBehaviour:
   Acceleration: 2
   Friction: 1
   MaxSpeed: 5
+  MaxAirborneSpeed: 10
   SprintMultiplier: 2
   ParkourMultiplier: 1.5
   CombatMultiplier: 1
   Gravity: 9.81
-  MaxRotationDegrees: 24.83
+  MaxRotationDegrees: 180
   JumpVelocity: 10
   MinimumJumpTime: 0.1
-  FFactor: 7.3
+  FFactor: 7.5
   GroundedHeight: 1.5
   ObstacleMask:
     serializedVersion: 2

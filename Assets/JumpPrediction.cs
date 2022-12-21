@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FishNet.Object;
 
-public class JumpPrediction : MonoBehaviour
+public class JumpPrediction : NetworkBehaviour
 {
 
     [SerializeField]
@@ -17,8 +18,19 @@ public class JumpPrediction : MonoBehaviour
     //private float fFactor = 6.75f;
     public float lerpValue = 0.1f;
 
-    void FixedUpdate()
+    public override void OnStartClient()
     {
+        base.OnStartClient();
+        //_line = GetComponent<LineRenderer>();
+        if (_line == null) return;
+        if (!base.IsOwner) _line.enabled = false;
+    }
+
+    private void FixedUpdate()
+    {
+
+        //float theta = Vector2.SignedAngle(Vector2.right, transform.up) * Mathf.Deg2Rad;
+        //float gamma = Vector2.SignedAngle(Vector2.right, transform.right) * Mathf.Deg2Rad;
         float theta = Vector2.SignedAngle(Vector2.right, transform.up) * Mathf.Deg2Rad;
         float gamma = Vector2.SignedAngle(Vector2.right, transform.right) * Mathf.Deg2Rad;
 
@@ -30,9 +42,10 @@ public class JumpPrediction : MonoBehaviour
 
         Vector2 predVelo;
         if (_movement.PublicData.IsGrounded) {
-            predVelo = new Vector2(xComponentOfXVelo + xComponentOfYVelo, yComponentOfXVelo + yComponentOfYVelo);
+            //predVelo = new Vector2(xComponentOfXVelo + xComponentOfYVelo, yComponentOfXVelo + yComponentOfYVelo);
+            predVelo = _movement.PublicData.Velocity + (transform.up * _movementProperties.JumpVelocity);
         } else {
-            predVelo = _movement.PublicData.AirborneVelocity;
+            predVelo = _movement.PublicData.Velocity;
         }
 
         RaycastHit2D predictHit = new RaycastHit2D();
@@ -53,15 +66,8 @@ public class JumpPrediction : MonoBehaviour
                 Mathf.RoundToInt(pos.y * 32)
             );
 
-            //return vectorInPixels / 32;
-
-            
             points.Add(pos);
 
-
-            if (count % 2 == 1) {
-                Debug.DrawRay(ray.origin, ray.direction * velo.magnitude, Color.green);
-            }
 
             // Update predictHit
             predictHit = Physics2D.Raycast(ray.origin, ray.direction, velo.magnitude, _movementProperties.ObstacleMask);
@@ -77,10 +83,6 @@ public class JumpPrediction : MonoBehaviour
         _line.positionCount = points.Count;
 
         for (int i = 0; i < points.Count; i++) {
-            //Vector2 posInUnits = points[i] / 32;
-
-            //Vector2 lerpedPos = Vector2.Lerp(points[i], posInUnits, lerpValue);
-
             _line.SetPosition(i, points[i]);
         }
     }

@@ -112,7 +112,7 @@ public class AnimationSystem : NetworkBehaviour {
 
     private void Update()
     { // public void OnUpdate
-        if (!base.IsOwner) return;
+        //if (!base.IsOwner) return;
 
         /*
         if (_movementSystem.Velocity.x > 1f || _movementSystem.AirborneVelocity.x > 1f) {

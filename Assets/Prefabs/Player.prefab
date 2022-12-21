@@ -928,6 +928,9 @@ MonoBehaviour:
   Input: {fileID: 0}
   _animator: {fileID: 5379027206402953739}
   MovementProperties: {fileID: 11400000, guid: 70099ab69eee19c4cad9e629a3eb4742, type: 2}
+  _inParkourMode: 1
+  _inCombatMode: 0
+  _isFiring: 0
 --- !u!114 &4268827610097334077
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -935,7 +938,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4268827610097334048}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46558cb76fb386f488ee5ae79352b8b5, type: 3}
   m_Name: 
@@ -1229,7 +1232,7 @@ MonoBehaviour:
   _animator: {fileID: 5379027206402953739}
   _smoothFloats: 1
   _interpolation: 2
-  _clientAuthoritative: 1
+  _clientAuthoritative: 0
   _sendToOwner: 0
 --- !u!114 &993915075168902806
 MonoBehaviour:
@@ -1493,6 +1496,7 @@ MonoBehaviour:
   _movementProperties: {fileID: 11400000, guid: 70099ab69eee19c4cad9e629a3eb4742, type: 2}
   _movement: {fileID: 4268827610097334074}
   _line: {fileID: 7153541498818810382}
+  lerpValue: 0.1
 --- !u!1 &8071898018228883347
 GameObject:
   m_ObjectHideFlags: 0
