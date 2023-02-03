@@ -17,6 +17,6 @@ public class CameraController : MonoBehaviour
     private void FirstObjectNotifier_OnFirstObjectSpawned(Transform obj)
     {
         CinemachineVirtualCamera vc = GetComponent<CinemachineVirtualCamera>();
-        vc.Follow = obj;
+        //vc.Follow = obj;
     }
 }
