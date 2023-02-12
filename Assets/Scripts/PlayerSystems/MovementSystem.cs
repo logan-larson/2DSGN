@@ -220,7 +220,7 @@ public class MovementSystem : NetworkBehaviour
         if (base.IsServer)
         {
             Move(default, true);
-            
+
             ReconcileData reconcileData = new ReconcileData()
             {
                 Position = transform.position,
@@ -289,9 +289,9 @@ public class MovementSystem : NetworkBehaviour
     [Reconcile]
     private void Reconciliation(ReconcileData data, bool asServer)
     {
-        transform.position = data.Position;
-        transform.rotation = data.Rotation;
-        _currentVelocity = data.Velocity;
+        transform.position = new Vector3(data.Position.x, data.Position.y, data.Position.z);
+        transform.rotation = new Quaternion(data.Rotation.x, data.Rotation.y, data.Rotation.z, data.Rotation.w);
+        _currentVelocity = new Vector3(data.Velocity.x, data.Velocity.y, data.Velocity.z);
         _isGrounded = data.IsGrounded;
         _inParkourMode = data.InParkourMode;
         _inCombatMode = data.InCombatMode;
@@ -304,7 +304,7 @@ public class MovementSystem : NetworkBehaviour
             _inCombatMode = false;
             _inParkourMode = true;
         }
-        
+
         if (moveData.ChangeToCombat)
         {
             _inCombatMode = true;
@@ -312,14 +312,16 @@ public class MovementSystem : NetworkBehaviour
         }
     }
 
-    private void UpdateRaycastOrigins() {
-		_raycastOrigins.bottomLeft = transform.position - (transform.right / 2) - (transform.up / 2);
-		_raycastOrigins.bottomRight = transform.position + (transform.right / 2) - (transform.up / 2);
-		_raycastOrigins.topLeft = transform.position - (transform.right / 2) + (transform.up / 2);
-		_raycastOrigins.topRight = transform.position + (transform.right / 2) + (transform.up / 2);
+    private void UpdateRaycastOrigins()
+    {
+        _raycastOrigins.bottomLeft = transform.position - (transform.right / 2) - (transform.up / 2);
+        _raycastOrigins.bottomRight = transform.position + (transform.right / 2) - (transform.up / 2);
+        _raycastOrigins.topLeft = transform.position - (transform.right / 2) + (transform.up / 2);
+        _raycastOrigins.topRight = transform.position + (transform.right / 2) + (transform.up / 2);
     }
 
-    private void UpdateGrounded() {
+    private void UpdateGrounded()
+    {
         // If the player is currently grounded, check if they are still grounded and set ground distance
         if (_isGrounded || _timeSinceGrounded > MovementProperties.MinimumJumpTime)
         {
@@ -332,14 +334,14 @@ public class MovementSystem : NetworkBehaviour
         // Otherwise, increase the time since grounded
         else
         {
-            _timeSinceGrounded += (float) TimeManager.TickDelta;
+            _timeSinceGrounded += (float)TimeManager.TickDelta;
         }
     }
 
     private void UpdateVelocity(MoveData moveData, bool asServer)
     {
 
-        
+
         // Increase top speed when sprint key is pressed
         float sprintMultiplier = moveData.Sprint && !_inCombatMode ? MovementProperties.SprintMultiplier : 1f;
         // Set top speed based on mode
@@ -358,7 +360,8 @@ public class MovementSystem : NetworkBehaviour
 
         // Limit top speed
         float maxSpeed = _isGrounded ? MovementProperties.MaxSpeed : MovementProperties.MaxAirborneSpeed;
-        if (_isGrounded && _currentVelocity.magnitude > maxSpeed * sprintMultiplier * modeMultiplier) {
+        if (_isGrounded && _currentVelocity.magnitude > maxSpeed * sprintMultiplier * modeMultiplier)
+        {
             _currentVelocity = _currentVelocity.normalized * maxSpeed * sprintMultiplier * modeMultiplier;
         }
 
@@ -391,14 +394,14 @@ public class MovementSystem : NetworkBehaviour
         else
         {
             // Apply gravity
-            _currentVelocity += (Vector3.down * MovementProperties.Gravity * (float) TimeManager.TickDelta);
+            _currentVelocity += (Vector3.down * MovementProperties.Gravity * (float)TimeManager.TickDelta);
 
             // This is where airborne movement forces can be applied
 
             // If forces were applied then we need to recalculate the landing
             //recalculateLanding = false;
         }
-        
+
 
         // If we are not grounded and we have not predicted a landing position then we need to calculate it
         // Or if we manually trigger a recalculation
@@ -410,30 +413,34 @@ public class MovementSystem : NetworkBehaviour
 
     private void UpdatePosition()
     {
-        Vector3 finalPosition = transform.position + _currentVelocity * (float) TimeManager.TickDelta;
+        Vector3 finalPosition = transform.position + _currentVelocity * (float)TimeManager.TickDelta;
 
 
         if (_isGrounded)
         {
             Vector2 velocity = new Vector2(_currentVelocity.x, _currentVelocity.y);
 
-            Ray2D leftRay = new Ray2D(_raycastOrigins.bottomLeft + (velocity * (float) TimeManager.TickDelta), -transform.up);
-            Ray2D rightRay = new Ray2D(_raycastOrigins.bottomRight + (velocity * (float) TimeManager.TickDelta), -transform.up);
+            Ray2D leftRay = new Ray2D(_raycastOrigins.bottomLeft + (velocity * (float)TimeManager.TickDelta), -transform.up);
+            Ray2D rightRay = new Ray2D(_raycastOrigins.bottomRight + (velocity * (float)TimeManager.TickDelta), -transform.up);
 
             RaycastHit2D leftHit = Physics2D.Raycast(leftRay.origin, leftRay.direction, MovementProperties.GroundedHeight, MovementProperties.ObstacleMask);
             RaycastHit2D rightHit = Physics2D.Raycast(rightRay.origin, rightRay.direction, MovementProperties.GroundedHeight, MovementProperties.ObstacleMask);
 
             // Use override hit to prevent clipping
             RaycastHit2D overrideHit = Physics2D.Raycast((leftRay.origin + rightRay.origin) / 2, transform.right, MovementProperties.OverrideRayLength * Mathf.Sign(_currentVelocity.x), MovementProperties.ObstacleMask);
-            if (_currentVelocity.x < 0f && overrideHit.collider != null) {
+            if (_currentVelocity.x < 0f && overrideHit.collider != null)
+            {
                 leftHit = overrideHit;
-            } else if (_currentVelocity.x > 0f && overrideHit.collider != null) {
+            }
+            else if (_currentVelocity.x > 0f && overrideHit.collider != null)
+            {
                 rightHit = overrideHit;
             }
 
             // Apply rotation to orient body to match ground
             Quaternion finalRotation = transform.rotation;
-            if (leftHit && rightHit) {
+            if (leftHit && rightHit)
+            {
                 Vector2 avgNorm = (leftHit.normal + rightHit.normal) / 2;
 
                 Quaternion targetRotation = Quaternion.FromToRotation(Vector3.up, avgNorm);
@@ -452,7 +459,8 @@ public class MovementSystem : NetworkBehaviour
         }
     }
 
-    private void RecalculateLandingPosition() {
+    private void RecalculateLandingPosition()
+    {
         // Predict the landing spot 
         RaycastHit2D predictHit = new RaycastHit2D();
         RaycastHit2D predictHit2 = new RaycastHit2D();
@@ -462,7 +470,8 @@ public class MovementSystem : NetworkBehaviour
         Vector2 velo = new Vector2(_currentVelocity.x, _currentVelocity.y) * Time.fixedDeltaTime * MovementProperties.FFactor;
 
         int count = 0;
-        while ((predictHit.collider == null && predictHit2.collider == null) && count < 100) {
+        while ((predictHit.collider == null && predictHit2.collider == null) && count < 100)
+        {
 
             // Generate new ray
             Ray2D ray = new Ray2D(pos, velo.normalized);
@@ -488,11 +497,14 @@ public class MovementSystem : NetworkBehaviour
 
         // Set the predicted landing position and normal
         // By nature this will get the closer of the two landing positions
-        if (predictHit.collider != null) {
+        if (predictHit.collider != null)
+        {
             _predictedPosition = predictHit.point;
 
             _predictedNormal = predictHit.normal;
-        } else if (predictHit2.collider != null) {
+        }
+        else if (predictHit2.collider != null)
+        {
             _predictedPosition = predictHit2.point;
 
             _predictedNormal = predictHit2.normal;

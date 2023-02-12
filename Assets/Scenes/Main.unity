@@ -12391,9 +12391,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 995797880}
   player: {fileID: 0}
-  threshold: 5
+  threshold: 3
   posLerpValue: 0.1
-  rotLerpValue: 0.01
+  rotLerpValue: 0.05
 --- !u!4 &1919249583
 Transform:
   m_ObjectHideFlags: 0
@@ -12622,7 +12622,7 @@ MonoBehaviour:
   _ipv6BindAddress: 
   _port: 14103
   _maximumClients: 4095
-  _clientAddress: localhost
+  _clientAddress: 44.203.13.24
   _timeout: 15
 --- !u!114 &5313784219897215940
 MonoBehaviour:
