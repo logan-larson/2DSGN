@@ -5,7 +5,7 @@ using UnityEngine;
 public class FirstObjectNotifier : NetworkBehaviour
 {
 
-    public static event Action<Transform> OnFirstObjectSpawned;
+    public static event Action<Transform, GameObject> OnFirstObjectSpawned;
 
     public override void OnStartClient()
     {
@@ -14,7 +14,7 @@ public class FirstObjectNotifier : NetworkBehaviour
         {
             NetworkObject nob = base.LocalConnection.FirstObject;
             if (nob == base.NetworkObject)
-                OnFirstObjectSpawned?.Invoke(transform);
+                OnFirstObjectSpawned?.Invoke(transform, base.gameObject);
         }
     }
 }

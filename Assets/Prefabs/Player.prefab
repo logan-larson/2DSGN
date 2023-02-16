@@ -922,7 +922,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InputValues: {fileID: 0}
-  _movement: {fileID: 4268827610097334074}
 --- !u!114 &3162633828202351065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1046,6 +1045,7 @@ MonoBehaviour:
   - {fileID: 3431540716247825733}
   - {fileID: 6413919363218253851}
   - {fileID: 223301570187018686}
+  - {fileID: 0}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
@@ -1234,7 +1234,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lerpValue: 0.1
-  positionLerpValue: 0.1
 --- !u!1 &7173244554442536117
 GameObject:
   m_ObjectHideFlags: 0
@@ -1484,7 +1483,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lerpValue: 0.1
-  positionLerpValue: 0.1
 --- !u!1001 &6691966581339463209
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -75,7 +75,7 @@ public class MovementSystem : NetworkBehaviour
     /// <summary>
     /// The current airborne velocity of the player.
     /// </summary>
-    private Vector3 _currentVelocity = new Vector3();
+    public Vector3 _currentVelocity { get; private set; } = new Vector3();
 
     /// <summary>
     /// True if subscribed to the TimeManager.
