@@ -10,6 +10,8 @@ public class CameraTarget : MonoBehaviour
     [SerializeField] private float startingZ = -10f;
     [SerializeField] private float zMod = 0.4f;
 
+    private Vector3 velocity = Vector3.zero;
+
 
     private MovementSystem movementSystem;
 
@@ -45,7 +47,7 @@ public class CameraTarget : MonoBehaviour
 
         // Calculate the camera z position based on the player's velocity
         // Zoom out when moving faster
-        Vector3 velocity = movementSystem._currentVelocity;
+        Vector3 velocity = movementSystem.PublicData.Velocity;
 
         targetPos.z = startingZ - (velocity.magnitude * zMod);
 
@@ -63,8 +65,10 @@ public class CameraTarget : MonoBehaviour
 
         // Lerp to nearest position and rotation
         Vector3 lerpedPos = Vector3.Lerp(transform.position, posInUnits, posLerpValue);
+        // Vector3 dampedPos = Vector3.SmoothDamp(transform.position, targetPos, ref velocity, posLerpValue);
         Quaternion lerpedRot = Quaternion.Lerp(this.transform.rotation, player.rotation, rotLerpValue);
 
         this.transform.SetPositionAndRotation(new Vector3(lerpedPos.x, lerpedPos.y, lerpedPos.z), lerpedRot);
+        // this.transform.SetPositionAndRotation(new Vector3(dampedPos.x, dampedPos.y, dampedPos.z), lerpedRot);
     }
 }

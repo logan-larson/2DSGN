@@ -75,7 +75,7 @@ public class MovementSystem : NetworkBehaviour
     /// <summary>
     /// The current airborne velocity of the player.
     /// </summary>
-    public Vector3 _currentVelocity { get; private set; } = new Vector3();
+    public Vector3 _currentVelocity = new Vector3();
 
     /// <summary>
     /// True if subscribed to the TimeManager.
@@ -144,6 +144,12 @@ public class MovementSystem : NetworkBehaviour
     /// </summary>
     [SerializeField]
     private bool _isFiring = false;
+
+    /// <summary>
+    /// Amount to change the players height when grounded
+    /// </summary>
+    [SerializeField]
+    private float groundChangeSpeed = 0.5f;
 
 
     #endregion
@@ -383,11 +389,11 @@ public class MovementSystem : NetworkBehaviour
             {
                 if (_groundDistance < 0.95f)
                 {
-                    _currentVelocity += transform.up * 3f;
+                    _currentVelocity += transform.up * groundChangeSpeed;
                 }
                 else if (_groundDistance > 1.05f)
                 {
-                    _currentVelocity -= transform.up * 3f;
+                    _currentVelocity -= transform.up * groundChangeSpeed;
                 }
             }
         }
