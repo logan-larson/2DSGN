@@ -1045,7 +1045,6 @@ MonoBehaviour:
   - {fileID: 3431540716247825733}
   - {fileID: 6413919363218253851}
   - {fileID: 223301570187018686}
-  - {fileID: 0}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1

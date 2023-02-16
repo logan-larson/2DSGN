@@ -1,21 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
-using Cinemachine;
 using UnityEngine;
 
 public class CameraTarget : MonoBehaviour
 {
     [SerializeField] private Camera cam;
     [SerializeField] private Transform player = null;
-    [SerializeField] private float threshold;
-    [SerializeField] private float posLerpValue = 0.1f;
-    [SerializeField] private float rotLerpValue = 0.1f;
+    [SerializeField] private float posLerpValue = 0.05f;
+    [SerializeField] private float rotLerpValue = 0.05f;
 
-    [SerializeField] private float startingZ = -1f;
-    [SerializeField] private float zMod = 0.2f;
+    [SerializeField] private float startingZ = -10f;
+    [SerializeField] private float zMod = 0.4f;
 
 
-    [SerializeField] private Vector2 velocity;
     private MovementSystem movementSystem;
 
 
@@ -37,28 +32,39 @@ public class CameraTarget : MonoBehaviour
     }
 
 
-    void Update()
+    void LateUpdate()
     {
         if (player == null) return;
 
+        // Get the mouse position in world space
         Vector3 mousePos = cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, cam.nearClipPlane));
-        // Vector3 targetPos = (player.position + new Vector3(mousePos.x, mousePos.y, 0f)) / 2f;
-        Vector3 targetPos = (player.position + mousePos) / 2f;
 
-        // targetPos.x = Mathf.Clamp(targetPos.x, player.position.x - threshold, player.position.x + threshold);
-        // targetPos.y = Mathf.Clamp(targetPos.y, player.position.y - threshold, player.position.y + threshold);
-        targetPos = player.position;
+        // Set the target position to the player position
+        Vector3 targetPos = player.position;
 
-        velocity = movementSystem._currentVelocity;
+
+        // Calculate the camera z position based on the player's velocity
+        // Zoom out when moving faster
+        Vector3 velocity = movementSystem._currentVelocity;
 
         targetPos.z = startingZ - (velocity.magnitude * zMod);
 
         targetPos.z = Mathf.Clamp(targetPos.z, -100f, -1f);
 
-        this.transform.position = Vector3.Lerp(this.transform.position, targetPos, posLerpValue);
-        // this.transform.position = Vector3.Lerp(this.transform.position, player.position, posLerpValue);
+        // Round target position to nearest pixel
+        Vector3 vectorInPixels = new Vector3(
+            Mathf.RoundToInt(targetPos.x * 32),
+            Mathf.RoundToInt(targetPos.y * 32),
+            Mathf.RoundToInt(targetPos.z * 32)
+        );
 
-        this.transform.rotation = Quaternion.Lerp(this.transform.rotation, player.rotation, rotLerpValue);
-        // cam.transform.rotation = Quaternion.Lerp(cam.transform.rotation, player.rotation, rotLerpValue);
+        // Convert position to units
+        Vector3 posInUnits = vectorInPixels / 32;
+
+        // Lerp to nearest position and rotation
+        Vector3 lerpedPos = Vector3.Lerp(transform.position, posInUnits, posLerpValue);
+        Quaternion lerpedRot = Quaternion.Lerp(this.transform.rotation, player.rotation, rotLerpValue);
+
+        this.transform.SetPositionAndRotation(new Vector3(lerpedPos.x, lerpedPos.y, lerpedPos.z), lerpedRot);
     }
 }
