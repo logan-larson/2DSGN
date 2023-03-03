@@ -1,7 +1,8 @@
 using FishNet.Object;
 using UnityEngine;
 
-public class AnimationSystem : NetworkBehaviour {
+public class AnimationSystem : NetworkBehaviour
+{
 
     Animator _animator;
 
@@ -17,6 +18,15 @@ public class AnimationSystem : NetworkBehaviour {
     public float lerpValue = 0.1f;
 
     private MovementSystem _movementSystem;
+
+    [SerializeField]
+    private SpriteRenderer _quad;
+    [SerializeField]
+    private SpriteRenderer _bi;
+
+
+
+
     private PlayerInputValues _playerInput;
 
 
@@ -45,10 +55,10 @@ public class AnimationSystem : NetworkBehaviour {
         _movementSystem = GetComponent<MovementSystem>();
     }
 
-    void Start() { // public void OnStart
+    void Start()
+    { // public void OnStart
 
         //staticAnimations = GameObject.Find("PlayerAnimation");
-        boneBody = GameObject.Find("Bone_Body");
 
         //animator = staticAnimations.GetComponent<Animator>();
         //animator = GetComponentInChildren<Animator>();
@@ -96,8 +106,18 @@ public class AnimationSystem : NetworkBehaviour {
 
     private void Update()
     { // public void OnUpdate
-        //if (!base.IsOwner) return;
+        if (!base.IsOwner) return;
 
+        if (_movementSystem.PublicData.InCombatMode)
+        {
+            _bi.enabled = true;
+            _quad.enabled = false;
+        }
+        else if (_movementSystem.PublicData.InParkourMode)
+        {
+            _bi.enabled = false;
+            _quad.enabled = true;
+        }
         /*
         if (_movementSystem.Velocity.x > 1f || _movementSystem.AirborneVelocity.x > 1f) {
             //_animator.CrossFade("Right", 0f, 0);

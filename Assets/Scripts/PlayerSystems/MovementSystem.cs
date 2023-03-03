@@ -46,6 +46,8 @@ public class MovementSystem : NetworkBehaviour
         public Vector3 Velocity;
         //public Quaternion Rotation;
         public bool IsGrounded;
+        public bool InParkourMode;
+        public bool InCombatMode;
     }
 
     public PublicMovementData PublicData;
@@ -209,7 +211,7 @@ public class MovementSystem : NetworkBehaviour
 
     private void Update()
     {
-        PerformAnimation();
+        // PerformAnimation();
     }
 
     private void OnTick()
@@ -229,9 +231,19 @@ public class MovementSystem : NetworkBehaviour
 
             ReconcileData reconcileData = new ReconcileData()
             {
+                /* Copy by reference */
+                /*
                 Position = transform.position,
                 Velocity = _currentVelocity,
                 Rotation = transform.rotation,
+                IsGrounded = _isGrounded,
+                InParkourMode = _inParkourMode,
+                InCombatMode = _inCombatMode
+                */
+                /* Copy by value */
+                Position = new Vector3(transform.position.x, transform.position.y, transform.position.z),
+                Velocity = new Vector3(_currentVelocity.x, _currentVelocity.y, _currentVelocity.z),
+                Rotation = new Quaternion(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w),
                 IsGrounded = _isGrounded,
                 InParkourMode = _inParkourMode,
                 InCombatMode = _inCombatMode
@@ -517,6 +529,7 @@ public class MovementSystem : NetworkBehaviour
         }
     }
 
+    /*
     private void PerformAnimation()
     {
         if (_input.HorizontalMovementInput > 0f)
@@ -526,11 +539,14 @@ public class MovementSystem : NetworkBehaviour
 
         _animator.SetBool("InCombatMode", _inCombatMode);
     }
+    */
 
     private void SetPublicMovementData()
     {
         PublicData.Velocity = _currentVelocity;
         PublicData.IsGrounded = _isGrounded;
+        PublicData.InParkourMode = _inParkourMode;
+        PublicData.InCombatMode = _inCombatMode;
     }
 
     #endregion
