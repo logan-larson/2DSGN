@@ -16,12 +16,14 @@ public class InputSystem : MonoBehaviour
     public PlayerInputValues InputValues;
 
     private MovementSystem _movement;
+    private CombatSystem _combatSystem;
 
     private PlayerInput _playerInput;
 
     private void Awake()
     {
         _movement = _movement ?? GetComponent<MovementSystem>();
+        _combatSystem = _combatSystem ?? GetComponent<CombatSystem>();
         _playerInput = _playerInput ?? GetComponent<PlayerInput>();
 
         InputValues = (PlayerInputValues)ScriptableObject.CreateInstance(typeof(PlayerInputValues));
@@ -51,11 +53,15 @@ public class InputSystem : MonoBehaviour
     public void OnFire(InputValue value)
     {
         InputValues.IsFirePressed = value.Get<float>() == 1f;
+        _combatSystem.Shoot();
         //movement.Fire();
     }
 
     public void OnControlsChanged()
     {
+        if (_playerInput == null)
+            return;
+
         InputValues.IsGamepad = _playerInput.currentControlScheme == "Gamepad";
         Debug.Log("Controls changed to " + _playerInput.currentControlScheme);
     }

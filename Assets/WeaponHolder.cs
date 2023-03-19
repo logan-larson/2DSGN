@@ -28,6 +28,11 @@ public class WeaponHolder : NetworkBehaviour
     [SerializeField]
     private PlayerInputValues _input;
 
+    [SerializeField]
+    private WeaponSprites _weaponSprites;
+
+    public WeaponInfo CurrentWeapon => _weapons[_currentWeaponIndex];
+
     [SyncVar(OnChange = nameof(OnChangeWeaponShow))]
     public bool WeaponShow = false;
 
@@ -62,7 +67,18 @@ public class WeaponHolder : NetworkBehaviour
     {
         base.OnStartClient();
 
-        _spriteRenderer.sprite = _weapons[_currentWeaponIndex].WeaponSprite;
+
+        int index = _weaponSprites.Names.IndexOf(CurrentWeapon.Name);
+
+        if (index == -1)
+        {
+            Debug.LogError($"Weapon {CurrentWeapon.Name} not found in WeaponSprites.");
+        }
+        else
+        {
+            _spriteRenderer.sprite = _weaponSprites.Sprites[index];
+        }
+
 
         if (base.IsOwner)
         {

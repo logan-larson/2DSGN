@@ -935,6 +935,7 @@ MonoBehaviour:
   _movementSystem: {fileID: 4268827610097334074}
   _inputSystem: {fileID: 4268827610097334073}
   _input: {fileID: 0}
+  _weaponSprites: {fileID: 11400000, guid: fe05ce176a53ff54e87bcb6ba4b7eb7e, type: 2}
   WeaponShow: 0
   FlipY: 0
 --- !u!114 &7300643456147865250

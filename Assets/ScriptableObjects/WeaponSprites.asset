@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01b5c97b0545f604cbc43a7f612b6296, type: 3}
-  m_Name: Red-volverInfo
+  m_Script: {fileID: 11500000, guid: 6f929242838717a4597b4051dee3dece, type: 3}
+  m_Name: WeaponSprites
   m_EditorClassIdentifier: 
-  Name: Red-volver
-  Damage: 40
-  FireRate: 0.2
-  Range: 10
-  ReloadTime: 1
-  ClipSize: 3
+  Names:
+  - Red-volver
+  - Revolver
+  Sprites:
+  - {fileID: 21300000, guid: 20f0fcc7b5942d24793a7fc81af045ed, type: 3}
+  - {fileID: 21300000, guid: 70dcb0b4765bde745954d29bc33c2818, type: 3}

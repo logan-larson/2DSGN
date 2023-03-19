@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01b5c97b0545f604cbc43a7f612b6296, type: 3}
   m_Name: RevolverInfo
   m_EditorClassIdentifier: 
-  WeaponName: Revolver
-  WeaponSprite: {fileID: 21300000, guid: 70dcb0b4765bde745954d29bc33c2818, type: 3}
+  Name: Revolver
   Damage: 20
   FireRate: 0.2
   Range: 10
