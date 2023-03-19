@@ -4,6 +4,7 @@ using UnityEngine;
 public class WeaponInfo : ScriptableObject
 {
     public string WeaponName;
+    public Sprite WeaponSprite;
     public int Damage;
     public float FireRate;
     public float Range;

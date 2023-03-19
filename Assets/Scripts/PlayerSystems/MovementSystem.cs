@@ -1,9 +1,24 @@
+using System;
 using FishNet.Object;
 using FishNet.Object.Prediction;
 using UnityEngine;
 
 public class MovementSystem : NetworkBehaviour
 {
+
+    #region Events
+
+    /// <summary>
+    /// Called when the player changes to parkour mode.
+    /// </summary>
+    public event Action<bool> OnChangeToParkourMode;
+
+    /// <summary>
+    /// Called when the player changes to combat mode.
+    /// </summary>
+    public event Action<bool> OnChangeToCombatMode;
+
+    #endregion
 
     #region Types
 
@@ -42,7 +57,7 @@ public class MovementSystem : NetworkBehaviour
 
     public struct PublicMovementData
     {
-        //public Vector3 Position;
+        public Vector3 Position;
         public Vector3 Velocity;
         //public Quaternion Rotation;
         public bool IsGrounded;
@@ -319,14 +334,24 @@ public class MovementSystem : NetworkBehaviour
     {
         if (moveData.ChangeToParkour)
         {
-            _inCombatMode = false;
-            _inParkourMode = true;
+            if (_inCombatMode)
+            {
+                OnChangeToParkourMode?.Invoke(true);
+
+                _inCombatMode = false;
+                _inParkourMode = true;
+            }
         }
 
         if (moveData.ChangeToCombat)
         {
-            _inCombatMode = true;
-            _inParkourMode = false;
+            if (_inParkourMode)
+            {
+                OnChangeToCombatMode?.Invoke(true);
+
+                _inParkourMode = false;
+                _inCombatMode = true;
+            }
         }
     }
 
@@ -495,7 +520,7 @@ public class MovementSystem : NetworkBehaviour
             Ray2D ray = new Ray2D(pos, velo.normalized);
             Ray2D ray2 = new Ray2D(pos2, velo.normalized);
 
-            Color randColor = Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
+            Color randColor = UnityEngine.Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
 
             Debug.DrawRay(ray.origin, ray.direction * velo.magnitude, randColor, 2f);
             Debug.DrawRay(ray2.origin, ray2.direction * velo.magnitude, randColor, 2f);
@@ -543,6 +568,7 @@ public class MovementSystem : NetworkBehaviour
 
     private void SetPublicMovementData()
     {
+        PublicData.Position = transform.position;
         PublicData.Velocity = _currentVelocity;
         PublicData.IsGrounded = _isGrounded;
         PublicData.InParkourMode = _inParkourMode;

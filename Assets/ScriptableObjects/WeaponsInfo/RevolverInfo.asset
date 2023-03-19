@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: RevolverInfo
   m_EditorClassIdentifier: 
   WeaponName: Revolver
+  WeaponSprite: {fileID: 21300000, guid: 70dcb0b4765bde745954d29bc33c2818, type: 3}
   Damage: 20
   FireRate: 0.2
   Range: 10

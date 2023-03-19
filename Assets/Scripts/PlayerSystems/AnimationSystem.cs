@@ -1,4 +1,5 @@
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
 
 public class AnimationSystem : NetworkBehaviour
@@ -24,6 +25,15 @@ public class AnimationSystem : NetworkBehaviour
     [SerializeField]
     private SpriteRenderer _bi;
 
+    [SerializeField]
+    private Sprite _quadSprite;
+    [SerializeField]
+    private Sprite _biSprite;
+    [SerializeField]
+    private SpriteRenderer _spriteRenderer;
+
+    [SerializeField]
+    private int _currentMode = 0;
 
 
 
@@ -47,12 +57,56 @@ public class AnimationSystem : NetworkBehaviour
     private bool _jumpParkour;
     private bool _jumpCombat;
 
-    private int _currentState;
 
+    [SyncVar(OnChange = nameof(OnChangeMode))]
+    public int Mode;
+
+    private void OnChangeMode(int oldValue, int newValue, bool isServer)
+    {
+        if (newValue == 0) // Parkour
+        {
+            _spriteRenderer.sprite = _quadSprite;
+            // _quad.enabled = true;
+            // _bi.enabled = false;
+        }
+        else if (newValue == 1) // Combat
+        {
+            _spriteRenderer.sprite = _biSprite;
+            // _quad.enabled = false;
+            // _bi.enabled = true;
+        }
+    }
+
+    /*
     private void Awake()
     {
         _animator = GetComponentInChildren<Animator>();
         _movementSystem = GetComponent<MovementSystem>();
+    }
+    */
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+
+        if (!base.IsOwner) return;
+
+        _movementSystem = GetComponent<MovementSystem>();
+
+        _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
+        _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
+
+        SetMode(0);
+    }
+
+    private void OnChangeToCombatMode(bool inCombat)
+    {
+        SetMode(1);
+    }
+
+    private void OnChangeToParkourMode(bool inParkour)
+    {
+        SetMode(0);
     }
 
     void Start()
@@ -80,7 +134,7 @@ public class AnimationSystem : NetworkBehaviour
     }
     */
 
-    private int GetState()
+    private int GetMode()
     {
         /*
         if (_movementSystem.InCombatMode)
@@ -101,7 +155,13 @@ public class AnimationSystem : NetworkBehaviour
         }
         */
 
-        return _currentState;
+        return _currentMode;
+    }
+
+    [ServerRpc]
+    public void SetMode(int mode)
+    {
+        Mode = mode;
     }
 
     private void Update()
@@ -110,13 +170,13 @@ public class AnimationSystem : NetworkBehaviour
 
         if (_movementSystem.PublicData.InCombatMode)
         {
-            _bi.enabled = true;
-            _quad.enabled = false;
+            // _bi.enabled = true;
+            // _quad.enabled = false;
         }
         else if (_movementSystem.PublicData.InParkourMode)
         {
-            _bi.enabled = false;
-            _quad.enabled = true;
+            // _bi.enabled = false;
+            // _quad.enabled = true;
         }
         /*
         if (_movementSystem.Velocity.x > 1f || _movementSystem.AirborneVelocity.x > 1f) {
