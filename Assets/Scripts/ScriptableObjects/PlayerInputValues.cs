@@ -25,19 +25,19 @@ public class PlayerInputValues : ScriptableObject
     public bool IsSprintKeyPressed = false;
 
     /// <summary>
-    /// Horizontal aim input (Right stick, mouse)
+    /// Aim input (Right stick, mouse)
     /// </summary>
-    public float HorizontalAimInput = 0f;
-
-    /// <summary>
-    /// Vertical aim input (Right stick, mouse)
-    /// </summary>
-    public float VerticalAimInput = 0f;
+    public Vector2 AimInput = Vector2.zero;
 
     /// <summary>
     /// Fire input (Right trigger, Left mouse button)
     /// </summary>
     public bool IsFirePressed = false;
+
+    /// <summary>
+    /// Is gamepad
+    /// </summary>
+    public bool IsGamepad = false;
 
 
     // Testing purposes only

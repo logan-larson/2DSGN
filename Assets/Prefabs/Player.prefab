@@ -305,7 +305,67 @@ MonoBehaviour:
   m_ControlsChangedEvent:
     m_PersistentCalls:
       m_Calls: []
-  m_ActionEvents: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c6bfd4fd-d94a-4952-b1aa-8d857fd66199
+    m_ActionName: Player/Move[/XInputControllerWindows/leftStick,/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 1fe1b23a-bdd6-4af9-b38d-55559995503a
+    m_ActionName: Player/Aim[/XInputControllerWindows/rightStick,/Mouse/position]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: d37f4b50-04ad-494e-8946-e932e8e3b419
+    m_ActionName: Player/Fire[/XInputControllerWindows/rightTrigger,/Mouse/leftButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c26de51c-55b3-45d8-8fb3-a1e14d2e0a7f
+    m_ActionName: Player/Jump[/XInputControllerWindows/buttonSouth,/Keyboard/space,/Keyboard/w]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 296f3142-fbde-41e6-a94f-4aff960c4e3b
+    m_ActionName: Player/Sprint[/Keyboard/leftShift,/XInputControllerWindows/buttonEast]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: cbe51345-b806-4281-9cbb-385b59636d09
+    m_ActionName: UI/Navigate[/XInputControllerWindows/leftStick/up,/XInputControllerWindows/rightStick/up,/XInputControllerWindows/leftStick/down,/XInputControllerWindows/rightStick/down,/XInputControllerWindows/leftStick/left,/XInputControllerWindows/rightStick/left,/XInputControllerWindows/leftStick/right,/XInputControllerWindows/rightStick/right,/XInputControllerWindows/dpad,/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 6405d706-52eb-4ba6-a4c8-a2610e1fe7d1
+    m_ActionName: UI/Submit[/Keyboard/enter,/XInputControllerWindows/buttonSouth]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: a82138d4-b48d-44fe-af61-5d23e7c2cf9f
+    m_ActionName: UI/Cancel[/Keyboard/escape,/XInputControllerWindows/buttonEast]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 147377fc-3948-4d28-b0e5-59331008303e
+    m_ActionName: UI/Point[/Mouse/position]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 9ae80c8a-37ca-4c52-9692-11ee156746f0
+    m_ActionName: UI/Click[/Mouse/leftButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c220404a-04a4-4133-9fdb-19cd03948976
+    m_ActionName: UI/ScrollWheel[/Mouse/scroll]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 69849288-e70b-4744-9102-57cb43f932f4
+    m_ActionName: UI/MiddleClick[/Mouse/middleButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 4b4e306a-999c-4b63-937e-b6c58a84681f
+    m_ActionName: UI/RightClick[/Mouse/rightButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 97669b8b-9065-4cdd-b8dc-4d2f21b2ff13
+    m_ActionName: UI/TrackedDevicePosition
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 01ff1de6-def9-4fc3-be60-b41252f4edc1
+    m_ActionName: UI/TrackedDeviceOrientation
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -873,6 +933,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8cf67411123df414f9a3bfe9d565a9ee, type: 2}
   _spriteRenderer: {fileID: 4157370059407970369}
   _movementSystem: {fileID: 4268827610097334074}
+  _inputSystem: {fileID: 4268827610097334073}
+  _input: {fileID: 0}
   WeaponShow: 0
   FlipY: 0
 --- !u!114 &7300643456147865250

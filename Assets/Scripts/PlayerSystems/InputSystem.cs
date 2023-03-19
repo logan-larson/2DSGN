@@ -1,9 +1,11 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent (typeof(PlayerInputValues))]
-[RequireComponent (typeof(MovementSystem))]
-public class InputSystem : MonoBehaviour {
+[RequireComponent(typeof(PlayerInputValues))]
+[RequireComponent(typeof(MovementSystem))]
+public class InputSystem : MonoBehaviour
+{
 
 
     // TODO: At some point I think I would like to make these events
@@ -15,10 +17,19 @@ public class InputSystem : MonoBehaviour {
 
     private MovementSystem _movement;
 
-    private void Awake() {
-        _movement = _movement ?? GetComponent<MovementSystem>();
+    private PlayerInput _playerInput;
 
-        InputValues = (PlayerInputValues) ScriptableObject.CreateInstance(typeof(PlayerInputValues));
+    private void Awake()
+    {
+        _movement = _movement ?? GetComponent<MovementSystem>();
+        _playerInput = _playerInput ?? GetComponent<PlayerInput>();
+
+        InputValues = (PlayerInputValues)ScriptableObject.CreateInstance(typeof(PlayerInputValues));
+    }
+
+    private void Update()
+    {
+        InputValues.AimInput = _playerInput.actions["Aim"].ReadValue<Vector2>();
     }
 
     public void OnMove(InputValue value)
@@ -26,18 +37,26 @@ public class InputSystem : MonoBehaviour {
         InputValues.HorizontalMovementInput = value.Get<Vector2>().x;
     }
 
-    public void OnSprint(InputValue value) {
+    public void OnSprint(InputValue value)
+    {
         InputValues.IsSprintKeyPressed = value.Get<float>() == 1f;
     }
-    
+
     // TODO: Move these events to triggers
-    public void OnJump(InputValue value) {
+    public void OnJump(InputValue value)
+    {
         InputValues.IsJumpKeyPressed = value.Get<float>() == 1f;
     }
 
-    public void OnFire(InputValue value) {
+    public void OnFire(InputValue value)
+    {
         InputValues.IsFirePressed = value.Get<float>() == 1f;
         //movement.Fire();
     }
 
+    public void OnControlsChanged()
+    {
+        InputValues.IsGamepad = _playerInput.currentControlScheme == "Gamepad";
+        Debug.Log("Controls changed to " + _playerInput.currentControlScheme);
+    }
 }

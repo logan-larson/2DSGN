@@ -22,6 +22,12 @@ public class WeaponHolder : NetworkBehaviour
     [SerializeField]
     private MovementSystem _movementSystem;
 
+    [SerializeField]
+    private InputSystem _inputSystem;
+
+    [SerializeField]
+    private PlayerInputValues _input;
+
     [SyncVar(OnChange = nameof(OnChangeWeaponShow))]
     public bool WeaponShow = false;
 
@@ -57,6 +63,12 @@ public class WeaponHolder : NetworkBehaviour
         base.OnStartClient();
 
         _spriteRenderer.sprite = _weapons[_currentWeaponIndex].WeaponSprite;
+
+        if (base.IsOwner)
+        {
+            _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
+            _input = _inputSystem.InputValues;
+        }
     }
 
     public void Update()
@@ -67,9 +79,16 @@ public class WeaponHolder : NetworkBehaviour
         screenMousePosition.z = Camera.main.nearClipPlane;
         Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
 
-        Debug.Log(Vector3.Distance(transform.parent.position, _movementSystem.PublicData.Position));
+        Vector3 direction = new Vector3();
 
-        Vector3 direction = (worldMousePosition - transform.parent.position).normalized;
+        if (_input.IsGamepad)
+        {
+            direction = _input.AimInput;
+        }
+        else
+        {
+            direction = (worldMousePosition - transform.parent.position).normalized;
+        }
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
