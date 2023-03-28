@@ -454,6 +454,8 @@ MonoBehaviour:
   _componentIndexCache: 2
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
+  _inputSystem: {fileID: 0}
+  _input: {fileID: 0}
   _weaponHolder: {fileID: 7800868568101946959}
 --- !u!114 &5020579654786682326
 MonoBehaviour:
@@ -581,6 +583,7 @@ GameObject:
   - component: {fileID: 3663645716607367464}
   - component: {fileID: 8997367718474366262}
   - component: {fileID: 7084400194756443070}
+  - component: {fileID: 2548567269387933774}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: Untagged
@@ -673,6 +676,32 @@ MonoBehaviour:
   InputSystem: {fileID: 4268827610097334073}
   _input: {fileID: 0}
   IsFacingRight: 0
+--- !u!61 &2548567269387933774
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6111030698262587285}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -0.23255801, y: 0.009690106}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.57751936, y: 0.49353993}
+    oldSize: {x: 3, y: 1.5}
+    newSize: {x: 3, y: 1.5}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 3, y: 1.5}
+  m_EdgeRadius: 0
 --- !u!1 &7173244554442536117
 GameObject:
   m_ObjectHideFlags: 0

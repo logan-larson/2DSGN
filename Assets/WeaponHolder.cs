@@ -63,6 +63,11 @@ public class WeaponHolder : NetworkBehaviour
         }
     }
 
+    private void Start() {
+        _spriteRenderer = _spriteRenderer ?? GetComponent<SpriteRenderer>();
+        _spriteRenderer.enabled = false;
+    }
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -79,7 +84,6 @@ public class WeaponHolder : NetworkBehaviour
             _spriteRenderer.sprite = _weaponSprites.Sprites[index];
         }
 
-
         if (base.IsOwner)
         {
             _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
@@ -91,9 +95,10 @@ public class WeaponHolder : NetworkBehaviour
     {
         if (!base.IsOwner) return;
 
-        Vector3 screenMousePosition = Mouse.current.position.ReadValue();
-        screenMousePosition.z = Camera.main.nearClipPlane;
-        Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
+        // Vector3 screenMousePosition = Mouse.current.position.ReadValue();
+        // screenMousePosition.z = Camera.main.nearClipPlane;
+        // Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
+        Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(_input.AimInput);
 
         Vector3 direction = new Vector3();
 
@@ -103,12 +108,14 @@ public class WeaponHolder : NetworkBehaviour
         }
         else
         {
-            direction = (worldMousePosition - transform.parent.position).normalized;
+            direction = (worldMousePosition - transform.position).normalized;
+            Debug.Log(worldMousePosition);
         }
+
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-        transform.eulerAngles = new Vector3(0f, 0f, angle);
+        transform.localEulerAngles = new Vector3(0f, 0f, angle);
 
         // If past vertical, flip sprite.
         float angleDifference = Mathf.DeltaAngle(transform.parent.rotation.eulerAngles.z, transform.rotation.eulerAngles.z);
