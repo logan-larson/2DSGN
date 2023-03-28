@@ -95,10 +95,10 @@ public class WeaponHolder : NetworkBehaviour
     {
         if (!base.IsOwner) return;
 
-        // Vector3 screenMousePosition = Mouse.current.position.ReadValue();
-        // screenMousePosition.z = Camera.main.nearClipPlane;
-        // Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
-        Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(_input.AimInput);
+        Vector3 screenMousePosition = Mouse.current.position.ReadValue();
+        screenMousePosition.z = Camera.main.nearClipPlane;
+        Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
+        // Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(_input.AimInput);
 
         Vector3 direction = new Vector3();
 
@@ -108,8 +108,7 @@ public class WeaponHolder : NetworkBehaviour
         }
         else
         {
-            direction = (worldMousePosition - transform.position).normalized;
-            Debug.Log(worldMousePosition);
+            direction = (new Vector3(worldMousePosition.x, worldMousePosition.y, 0f) - transform.position).normalized;
         }
 
 

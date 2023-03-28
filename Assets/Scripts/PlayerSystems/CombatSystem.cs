@@ -1,5 +1,6 @@
 using UnityEngine;
 using FishNet.Object;
+using System.Collections;
 using UnityEngine.InputSystem;
 
 public class CombatSystem : NetworkBehaviour
@@ -13,13 +14,24 @@ public class CombatSystem : NetworkBehaviour
     [SerializeField]
     private WeaponHolder _weaponHolder;
 
+    [SerializeField]
+    private LineRenderer _bullet;
+
+    [SerializeField]
+    private SpriteRenderer _muzzleFlash;
+
     private MovementSystem _movementSystem;
 
     private float _shootTimer = 0f;
     private Vector3 _aimDirection = Vector3.zero;
 
+    public UserInfo UserInfo;
+
+
     void Start()
     { // public void OnStart
+        _bullet.enabled = false;
+        _muzzleFlash.enabled = false;
     }
 
     public override void OnStartClient()
@@ -33,17 +45,8 @@ public class CombatSystem : NetworkBehaviour
         _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
         _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
 
-        // _weaponHolder.SetWeaponShow(false);
-
         _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
         _input = _inputSystem.InputValues;
-    }
-
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-
-        // _weaponHolder.SetWeaponShow(false);
     }
 
     private void OnChangeToCombatMode(bool inCombat)
@@ -86,17 +89,14 @@ public class CombatSystem : NetworkBehaviour
 
         if (_input.IsGamepad)
         {
-            direction = _input.AimInput;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            angle += transform.eulerAngles.z;
-            _aimDirection = new Vector3(0f, 0f, angle);
+            direction = _input.AimInput.normalized;
         }
         else
         {
-            direction = (worldMousePosition - transform.position).normalized;
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            _aimDirection = new Vector3(0f, 0f, angle);
+            direction = (new Vector3(worldMousePosition.x, worldMousePosition.y, 0f) - new Vector3(transform.position.x, transform.position.y, 0f)).normalized;
         }
+
+        _aimDirection = transform.localRotation * direction;
     }
 
     public void Shoot()
@@ -111,23 +111,72 @@ public class CombatSystem : NetworkBehaviour
 
         _shootTimer = 0f;
 
-        Debug.Log("Shoot");
-        Debug.DrawRay(transform.position, _aimDirection * _weaponHolder.CurrentWeapon.Range, Color.red, 1f);
+        // Debug.DrawRay(transform.position, _aimDirection * _weaponHolder.CurrentWeapon.Range, Color.red, 1f);
 
-        ShootServer(_weaponHolder.CurrentWeapon, transform.position, _aimDirection);
+        ShootServer(_weaponHolder.CurrentWeapon, _weaponHolder.transform.position, _aimDirection, UserInfo.Username);
     }
 
     [ServerRpc]
-    public void ShootServer(WeaponInfo weapon, Vector3 position, Vector3 direction)
+    public void ShootServer(WeaponInfo weapon, Vector3 position, Vector3 direction, string username)
     {
         if (weapon == null) return;
 
-        RaycastHit hit = new RaycastHit();
+        RaycastHit2D[] hits = Physics2D.RaycastAll(position, direction, weapon.Range);
 
-        if (Physics.Raycast(position, direction, out hit, weapon.Range))
+        bool hitSomething = false;
+
+        foreach (RaycastHit2D hit in hits)
         {
-            Debug.Log("Hit " + hit.collider.name);
+            if (hit.collider != null)
+            {
+                if (hit.transform.GetComponentInChildren<PlayerName>() != null)
+                {
+                    if (hit.transform.GetComponentInChildren<PlayerName>().Username != username)
+                    {
+                        Debug.Log("Hit user: " + hit.transform.GetComponentInChildren<PlayerName>().Username);
+
+                        ShootObservers(position, direction, hit.distance);
+
+                        hitSomething = true;
+                    }
+                }
+                else
+                {
+                    Debug.Log("Hit environment");
+                    ShootObservers(position, direction, hit.distance);
+
+                    hitSomething = true;
+                }
+            }
         }
 
+        if (!hitSomething)
+        {
+            Debug.Log("Miss");
+            ShootObservers(position, direction, weapon.Range);
+        }
+    }
+
+    [ObserversRpc]
+    public void ShootObservers(Vector3 position, Vector3 direction, float distance)
+    {
+        StartCoroutine(ShootCoroutine(position, direction, distance));
+    }
+
+    private IEnumerator ShootCoroutine(Vector3 position, Vector3 direction, float distance)
+    {
+        _bullet.SetPosition(0, position + direction);
+        _bullet.SetPosition(1, position + direction * distance);
+
+        _bullet.enabled = true;
+        _muzzleFlash.enabled = true;
+
+        yield return new WaitForSeconds(0.05f);
+
+        _muzzleFlash.enabled = false;
+
+        yield return new WaitForSeconds(0.05f);
+
+        _bullet.enabled = false;
     }
 }
