@@ -29,12 +29,17 @@ public class WeaponHolder : NetworkBehaviour
     private PlayerInputValues _input;
 
     [SerializeField]
+    private CombatSystem _combatSystem;
+
+    [SerializeField]
     private WeaponSprites _weaponSprites;
 
     public WeaponInfo CurrentWeapon => _weapons[_currentWeaponIndex];
 
     [SyncVar(OnChange = nameof(OnChangeWeaponShow))]
     public bool WeaponShow = false;
+
+    private Vector3 _aimDirection = Vector3.zero;
 
     private void OnChangeWeaponShow(bool oldValue, bool newValue, bool isServer)
     {
@@ -95,6 +100,9 @@ public class WeaponHolder : NetworkBehaviour
     {
         if (!base.IsOwner) return;
 
+        _aimDirection = _combatSystem.AimDirection;
+
+        /*
         Vector3 screenMousePosition = Mouse.current.position.ReadValue();
         screenMousePosition.z = Camera.main.nearClipPlane;
         Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
@@ -110,11 +118,13 @@ public class WeaponHolder : NetworkBehaviour
         {
             direction = (new Vector3(worldMousePosition.x, worldMousePosition.y, 0f) - transform.position).normalized;
         }
+        */
 
 
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        // float angle = Mathf.Atan2(_aimDirection.y, _aimDirection.x) * Mathf.Rad2Deg;
 
-        transform.localEulerAngles = new Vector3(0f, 0f, angle);
+        // transform.localEulerAngles = new Vector3(0f, 0f, angle);
+        transform.rotation = Quaternion.LookRotation(Vector3.forward, _aimDirection) * Quaternion.Euler(0f, 0f, 90f);
 
         // If past vertical, flip sprite.
         float angleDifference = Mathf.DeltaAngle(transform.parent.rotation.eulerAngles.z, transform.rotation.eulerAngles.z);

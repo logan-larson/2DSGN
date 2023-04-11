@@ -27,6 +27,8 @@ public class CombatSystem : NetworkBehaviour
 
     public UserInfo UserInfo;
 
+    public Vector3 AimDirection => _aimDirection;
+
 
     void Start()
     { // public void OnStart
@@ -89,14 +91,14 @@ public class CombatSystem : NetworkBehaviour
 
         if (_input.IsGamepad)
         {
-            direction = _input.AimInput.normalized;
+            direction = transform.localRotation * _input.AimInput.normalized;
         }
         else
         {
             direction = (new Vector3(worldMousePosition.x, worldMousePosition.y, 0f) - new Vector3(transform.position.x, transform.position.y, 0f)).normalized;
         }
 
-        _aimDirection = transform.localRotation * direction;
+        _aimDirection = /* transform.localRotation  * */ direction;
     }
 
     public void Shoot()
