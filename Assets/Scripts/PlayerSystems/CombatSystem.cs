@@ -137,6 +137,10 @@ public class CombatSystem : NetworkBehaviour
                     {
                         Debug.Log("Hit user: " + hit.transform.GetComponentInChildren<PlayerName>().Username);
 
+                        if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
+                            enemyHealth.Health -= weapon.Damage;
+                        }
+
                         ShootObservers(position, direction, hit.distance);
 
                         hitSomething = true;
