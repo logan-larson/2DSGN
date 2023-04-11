@@ -466,6 +466,14 @@ MonoBehaviour:
   _bullet: {fileID: 5339978170091014856}
   _muzzleFlash: {fileID: 998307532926035764}
   UserInfo: {fileID: 11400000, guid: 643573264b41f1240997b14195ca096f, type: 2}
+  _spawnPositions:
+  - {x: -30, y: -13, z: 0}
+  - {x: -30, y: -25, z: 0}
+  - {x: -3.5, y: -3, z: 0}
+  - {x: 7.5, y: 0, z: 0}
+  - {x: 9.2, y: -12.5, z: 0}
+  - {x: 14, y: -25, z: 0}
+  - {x: -30.5, y: -1, z: 0}
 --- !u!114 &5020579654786682326
 MonoBehaviour:
   m_ObjectHideFlags: 0

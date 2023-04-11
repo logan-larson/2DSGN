@@ -1,6 +1,7 @@
 using UnityEngine;
 using FishNet.Object;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.InputSystem;
 
 public class CombatSystem : NetworkBehaviour
@@ -28,6 +29,9 @@ public class CombatSystem : NetworkBehaviour
     public UserInfo UserInfo;
 
     public Vector3 AimDirection => _aimDirection;
+
+    [SerializeField]
+    private List<Vector3> _spawnPositions = new List<Vector3>();
 
 
     void Start()
@@ -139,6 +143,19 @@ public class CombatSystem : NetworkBehaviour
 
                         if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
                             enemyHealth.Health -= weapon.Damage;
+
+                            if (enemyHealth.Health <= 0)
+                            {
+                                // Debug.Log("Killed user: " + hit.transform.GetComponentInChildren<PlayerName>().Username);
+
+                                enemyHealth.Health = 100;
+
+                                int randomSpawnPosition = Random.Range(0, _spawnPositions.Count);
+
+                                Debug.Log("Spawned at position: " + randomSpawnPosition);
+
+                                hit.transform.position = _spawnPositions[randomSpawnPosition];
+                            }
                         }
 
                         ShootObservers(position, direction, hit.distance);
@@ -152,6 +169,7 @@ public class CombatSystem : NetworkBehaviour
                     ShootObservers(position, direction, hit.distance);
 
                     hitSomething = true;
+                    break;
                 }
             }
         }
