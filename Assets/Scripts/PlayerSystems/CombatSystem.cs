@@ -25,6 +25,7 @@ public class CombatSystem : NetworkBehaviour
 
     private float _shootTimer = 0f;
     private Vector3 _aimDirection = Vector3.zero;
+    private Vector3 _worldMousePosition = Vector3.zero;
 
     public UserInfo UserInfo;
 
@@ -33,6 +34,8 @@ public class CombatSystem : NetworkBehaviour
     [SerializeField]
     private List<Vector3> _spawnPositions = new List<Vector3>();
 
+
+    // TEMP
 
     void Start()
     { // public void OnStart
@@ -81,28 +84,37 @@ public class CombatSystem : NetworkBehaviour
             return;
         }
 
-        // Update aim direction.
         UpdateAimDirection();
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(transform.position, 0.25f);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(_worldMousePosition, 0.25f);
     }
 
     private void UpdateAimDirection()
     {
         Vector3 screenMousePosition = Mouse.current.position.ReadValue();
-        screenMousePosition.z = Camera.main.nearClipPlane;
+        screenMousePosition.z = 10f;
         Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
 
-        Vector3 direction = new Vector3();
+        _worldMousePosition = new Vector3(worldMousePosition.x, worldMousePosition.y, 0f);
 
+        // Determine input type
         if (_input.IsGamepad)
         {
-            direction = transform.localRotation * _input.AimInput.normalized;
+            // If player is actively aiming, use that direction
+            if (_input.AimInput != Vector2.zero)
+                _aimDirection = transform.localRotation * _input.AimInput.normalized;
         }
         else
         {
-            direction = (new Vector3(worldMousePosition.x, worldMousePosition.y, 0f) - new Vector3(transform.position.x, transform.position.y, 0f)).normalized;
+            _aimDirection = (new Vector3(worldMousePosition.x, worldMousePosition.y, 0f) - new Vector3(transform.position.x, transform.position.y, 0f)).normalized;
         }
 
-        _aimDirection = /* transform.localRotation  * */ direction;
     }
 
     public void Shoot()

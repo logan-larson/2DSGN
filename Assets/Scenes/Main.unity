@@ -12178,7 +12178,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 1
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -12385,7 +12385,7 @@ MonoBehaviour:
   _ipv6BindAddress: 
   _port: 14103
   _maximumClients: 4095
-  _clientAddress: localhost
+  _clientAddress: d85791eda4154bd29fbe5b6ed699c371-us-east-free.games.playflow.cloud
   _timeout: 15
 --- !u!114 &5313784219897215940
 MonoBehaviour:
