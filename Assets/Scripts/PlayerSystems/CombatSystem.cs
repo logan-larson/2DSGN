@@ -167,6 +167,7 @@ public class CombatSystem : NetworkBehaviour
                                 Debug.Log("Spawned at position: " + randomSpawnPosition);
 
                                 hit.transform.position = _spawnPositions[randomSpawnPosition];
+                                hit.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
                             }
                         }
 
