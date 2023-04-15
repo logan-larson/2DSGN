@@ -4,6 +4,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 
+/**
+<summary>
+CombatSystem is responsible for handling all combat related actions.
+TODO: Break this up into the following classes:
+- WeaponManager
+- WeaponAnimator
+- ShootManager
+- AimManager
+- DamageManager
+- HitManager
+- DeathManager
+- RespawnManager
+- IngameStatsManager
+</summary>
+*/
 public class CombatSystem : NetworkBehaviour
 {
     [SerializeField]

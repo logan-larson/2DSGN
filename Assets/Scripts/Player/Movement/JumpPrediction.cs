@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using FishNet.Object;
 
+/**
+<summary>
+JumpPrediction is responsible for drawing the jump prediction line.
+</summary>
+*/
 public class JumpPrediction : NetworkBehaviour
 {
 

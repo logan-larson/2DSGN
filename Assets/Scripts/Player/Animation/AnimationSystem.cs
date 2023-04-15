@@ -2,6 +2,11 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
 
+/**
+<summary>
+AnimationSystem is used to handle the player's animation state.
+</summary>
+*/
 public class AnimationSystem : NetworkBehaviour
 {
 

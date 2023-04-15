@@ -3,6 +3,11 @@ using FishNet.Object;
 using FishNet.Object.Prediction;
 using UnityEngine;
 
+/**
+<summary>
+MovementSystem is responsible for handling all movement related actions.
+</summary>
+*/
 public class MovementSystem : NetworkBehaviour
 {
 
