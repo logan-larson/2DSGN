@@ -2,6 +2,11 @@ using UnityEngine;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 
+/**
+<summary>
+NetworkDirection is responsible for syncing the direction of the player.
+</summary>
+*/
 public class NetworkDirection : NetworkBehaviour
 {
 

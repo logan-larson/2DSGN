@@ -1,10 +1,10 @@
 using UnityEngine;
 
-/// <summary>
-/// Class <c>CameraController</c> moves the camera's position and rotation to follow the player's position and rotation.
-/// The script waits for the player to spawn before it can start following the player.
-/// The camera's position and rotation is lerped to the player's position and rotation.
-/// </summary>
+/**
+<summary>
+CameraController moves the camera's position and rotation to follow the player's position and rotation.
+</summary>
+*/
 public class CameraController : MonoBehaviour
 {
     [SerializeField] private Camera cam;
@@ -17,9 +17,6 @@ public class CameraController : MonoBehaviour
     /// The factor by which the z position is effected by the player's velocity.
     /// </summary>
     [SerializeField] private float zFactor = 0.4f;
-
-    private Vector3 velocity = Vector3.zero;
-
 
     private MovementSystem movementSystem;
 

@@ -2,6 +2,11 @@ using System;
 using FishNet.Object;
 using UnityEngine;
 
+/**
+<summary>
+FirstObjectNotifier provides an event that is invoked when the object it is attached to is spawned.
+</summary>
+*/
 public class FirstObjectNotifier : NetworkBehaviour
 {
 

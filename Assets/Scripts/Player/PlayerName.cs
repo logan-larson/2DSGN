@@ -4,6 +4,11 @@ using UnityEngine;
 using TMPro;
 using System;
 
+/**
+<summary>
+PlayerName is responsible for syncing the username and setting the username textbox above the player.
+</summary>
+*/
 public class PlayerName : NetworkBehaviour
 {
     [SyncVar (OnChange = nameof(OnUsernameChanged))]

@@ -1,6 +1,11 @@
 using UnityEngine;
 using FishNet.Managing;
 
+/**
+<summary>
+NetworkHandler is responsible for starting the server or client connection.
+</summary>
+*/
 public class NetworkHandler : MonoBehaviour
 {
     public UserInfo UserInfo;

@@ -5,6 +5,11 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using TMPro;
 
+/**
+<summary>
+PlayerHealth is responsible for syncing the health of the player.
+</summary>
+*/
 public class PlayerHealth : NetworkBehaviour
 {
     [SyncVar]

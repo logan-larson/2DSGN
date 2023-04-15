@@ -5,13 +5,15 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine.InputSystem;
 
+/**
+<summary>
+WeaponHolder is responsible for displaying the weapon sprite and pointing it in the aim direction.
+</summary>
+*/
 public class WeaponHolder : NetworkBehaviour
 {
     [SerializeField]
     private int _currentWeaponIndex = 0;
-
-    [SerializeField]
-    private float _weaponDistanceThreshold = 1.5f;
 
     [SerializeField]
     private List<WeaponInfo> _weapons = new List<WeaponInfo>();
@@ -102,28 +104,6 @@ public class WeaponHolder : NetworkBehaviour
 
         _aimDirection = _combatSystem.AimDirection;
 
-        /*
-        Vector3 screenMousePosition = Mouse.current.position.ReadValue();
-        screenMousePosition.z = Camera.main.nearClipPlane;
-        Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
-        // Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(_input.AimInput);
-
-        Vector3 direction = new Vector3();
-
-        if (_input.IsGamepad)
-        {
-            direction = _input.AimInput;
-        }
-        else
-        {
-            direction = (new Vector3(worldMousePosition.x, worldMousePosition.y, 0f) - transform.position).normalized;
-        }
-        */
-
-
-        // float angle = Mathf.Atan2(_aimDirection.y, _aimDirection.x) * Mathf.Rad2Deg;
-
-        // transform.localEulerAngles = new Vector3(0f, 0f, angle);
         transform.rotation = Quaternion.LookRotation(Vector3.forward, _aimDirection) * Quaternion.Euler(0f, 0f, 90f);
 
         // If past vertical, flip sprite.
