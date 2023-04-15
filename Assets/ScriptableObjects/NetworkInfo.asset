@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbdb3028654dd7d468f0b680160482b8, type: 3}
   m_Name: NetworkInfo
   m_EditorClassIdentifier: 
-  IsServerBuild: 0
+  IsServerBuild: 1
