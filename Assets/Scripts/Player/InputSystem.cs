@@ -54,7 +54,6 @@ public class InputSystem : MonoBehaviour
     {
         InputValues.IsFirePressed = value.Get<float>() == 1f;
         _combatSystem.Shoot();
-        //movement.Fire();
     }
 
     public void OnControlsChanged()

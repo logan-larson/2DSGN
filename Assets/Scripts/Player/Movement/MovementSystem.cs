@@ -157,16 +157,6 @@ public class MovementSystem : NetworkBehaviour
     [SerializeField]
     private bool _inCombatMode = false;
 
-
-
-    /// TODO: Move to combat when ready
-
-    /// <summary>
-    /// True if the player is firing.
-    /// </summary>
-    [SerializeField]
-    private bool _isFiring = false;
-
     /// <summary>
     /// Amount to change the players height when grounded
     /// </summary>
@@ -251,15 +241,6 @@ public class MovementSystem : NetworkBehaviour
 
             ReconcileData reconcileData = new ReconcileData()
             {
-                /* Copy by reference */
-                /*
-                Position = transform.position,
-                Velocity = _currentVelocity,
-                Rotation = transform.rotation,
-                IsGrounded = _isGrounded,
-                InParkourMode = _inParkourMode,
-                InCombatMode = _inCombatMode
-                */
                 /* Copy by value */
                 Position = new Vector3(transform.position.x, transform.position.y, transform.position.z),
                 Velocity = new Vector3(_currentVelocity.x, _currentVelocity.y, _currentVelocity.z),
@@ -274,11 +255,6 @@ public class MovementSystem : NetworkBehaviour
 
 
         SetPublicMovementData();
-    }
-
-    public void Fire()
-    {
-        _isFiring = true;
     }
 
     /// <summary>
@@ -558,18 +534,6 @@ public class MovementSystem : NetworkBehaviour
             _predictedNormal = predictHit2.normal;
         }
     }
-
-    /*
-    private void PerformAnimation()
-    {
-        if (_input.HorizontalMovementInput > 0f)
-            _animator.SetBool("IsFacingRight", true);
-        else if (_input.HorizontalMovementInput < 0f)
-            _animator.SetBool("IsFacingRight", false);
-
-        _animator.SetBool("InCombatMode", _inCombatMode);
-    }
-    */
 
     private void SetPublicMovementData()
     {
