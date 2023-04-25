@@ -54,8 +54,12 @@ public class InputSystem : MonoBehaviour
 
     public void OnFire(InputValue value)
     {
-        InputValues.IsFirePressed = value.Get<float>() == 1f;
-        _combatSystem.Shoot();
+        // InputValues.IsFirePressed = value.Get<float>() == 1f;
+
+        _combatSystem.SetIsShooting(value.Get<float>() == 1f);
+
+        // if (value.Get<float>() == 1f)  
+            // _combatSystem.Shoot();
     }
 
     public void OnInteract(InputValue value)

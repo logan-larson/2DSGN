@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Revolver
   Damage: 20
-  FireRate: 0.2
+  FireRate: 0.5
   Range: 10
   ReloadTime: 3
   ClipSize: 6
-  Position: {x: 0.612, y: -0.218, z: -0.1}

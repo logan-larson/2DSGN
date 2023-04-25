@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Red-volver
   Damage: 40
-  FireRate: 0.2
+  FireRate: 1
   Range: 10
   ReloadTime: 1
   ClipSize: 3
-  Position: {x: 0.612, y: -0.218, z: -0.1}

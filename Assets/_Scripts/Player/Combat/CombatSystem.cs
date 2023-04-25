@@ -36,6 +36,8 @@ public class CombatSystem : NetworkBehaviour
     private MovementSystem _movementSystem;
 
     private float _shootTimer = 0f;
+    private bool _isShooting = false;
+
     private Vector3 _aimDirection = Vector3.zero;
     private Vector3 _worldMousePosition = Vector3.zero;
 
@@ -98,6 +100,8 @@ public class CombatSystem : NetworkBehaviour
         }
 
         UpdateAimDirection();
+
+        CheckShoot();
     }
 
     private void OnDrawGizmos()
@@ -130,13 +134,20 @@ public class CombatSystem : NetworkBehaviour
 
     }
 
-    public void Shoot()
+    public void SetIsShooting(bool isShooting)
+    {
+        _isShooting = isShooting;
+    }
+
+    private void CheckShoot()
     {
         if (_weaponHolder.CurrentWeapon == null)
         {
             Debug.Log("No weapon");
             return;
         }
+
+        if (!_isShooting) return;
 
         if (_shootTimer < _weaponHolder.CurrentWeapon.WeaponInfo.FireRate) return;
 
