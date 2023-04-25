@@ -8,12 +8,6 @@ public class Weapon : MonoBehaviour
     public SpriteRenderer WeaponSprite;
     public SpriteRenderer MuzzleFlashSprite;
 
-    public void Equip()
-    {
-        ShowWeapon();
-        transform.localPosition = WeaponInfo.Position;
-    }
-
     public void ShowWeapon()
     {
         WeaponSprite.enabled = true;
@@ -44,7 +38,7 @@ public class Weapon : MonoBehaviour
 
     public void ShowHighlight()
     {
-        WeaponSprite.color = Color.yellow;
+        WeaponSprite.color = Color.blue;
     }
 
     public void HideHighlight()
@@ -52,9 +46,23 @@ public class Weapon : MonoBehaviour
         WeaponSprite.color = Color.white;
     }
 
-    public void DropWeapon(Vector3 dropPosition)
+    public void Equip(Transform weaponHolder, Vector3 position, Quaternion rotation)
+    {
+        transform.SetParent(weaponHolder);
+        transform.localPosition = position;
+        transform.localRotation = rotation;
+        HideHighlight();
+    }
+
+
+    public void Drop(Vector3 dropPosition)
     {
         transform.position = dropPosition;
+
+        var weaponPickups = GameObject.FindWithTag("WeaponPickups");
+        transform.SetParent(weaponPickups.transform);
+
         ShowWeapon();
+        HideHighlight();
     }
 }

@@ -25,6 +25,7 @@ public class InputSystem : MonoBehaviour
     {
         _movement = _movement ?? GetComponent<MovementSystem>();
         _combatSystem = _combatSystem ?? GetComponent<CombatSystem>();
+        _weaponEquipManager = _weaponEquipManager ?? GetComponent<WeaponEquipManager>();
         _playerInput = _playerInput ?? GetComponent<PlayerInput>();
 
         InputValues = (PlayerInputValues)ScriptableObject.CreateInstance(typeof(PlayerInputValues));

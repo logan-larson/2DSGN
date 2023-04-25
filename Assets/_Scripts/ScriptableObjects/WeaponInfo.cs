@@ -9,5 +9,4 @@ public class WeaponInfo : ScriptableObject
     public float Range;
     public float ReloadTime;
     public float ClipSize;
-    public Vector3 Position;
 }

@@ -18,3 +18,4 @@ MonoBehaviour:
   Range: 10
   ReloadTime: 1
   ClipSize: 3
+  Position: {x: 0.612, y: -0.218, z: -0.1}

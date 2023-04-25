@@ -25,30 +25,42 @@ public class WeaponEquipManager : MonoBehaviour
     private void HighlightWeapon()
     {
         // See if the player is aiming at a weapon
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, _aimDirection, 3f, LayerMask.GetMask("Weapon"));
-        Debug.DrawRay(transform.position, _aimDirection * 3f, Color.red);
+        // RaycastHit2D hit = Physics2D.Raycast(transform.position, _aimDirection, 3f, LayerMask.GetMask("Weapon"));
 
-        // If the player is aiming at a weapon, highlight it
-        if (hit.collider != null)
+
+        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, _aimDirection, 3f, LayerMask.GetMask("Weapon"));
+
+        bool hitSomething = false;
+
+        foreach (RaycastHit2D hit in hits)
         {
-            Weapon weapon = hit.collider.GetComponent<Weapon>();
-
-            if (weapon != null)
+            // If the player is aiming at a weapon, highlight it
+            if (hit.collider != null)
             {
-                if (_highlightedWeapon != weapon)
-                {
-                    if (_highlightedWeapon != null)
-                    {
-                        _highlightedWeapon.HideHighlight();
-                    }
+                Weapon weapon = hit.collider.GetComponent<Weapon>();
 
-                    _highlightedWeapon = weapon;
-                    _highlightedWeapon.ShowHighlight();
+                if (weapon != null && weapon != _weaponHolder.CurrentWeapon)
+                {
+                    Debug.DrawRay(transform.position, _aimDirection * 3f, Color.green);
+                    hitSomething = true;
+                    if (_highlightedWeapon != weapon)
+                    {
+                        if (_highlightedWeapon != null)
+                        {
+                            _highlightedWeapon.HideHighlight();
+                        }
+
+                        _highlightedWeapon = weapon;
+                        _highlightedWeapon.ShowHighlight();
+                    }
                 }
             }
         }
-        else // If the player is not aiming at a weapon, remove the highlight from the currently highlighted weapon
+
+        if (hitSomething == false)
         {
+            // If the player is not aiming at a weapon, remove the highlight from the currently highlighted weapon
+            Debug.DrawRay(transform.position, _aimDirection * 3f, Color.red);
             if (_highlightedWeapon != null)
             {
                 _highlightedWeapon.HideHighlight();
@@ -59,8 +71,11 @@ public class WeaponEquipManager : MonoBehaviour
 
     public void TryEquipWeapon()
     {
+        Debug.Log("Try equip weapon");
         if (_highlightedWeapon == null) return;
         
         _weaponHolder.EquipWeapon(_highlightedWeapon, _highlightedWeapon.transform.position);
+
+        _highlightedWeapon = null;
     }
 }

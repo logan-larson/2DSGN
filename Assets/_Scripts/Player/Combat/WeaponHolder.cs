@@ -111,11 +111,16 @@ public class WeaponHolder : NetworkBehaviour
 
     public void EquipWeapon(Weapon weapon, Vector3 dropPosition)
     {
+        var droppedWeaponPos = CurrentWeapon.transform.localPosition;
+        var droppedWeaponRot = CurrentWeapon.transform.localRotation;
+
         if (CurrentWeapon != null)
         {
-            CurrentWeapon.DropWeapon(dropPosition);
+            CurrentWeapon.Drop(dropPosition);
         }
 
         CurrentWeapon = weapon;
+
+        CurrentWeapon.Equip(transform, droppedWeaponPos, droppedWeaponRot);
     }
 }
