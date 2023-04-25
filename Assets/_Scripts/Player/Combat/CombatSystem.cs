@@ -33,9 +33,6 @@ public class CombatSystem : NetworkBehaviour
     [SerializeField]
     private LineRenderer _bullet;
 
-    [SerializeField]
-    private SpriteRenderer _muzzleFlash;
-
     private MovementSystem _movementSystem;
 
     private float _shootTimer = 0f;
@@ -46,16 +43,16 @@ public class CombatSystem : NetworkBehaviour
 
     public Vector3 AimDirection => _aimDirection;
 
+
+    // This needs to get moved sometime
     [SerializeField]
     private List<Vector3> _spawnPositions = new List<Vector3>();
 
 
-    // TEMP
 
     void Start()
     { // public void OnStart
         _bullet.enabled = false;
-        _muzzleFlash.enabled = false;
     }
 
     public override void OnStartClient()
@@ -71,6 +68,7 @@ public class CombatSystem : NetworkBehaviour
 
         _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
         _input = _inputSystem.InputValues;
+
     }
 
     private void OnChangeToCombatMode(bool inCombat)
@@ -93,7 +91,7 @@ public class CombatSystem : NetworkBehaviour
             return;
         }
 
-        if (_shootTimer < _weaponHolder.CurrentWeapon.FireRate)
+        if (_shootTimer < _weaponHolder.CurrentWeapon.WeaponInfo.FireRate)
         {
             _shootTimer += Time.deltaTime;
             return;
@@ -140,13 +138,13 @@ public class CombatSystem : NetworkBehaviour
             return;
         }
 
-        if (_shootTimer < _weaponHolder.CurrentWeapon.FireRate) return;
+        if (_shootTimer < _weaponHolder.CurrentWeapon.WeaponInfo.FireRate) return;
 
         _shootTimer = 0f;
 
         // Debug.DrawRay(transform.position, _aimDirection * _weaponHolder.CurrentWeapon.Range, Color.red, 1f);
 
-        ShootServer(_weaponHolder.CurrentWeapon, _weaponHolder.transform.position, _aimDirection, UserInfo.Username);
+        ShootServer(_weaponHolder.CurrentWeapon.WeaponInfo, _weaponHolder.transform.position, _aimDirection, UserInfo.Username);
     }
 
     [ServerRpc]
@@ -221,13 +219,10 @@ public class CombatSystem : NetworkBehaviour
         _bullet.SetPosition(1, position + direction * distance);
 
         _bullet.enabled = true;
-        _muzzleFlash.enabled = true;
 
-        yield return new WaitForSeconds(0.05f);
+        _weaponHolder.CurrentWeapon.ShowMuzzleFlash();
 
-        _muzzleFlash.enabled = false;
-
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSeconds(0.1f);
 
         _bullet.enabled = false;
     }

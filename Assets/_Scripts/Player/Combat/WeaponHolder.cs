@@ -13,15 +13,6 @@ WeaponHolder is responsible for displaying the weapon sprite and pointing it in 
 public class WeaponHolder : NetworkBehaviour
 {
     [SerializeField]
-    private int _currentWeaponIndex = 0;
-
-    [SerializeField]
-    private List<WeaponInfo> _weapons = new List<WeaponInfo>();
-
-    [SerializeField]
-    private SpriteRenderer _spriteRenderer;
-
-    [SerializeField]
     private MovementSystem _movementSystem;
 
     [SerializeField]
@@ -33,25 +24,24 @@ public class WeaponHolder : NetworkBehaviour
     [SerializeField]
     private CombatSystem _combatSystem;
 
-    [SerializeField]
-    private WeaponSprites _weaponSprites;
+    public Weapon CurrentWeapon;
 
-    public WeaponInfo CurrentWeapon => _weapons[_currentWeaponIndex];
+    private Vector3 _aimDirection = Vector3.zero;
 
     [SyncVar(OnChange = nameof(OnChangeWeaponShow))]
     public bool WeaponShow = false;
-
-    private Vector3 _aimDirection = Vector3.zero;
 
     private void OnChangeWeaponShow(bool oldValue, bool newValue, bool isServer)
     {
         if (newValue)
         {
-            _spriteRenderer.enabled = true;
+            // _spriteRenderer.enabled = true;
+            CurrentWeapon.ShowWeapon();
         }
         else
         {
-            _spriteRenderer.enabled = false;
+            // _spriteRenderer.enabled = false;
+            CurrentWeapon.HideWeapon();
         }
     }
 
@@ -62,34 +52,23 @@ public class WeaponHolder : NetworkBehaviour
     {
         if (newValue)
         {
-            _spriteRenderer.flipY = true;
+            // _spriteRenderer.flipY = true;
+            CurrentWeapon.FlipY(true);
         }
         else
         {
-            _spriteRenderer.flipY = false;
+            // _spriteRenderer.flipY = false;
+            CurrentWeapon.FlipY(false);
         }
     }
 
     private void Start() {
-        _spriteRenderer = _spriteRenderer ?? GetComponent<SpriteRenderer>();
-        _spriteRenderer.enabled = false;
+        CurrentWeapon = CurrentWeapon ?? GetComponentInChildren<Weapon>();
     }
 
     public override void OnStartClient()
     {
         base.OnStartClient();
-
-
-        int index = _weaponSprites.Names.IndexOf(CurrentWeapon.Name);
-
-        if (index == -1)
-        {
-            Debug.LogError($"Weapon {CurrentWeapon.Name} not found in WeaponSprites.");
-        }
-        else
-        {
-            _spriteRenderer.sprite = _weaponSprites.Sprites[index];
-        }
 
         if (base.IsOwner)
         {
@@ -130,4 +109,13 @@ public class WeaponHolder : NetworkBehaviour
         FlipY = flipY;
     }
 
+    public void EquipWeapon(Weapon weapon, Vector3 dropPosition)
+    {
+        if (CurrentWeapon != null)
+        {
+            CurrentWeapon.DropWeapon(dropPosition);
+        }
+
+        CurrentWeapon = weapon;
+    }
 }

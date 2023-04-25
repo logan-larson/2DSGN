@@ -17,6 +17,7 @@ public class InputSystem : MonoBehaviour
 
     private MovementSystem _movement;
     private CombatSystem _combatSystem;
+    private WeaponEquipManager _weaponEquipManager;
 
     private PlayerInput _playerInput;
 
@@ -54,6 +55,11 @@ public class InputSystem : MonoBehaviour
     {
         InputValues.IsFirePressed = value.Get<float>() == 1f;
         _combatSystem.Shoot();
+    }
+
+    public void OnInteract(InputValue value)
+    {
+        _weaponEquipManager.TryEquipWeapon();
     }
 
     public void OnControlsChanged()
