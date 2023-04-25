@@ -93,13 +93,13 @@ public class CombatSystem : NetworkBehaviour
             return;
         }
 
+        UpdateAimDirection();
+
         if (_shootTimer < _weaponHolder.CurrentWeapon.WeaponInfo.FireRate)
         {
             _shootTimer += Time.deltaTime;
             return;
         }
-
-        UpdateAimDirection();
 
         CheckShoot();
     }
@@ -153,7 +153,7 @@ public class CombatSystem : NetworkBehaviour
 
         _shootTimer = 0f;
 
-        // Debug.DrawRay(transform.position, _aimDirection * _weaponHolder.CurrentWeapon.Range, Color.red, 1f);
+        Debug.DrawRay(transform.position, _aimDirection * _weaponHolder.CurrentWeapon.WeaponInfo.Range, Color.red, 1f);
 
         ShootServer(_weaponHolder.CurrentWeapon.WeaponInfo, _weaponHolder.transform.position, _aimDirection, UserInfo.Username);
     }
@@ -199,6 +199,10 @@ public class CombatSystem : NetworkBehaviour
 
                         hitSomething = true;
                     }
+                }
+                else if (hit.transform.GetComponentInChildren<Weapon>() != null)
+                {
+                    Debug.Log("Hit weapon");
                 }
                 else
                 {
