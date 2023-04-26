@@ -33,8 +33,6 @@ public class CombatSystem : NetworkBehaviour
     [SerializeField]
     private LineRenderer _bullet;
 
-    private MovementSystem _movementSystem;
-
     private float _shootTimer = 0f;
     private bool _isShooting = false;
 
@@ -63,24 +61,9 @@ public class CombatSystem : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
-        _movementSystem = GetComponent<MovementSystem>();
-
-        _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
-        _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
-
         _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
         _input = _inputSystem.InputValues;
 
-    }
-
-    private void OnChangeToCombatMode(bool inCombat)
-    {
-        _weaponHolder.SetWeaponShow(true);
-    }
-
-    private void OnChangeToParkourMode(bool inParkour)
-    {
-        _weaponHolder.SetWeaponShow(false);
     }
 
     private void Update()

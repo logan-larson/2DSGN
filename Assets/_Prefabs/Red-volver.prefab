@@ -96,6 +96,8 @@ GameObject:
   - component: {fileID: 2973064127713107434}
   - component: {fileID: -3234423926899328792}
   - component: {fileID: 4429026771321983689}
+  - component: {fileID: -4509752463504215618}
+  - component: {fileID: 5542194646864748460}
   m_Layer: 10
   m_Name: Red-volver
   m_TagString: Untagged
@@ -186,6 +188,9 @@ MonoBehaviour:
   WeaponInfo: {fileID: 11400000, guid: 5c8b6de95a6b75c48b82f91f8428f83b, type: 2}
   WeaponSprite: {fileID: 2973064127713107434}
   MuzzleFlashSprite: {fileID: 5218930415823988518}
+  IsShown: 0
+  IsFlippedY: 0
+  IsEquipped: 0
 --- !u!61 &4429026771321983689
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -212,3 +217,71 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.290211, y: 0.8801223}
   m_EdgeRadius: 0
+--- !u!114 &-4509752463504215618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6059912039733264002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsNested>k__BackingField: 0
+  <ComponentIndex>k__BackingField: 0
+  _networkBehaviours: []
+  <ParentNetworkObject>k__BackingField: {fileID: 0}
+  <ChildNetworkObjects>k__BackingField: []
+  _isNetworked: 1
+  _isGlobal: 0
+  _defaultDespawnType: 0
+  NetworkObserver: {fileID: 0}
+  <PrefabId>k__BackingField: -1
+  _scenePathHash: 0
+  <SceneId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 18233295500462754832
+  _sceneNetworkObjects: []
+--- !u!114 &5542194646864748460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6059912039733264002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: -4509752463504215618}
+  _networkObjectCache: {fileID: 0}
+  _synchronizeParent: 0
+  _packing:
+    Position: 1
+    Rotation: 1
+    Scale: 0
+  _interpolation: 2
+  _extrapolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  _clientAuthoritative: 1
+  _sendToOwner: 1
+  _interval: 1
+  _synchronizePosition: 1
+  _positionSnapping:
+    X: 0
+    Y: 0
+    Z: 0
+  _synchronizeRotation: 1
+  _rotationSnapping:
+    X: 0
+    Y: 0
+    Z: 0
+  _synchronizeScale: 1
+  _scaleSnapping:
+    X: 0
+    Y: 0
+    Z: 0

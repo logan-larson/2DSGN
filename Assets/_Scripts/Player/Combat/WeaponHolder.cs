@@ -35,13 +35,11 @@ public class WeaponHolder : NetworkBehaviour
     {
         if (newValue)
         {
-            // _spriteRenderer.enabled = true;
-            CurrentWeapon.ShowWeapon();
+            CurrentWeapon.Show(true);
         }
         else
         {
-            // _spriteRenderer.enabled = false;
-            CurrentWeapon.HideWeapon();
+            CurrentWeapon.Show(false);
         }
     }
 
@@ -52,29 +50,44 @@ public class WeaponHolder : NetworkBehaviour
     {
         if (newValue)
         {
-            // _spriteRenderer.flipY = true;
             CurrentWeapon.FlipY(true);
         }
         else
         {
-            // _spriteRenderer.flipY = false;
             CurrentWeapon.FlipY(false);
         }
-    }
-
-    private void Start() {
-        CurrentWeapon = CurrentWeapon ?? GetComponentInChildren<Weapon>();
     }
 
     public override void OnStartClient()
     {
         base.OnStartClient();
 
-        if (base.IsOwner)
-        {
-            _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
-            _input = _inputSystem.InputValues;
-        }
+        if (!base.IsOwner) return;
+
+        CurrentWeapon = CurrentWeapon ?? gameObject   .GetComponent<Weapon>();
+
+        _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
+        _movementSystem = _movementSystem ?? GetComponent<MovementSystem>();
+
+        _input = _inputSystem.InputValues;
+
+        _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
+        _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
+
+
+        // Set defaults
+        SetWeaponShow(false);
+        SetFlipY(false);
+    }
+
+    private void OnChangeToCombatMode(bool inCombat)
+    {
+        SetWeaponShow(true);
+    }
+
+    private void OnChangeToParkourMode(bool inCombat)
+    {
+        SetWeaponShow(false);
     }
 
     public void Update()
@@ -109,18 +122,52 @@ public class WeaponHolder : NetworkBehaviour
         FlipY = flipY;
     }
 
-    public void EquipWeapon(Weapon weapon, Vector3 dropPosition)
+    public void EquipWeapon(GameObject weapon, Vector3 dropPosition)
     {
+        // Get current weapon's visual properties
         var droppedWeaponPos = CurrentWeapon.transform.localPosition;
         var droppedWeaponRot = CurrentWeapon.transform.localRotation;
+        var droppedWeaponIsShown = CurrentWeapon.IsShown;
+        var droppedWeaponIsFlippedY = CurrentWeapon.IsFlippedY;
+        // droppedWeaponPos = new Vector3();
 
-        if (CurrentWeapon != null)
-        {
-            CurrentWeapon.Drop(dropPosition);
-        }
+        // Drop the current weapon where the new weapon to switch to is
+        // Need to pass the weapon holder game object to the server because the weapon holder game object is the one that has the weapon component
+        DropWeaponServer(gameObject, dropPosition);
 
-        CurrentWeapon = weapon;
+        // Equip the new weapon with the old weapon's visual properties
+        EquipWeaponServer(weapon, droppedWeaponPos, droppedWeaponRot, droppedWeaponIsShown, droppedWeaponIsFlippedY);
+    }
 
-        CurrentWeapon.Equip(transform, droppedWeaponPos, droppedWeaponRot);
+    [ServerRpc(RequireOwnership = false)]
+    private void DropWeaponServer(GameObject weaponHolderGameObj, Vector3 dropPosition)
+    {
+        DropWeaponObserver(weaponHolderGameObj, dropPosition);
+    }
+
+    [ObserversRpc]
+    private void DropWeaponObserver(GameObject weaponHolderGameObj, Vector3 dropPosition)
+    {
+        // Get weapon component from weapon holder game object
+        var weapon = weaponHolderGameObj.transform.GetChild(0).gameObject.GetComponent<Weapon>();
+
+        weapon.Drop(dropPosition);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void EquipWeaponServer(GameObject weaponGameObj, Vector3 equipPosition, Quaternion equipRotation, bool showWeapon, bool flipY)
+    {
+        EquipWeaponObserver(weaponGameObj, equipPosition, equipRotation, showWeapon, flipY);
+    }
+
+    [ObserversRpc]
+    private void EquipWeaponObserver(GameObject weapon, Vector3 equipPosition, Quaternion equipRotation, bool showWeapon, bool flipY)
+    {
+        CurrentWeapon = weapon.GetComponent<Weapon>();
+
+        CurrentWeapon.Equip(transform, equipPosition, equipRotation);
+
+        CurrentWeapon.Show(WeaponShow);
+        CurrentWeapon.FlipY(FlipY);
     }
 }

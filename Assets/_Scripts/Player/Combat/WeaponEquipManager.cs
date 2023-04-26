@@ -71,10 +71,11 @@ public class WeaponEquipManager : MonoBehaviour
 
     public void TryEquipWeapon()
     {
-        Debug.Log("Try equip weapon");
         if (_highlightedWeapon == null) return;
-        
-        _weaponHolder.EquipWeapon(_highlightedWeapon, _highlightedWeapon.transform.position);
+
+        var weaponObj = _highlightedWeapon.gameObject;
+
+        _weaponHolder.EquipWeapon(weaponObj, _highlightedWeapon.transform.position);
 
         _highlightedWeapon = null;
     }

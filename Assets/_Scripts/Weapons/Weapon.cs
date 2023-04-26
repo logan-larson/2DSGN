@@ -1,27 +1,42 @@
 using System.Collections;
 using System.Collections.Generic;
+using FishNet.Object;
 using UnityEngine;
 
-public class Weapon : MonoBehaviour
+public class Weapon : NetworkBehaviour
 {
     public WeaponInfo WeaponInfo;
     public SpriteRenderer WeaponSprite;
     public SpriteRenderer MuzzleFlashSprite;
 
-    public void ShowWeapon()
+    public bool IsShown = false;
+    public bool IsFlippedY = false;
+    public bool IsEquipped = false;
+
+    public override void OnStartClient()
     {
-        WeaponSprite.enabled = true;
+        base.OnStartClient();
+
+        MuzzleFlashSprite.enabled = false;
+
+        if (IsEquipped)
+        {
+            Show(true);
+            FlipY(IsFlippedY);
+        }
     }
 
-    public void HideWeapon()
+    public void Show(bool show)
     {
-        WeaponSprite.enabled = false;
+        WeaponSprite.enabled = show;
+        IsShown = show;
     }
 
     public void FlipY(bool flipY)
     {
         WeaponSprite.flipY = flipY;
         MuzzleFlashSprite.flipY = flipY;
+        IsFlippedY = flipY;
     }
 
     public void ShowMuzzleFlash()
@@ -62,7 +77,7 @@ public class Weapon : MonoBehaviour
         var weaponPickups = GameObject.FindWithTag("WeaponPickups");
         transform.SetParent(weaponPickups.transform);
 
-        ShowWeapon();
+        Show(true);
         HideHighlight();
     }
 }
