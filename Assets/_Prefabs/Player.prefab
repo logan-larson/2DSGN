@@ -1129,7 +1129,6 @@ MonoBehaviour:
   _input: {fileID: 0}
   _combatSystem: {fileID: 4268827610097334069}
   CurrentWeapon: {fileID: 8137224110724643508}
-  CurrentWeaponGameObj: {fileID: 4168662063004538829}
   WeaponShow: 0
   FlipY: 0
 --- !u!114 &7300643456147865250
@@ -1150,7 +1149,8 @@ MonoBehaviour:
   - {fileID: 7800868568101946959}
   - {fileID: 1255010134182394098}
   <ParentNetworkObject>k__BackingField: {fileID: 5020579654786682326}
-  <ChildNetworkObjects>k__BackingField: []
+  <ChildNetworkObjects>k__BackingField:
+  - {fileID: 6701480267049118233}
   _isNetworked: 1
   _isGlobal: 0
   _defaultDespawnType: 0
@@ -1317,14 +1317,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4822181984916969488}
     m_Modifications:
-    - target: {fileID: 295105370526668722, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
-      propertyPath: m_Enabled
-      value: 0
+    - target: {fileID: -5709648262544161962, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
+      propertyPath: <IsNested>k__BackingField
+      value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 2102631118722159611, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
-      propertyPath: MuzzleFlashSprite
+    - target: {fileID: -5709648262544161962, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
+      propertyPath: <ParentNetworkObject>k__BackingField
       value: 
-      objectReference: {fileID: 7627792848748609277}
+      objectReference: {fileID: 7300643456147865250}
     - target: {fileID: 2562105026587387031, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -1369,45 +1369,34 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2973064127713107434, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6059912039733264002, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
       propertyPath: m_Name
       value: Revolver
       objectReference: {fileID: 0}
-    - target: {fileID: 6059912039733264002, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 7205523236404391683, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
-      propertyPath: m_Layer
-      value: 10
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
---- !u!1 &4168662063004538829 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6059912039733264002, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
-  m_PrefabInstance: {fileID: 7909220260214057295}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5642268272513142232 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2562105026587387031, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
   m_PrefabInstance: {fileID: 7909220260214057295}
   m_PrefabAsset: {fileID: 0}
---- !u!212 &7627792848748609277 stripped
-SpriteRenderer:
-  m_CorrespondingSourceObject: {fileID: 295105370526668722, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
+--- !u!114 &6701480267049118233 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -5709648262544161962, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
   m_PrefabInstance: {fileID: 7909220260214057295}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8137224110724643508 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2102631118722159611, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
   m_PrefabInstance: {fileID: 7909220260214057295}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4168662063004538829}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7e3ff2d782dd94b48a15fc1905b21ccb, type: 3}

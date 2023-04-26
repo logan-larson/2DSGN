@@ -8,6 +8,7 @@ public class Weapon : NetworkBehaviour
     public WeaponInfo WeaponInfo;
     public SpriteRenderer WeaponSprite;
     public SpriteRenderer MuzzleFlashSprite;
+    public TrailRenderer BulletTrailRenderer;
 
     public bool IsShown = false;
     public bool IsFlippedY = false;

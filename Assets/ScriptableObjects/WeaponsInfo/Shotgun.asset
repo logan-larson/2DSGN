@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Shotgun
   Damage: 80
-  FireRate: 0.7
+  FireRate: 0.5
   Range: 8
-  ReloadTime: 0
-  ClipSize: 0
+  IsAutomatic: 1
+  BulletsPerShot: 3
+  SpreadAngle: 18.77
+  MaxBloomAngle: 0
+  BloomAngleIncreasePerShot: 0

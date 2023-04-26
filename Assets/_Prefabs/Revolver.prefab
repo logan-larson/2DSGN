@@ -101,9 +101,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e3ff2d782dd94b48a15fc1905b21ccb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: -5709648262544161962}
+  _networkObjectCache: {fileID: -5709648262544161962}
   WeaponInfo: {fileID: 11400000, guid: 8cf67411123df414f9a3bfe9d565a9ee, type: 2}
   WeaponSprite: {fileID: 2973064127713107434}
   MuzzleFlashSprite: {fileID: 295105370526668722}
+  BulletTrailRenderer: {fileID: 7365057579148312717, guid: abaa1bdfe97d19245a6bb699ff9173c0, type: 3}
   IsShown: 0
   IsFlippedY: 0
   IsEquipped: 0
@@ -147,14 +151,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <IsNested>k__BackingField: 0
   <ComponentIndex>k__BackingField: 0
-  _networkBehaviours: []
+  _networkBehaviours:
+  - {fileID: 2102631118722159611}
+  - {fileID: -1446210289863654907}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
   _isGlobal: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: -1
+  <PrefabId>k__BackingField: 5
   _scenePathHash: 0
   <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 7891346041705931610
@@ -171,9 +177,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: -5709648262544161962}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: -5709648262544161962}
   _synchronizeParent: 0
   _packing:
     Position: 1

@@ -146,82 +146,138 @@ public class CombatSystem : NetworkBehaviour
     {
         if (weapon == null) return;
 
-        RaycastHit2D[] hits = Physics2D.RaycastAll(position, direction, weapon.Range);
+        RaycastHit2D[][] allHits = GetHits(weapon, position, direction);
+
+
 
         bool hitSomething = false;
 
-        foreach (RaycastHit2D hit in hits)
+        foreach (RaycastHit2D[] hits in allHits) 
         {
-            if (hit.collider != null)
+            foreach (RaycastHit2D hit in hits)
             {
-                if (hit.transform.GetComponentInChildren<PlayerName>() != null)
+                if (hit.collider != null)
                 {
-                    if (hit.transform.GetComponentInChildren<PlayerName>().Username != username)
+                    if (hit.transform.GetComponentInChildren<PlayerName>() != null)
                     {
-                        Debug.Log("Hit user: " + hit.transform.GetComponentInChildren<PlayerName>().Username);
+                        if (hit.transform.GetComponentInChildren<PlayerName>().Username != username)
+                        {
+                            Debug.Log("Hit user: " + hit.transform.GetComponentInChildren<PlayerName>().Username);
 
-                        if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
-                            enemyHealth.Health -= weapon.Damage;
+                            if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
+                                enemyHealth.Health -= weapon.Damage;
 
-                            if (enemyHealth.Health <= 0)
-                            {
-                                // Debug.Log("Killed user: " + hit.transform.GetComponentInChildren<PlayerName>().Username);
+                                if (enemyHealth.Health <= 0)
+                                {
+                                    // Debug.Log("Killed user: " + hit.transform.GetComponentInChildren<PlayerName>().Username);
 
-                                enemyHealth.Health = 100;
+                                    enemyHealth.Health = 100;
 
-                                int randomSpawnPosition = Random.Range(0, _spawnPositions.Count);
+                                    int randomSpawnPosition = Random.Range(0, _spawnPositions.Count);
 
-                                Debug.Log("Spawned at position: " + randomSpawnPosition);
+                                    Debug.Log("Spawned at position: " + randomSpawnPosition);
 
-                                hit.transform.position = _spawnPositions[randomSpawnPosition];
-                                hit.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                                    hit.transform.position = _spawnPositions[randomSpawnPosition];
+                                    hit.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                                }
                             }
-                        }
+                            var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
+                            ShootObservers(position, dir, hit.distance);
 
-                        ShootObservers(position, direction, hit.distance);
+                            hitSomething = true;
+                        }
+                    }
+                    else if (hit.transform.GetComponentInChildren<Weapon>() != null)
+                    {
+                        // Debug.Log("Hit weapon");
+                    }
+                    else
+                    {
+                        Debug.Log("Hit environment");
+                        var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
+                        ShootObservers(position, dir, hit.distance);
 
                         hitSomething = true;
+                        break;
                     }
                 }
-                else if (hit.transform.GetComponentInChildren<Weapon>() != null)
-                {
-                    Debug.Log("Hit weapon");
-                }
-                else
-                {
-                    Debug.Log("Hit environment");
-                    ShootObservers(position, direction, hit.distance);
+            }
 
-                    hitSomething = true;
-                    break;
-                }
+            if (!hitSomething)
+            {
+                Debug.Log("Miss");
+
+                // This technically isn't showing the proper miss position and I need to fix it in the future
+                // Otherwise people are going to be confused as to why they missed
+                Vector3 randomDirection = Quaternion.Euler(0f, 0f, Random.Range(-weapon.SpreadAngle, weapon.SpreadAngle)) * direction;
+                ShootObservers(position, randomDirection, weapon.Range);
             }
         }
 
-        if (!hitSomething)
+    }
+
+    private RaycastHit2D[][] GetHits(WeaponInfo weapon, Vector3 position, Vector3 direction)
+    {
+        RaycastHit2D[][] hits = new RaycastHit2D[0][];
+        if (weapon.BulletsPerShot == 1)
         {
-            Debug.Log("Miss");
-            ShootObservers(position, direction, weapon.Range);
+            hits = new RaycastHit2D[1][];
+            hits[0] = Physics2D.RaycastAll(position, direction, weapon.Range);
         }
+        else
+        {
+            hits = new RaycastHit2D[weapon.BulletsPerShot][];
+            for (int i = 0; i < weapon.BulletsPerShot; i++)
+            {
+                Vector3 randomDirection = Quaternion.Euler(0f, 0f, Random.Range(-weapon.SpreadAngle, weapon.SpreadAngle)) * direction;
+
+                Debug.DrawRay(position, randomDirection * weapon.Range, Color.green, 0.5f);
+
+                RaycastHit2D[] bulletHits = Physics2D.RaycastAll(position, randomDirection, weapon.Range);
+
+                hits[i] = bulletHits;
+            }
+        }
+
+        return hits;
     }
 
     [ObserversRpc]
     public void ShootObservers(Vector3 position, Vector3 direction, float distance)
     {
-        StartCoroutine(ShootCoroutine(position, direction, distance));
+        TrailRenderer bulletTrail = Instantiate(_weaponHolder.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
+        
+        StartCoroutine(ShootCoroutine(position, direction, distance, bulletTrail));
     }
 
-    private IEnumerator ShootCoroutine(Vector3 position, Vector3 direction, float distance)
+    private IEnumerator ShootCoroutine(Vector3 position, Vector3 direction, float distance, TrailRenderer bulletTrail)
     {
+        _weaponHolder.CurrentWeapon.ShowMuzzleFlash();
+
+        float time = 0;
+        Vector3 startPosition = bulletTrail.transform.position;
+        Vector3 endPosition = position + direction * distance;
+
+        while (time < 1f)
+        {
+            bulletTrail.transform.position = Vector3.Lerp(startPosition, endPosition, time);
+            time += Time.deltaTime / bulletTrail.time;
+
+            yield return null;
+        }
+
+        Destroy(bulletTrail.gameObject, bulletTrail.time);
+
+        /*
         _bullet.SetPosition(0, position + direction);
         _bullet.SetPosition(1, position + direction * distance);
 
         _bullet.enabled = true;
 
-        _weaponHolder.CurrentWeapon.ShowMuzzleFlash();
 
         yield return new WaitForSeconds(0.1f);
 
         _bullet.enabled = false;
+        */
     }
 }
