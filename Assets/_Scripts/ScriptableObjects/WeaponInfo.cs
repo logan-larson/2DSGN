@@ -7,6 +7,10 @@ public class WeaponInfo : ScriptableObject
     public int Damage;
     public float FireRate;
     public float Range;
-    public float ReloadTime;
-    public float ClipSize;
+
+    public bool IsAutomatic = true;
+    public int BulletsPerShot = 1;
+    public float SpreadAngle = 0f;
+    public float MaxBloomAngle = 0f;
+    public float BloomAngleIncreasePerShot = 0f;
 }
