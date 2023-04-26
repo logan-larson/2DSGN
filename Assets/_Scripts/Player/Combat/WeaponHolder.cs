@@ -64,7 +64,7 @@ public class WeaponHolder : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
-        CurrentWeapon = CurrentWeapon ?? gameObject   .GetComponent<Weapon>();
+        CurrentWeapon = CurrentWeapon ?? gameObject.GetComponent<Weapon>();
 
         _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
         _movementSystem = _movementSystem ?? GetComponent<MovementSystem>();
@@ -133,25 +133,22 @@ public class WeaponHolder : NetworkBehaviour
 
         // Drop the current weapon where the new weapon to switch to is
         // Need to pass the weapon holder game object to the server because the weapon holder game object is the one that has the weapon component
-        DropWeaponServer(gameObject, dropPosition);
+        DropWeaponServer(CurrentWeapon.gameObject, dropPosition);
 
         // Equip the new weapon with the old weapon's visual properties
         EquipWeaponServer(weapon, droppedWeaponPos, droppedWeaponRot, droppedWeaponIsShown, droppedWeaponIsFlippedY);
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void DropWeaponServer(GameObject weaponHolderGameObj, Vector3 dropPosition)
+    private void DropWeaponServer(GameObject weaponGameObj, Vector3 dropPosition)
     {
-        DropWeaponObserver(weaponHolderGameObj, dropPosition);
+        DropWeaponObserver(weaponGameObj, dropPosition);
     }
 
     [ObserversRpc]
-    private void DropWeaponObserver(GameObject weaponHolderGameObj, Vector3 dropPosition)
+    private void DropWeaponObserver(GameObject weaponGameObj, Vector3 dropPosition)
     {
-        // Get weapon component from weapon holder game object
-        var weapon = weaponHolderGameObj.transform.GetChild(0).gameObject.GetComponent<Weapon>();
-
-        weapon.Drop(dropPosition);
+        weaponGameObj.GetComponent<Weapon>().Drop(dropPosition);
     }
 
     [ServerRpc(RequireOwnership = false)]
