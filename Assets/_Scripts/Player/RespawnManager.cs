@@ -32,7 +32,7 @@ public class RespawnManager : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            Respawn();
+            _playerHealth.TakeDamage(100);
         }
     }
 

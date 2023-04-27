@@ -16,6 +16,9 @@ public class WeaponHolder : NetworkBehaviour
     private MovementSystem _movementSystem;
 
     [SerializeField]
+    private PlayerHealth _playerHealth;
+
+    [SerializeField]
     private InputSystem _inputSystem;
 
     [SerializeField]
@@ -23,6 +26,9 @@ public class WeaponHolder : NetworkBehaviour
 
     [SerializeField]
     private CombatSystem _combatSystem;
+
+    [SerializeField]
+    private GameObject _defaultWeapon;
 
     public Weapon CurrentWeapon;
 
@@ -74,6 +80,7 @@ public class WeaponHolder : NetworkBehaviour
         _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
         _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
 
+        _playerHealth.OnDeath.AddListener(OnDeath);
 
         // Set defaults
         SetWeaponShow(false);
@@ -133,10 +140,35 @@ public class WeaponHolder : NetworkBehaviour
 
         // Drop the current weapon where the new weapon to switch to is
         // Need to pass the weapon holder game object to the server because the weapon holder game object is the one that has the weapon component
-        DropWeaponServer(CurrentWeapon.gameObject, dropPosition);
+        if (CurrentWeapon.gameObject != _defaultWeapon)
+        {
+            DropWeaponServer(CurrentWeapon.gameObject, dropPosition);
+        }
+        else
+        {
+            // If the current weapon is the default weapon, destroy it
+            Destroy(CurrentWeapon.gameObject);
+        }
 
         // Equip the new weapon with the old weapon's visual properties
         EquipWeaponServer(weapon, droppedWeaponPos, droppedWeaponRot, droppedWeaponIsShown, droppedWeaponIsFlippedY);
+    }
+
+    private void OnDeath()
+    {
+        // Drop the current weapon, if it isn't the default weapon
+        if (CurrentWeapon.gameObject != _defaultWeapon)
+        {
+            DropWeaponServer(CurrentWeapon.gameObject, transform.position);
+        }
+        else
+        {
+            // If the current weapon is the default weapon, destroy it
+            Destroy(CurrentWeapon.gameObject);
+        }
+
+        // Equip the default weapon
+        EquipWeaponServer(_defaultWeapon, Vector3.zero, Quaternion.identity, false, false);
     }
 
     [ServerRpc(RequireOwnership = false)]

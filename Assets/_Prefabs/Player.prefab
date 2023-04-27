@@ -1113,9 +1113,11 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 7300643456147865250}
   _movementSystem: {fileID: 4268827610097334074}
+  _playerHealth: {fileID: 1707328605495123278}
   _inputSystem: {fileID: 4268827610097334073}
   _input: {fileID: 0}
   _combatSystem: {fileID: 4268827610097334069}
+  _defaultWeapon: {fileID: 4168662063004538829}
   CurrentWeapon: {fileID: 8137224110724643508}
   WeaponShow: 0
   FlipY: 0
@@ -1367,6 +1369,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
+--- !u!1 &4168662063004538829 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6059912039733264002, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
+  m_PrefabInstance: {fileID: 7909220260214057295}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5642268272513142232 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2562105026587387031, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
@@ -1377,7 +1384,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -5709648262544161962, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
   m_PrefabInstance: {fileID: 7909220260214057295}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 4168662063004538829}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
@@ -1388,7 +1395,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2102631118722159611, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
   m_PrefabInstance: {fileID: 7909220260214057295}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 4168662063004538829}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7e3ff2d782dd94b48a15fc1905b21ccb, type: 3}
