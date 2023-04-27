@@ -167,6 +167,7 @@ public class CombatSystem : NetworkBehaviour
                             if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
                                 enemyHealth.Health -= weapon.Damage;
 
+                                /*
                                 if (enemyHealth.Health <= 0)
                                 {
                                     // Debug.Log("Killed user: " + hit.transform.GetComponentInChildren<PlayerName>().Username);
@@ -180,6 +181,7 @@ public class CombatSystem : NetworkBehaviour
                                     hit.transform.position = _spawnPositions[randomSpawnPosition];
                                     hit.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
                                 }
+                                */
                             }
                             var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
                             ShootObservers(position, dir, hit.distance);

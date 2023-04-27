@@ -239,15 +239,14 @@ GameObject:
   - component: {fileID: 3162633828202351065}
   - component: {fileID: 4268827610097334074}
   - component: {fileID: 4268827610097334077}
-  - component: {fileID: 5379027206402953739}
   - component: {fileID: 4268827610097334069}
   - component: {fileID: 5020579654786682326}
   - component: {fileID: 8314681878889343522}
   - component: {fileID: -3006074405203397699}
-  - component: {fileID: 3431540716247825733}
   - component: {fileID: 6558510044089372251}
   - component: {fileID: 1707328605495123278}
   - component: {fileID: 6483848118584978808}
+  - component: {fileID: 3545057823035152873}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -394,7 +393,7 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 5020579654786682326}
   InputSystem: {fileID: 0}
   _input: {fileID: 0}
-  _animator: {fileID: 5379027206402953739}
+  _animator: {fileID: 0}
   MovementProperties: {fileID: 11400000, guid: 70099ab69eee19c4cad9e629a3eb4742, type: 2}
   _currentVelocity: {x: 0, y: 0, z: 0}
   _timeSinceGrounded: 0
@@ -424,26 +423,6 @@ MonoBehaviour:
   _spriteRenderer: {fileID: 8997367718474366262}
   _currentMode: 0
   Mode: 0
---- !u!95 &5379027206402953739
-Animator:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4268827610097334048}
-  m_Enabled: 0
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 0ce37cbaade7474459acedf2cd372906, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!114 &4268827610097334069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -492,8 +471,8 @@ MonoBehaviour:
   - {fileID: 4268827610097334069}
   - {fileID: 8314681878889343522}
   - {fileID: -3006074405203397699}
-  - {fileID: 3431540716247825733}
   - {fileID: 1707328605495123278}
+  - {fileID: 3545057823035152873}
   - {fileID: 6413919363218253851}
   - {fileID: 223301570187018686}
   - {fileID: 7084400194756443070}
@@ -567,27 +546,6 @@ MonoBehaviour:
   _componentIndexCache: 4
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
---- !u!114 &3431540716247825733
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4268827610097334048}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _componentIndexCache: 5
-  _addedNetworkObject: {fileID: 5020579654786682326}
-  _networkObjectCache: {fileID: 5020579654786682326}
-  IgnoredParameters: []
-  _animator: {fileID: 5379027206402953739}
-  _smoothFloats: 1
-  _interpolation: 2
-  _clientAuthoritative: 0
-  _sendToOwner: 1
 --- !u!61 &6558510044089372251
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -626,10 +584,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 178d4b97b5b8ca84f90111ffa674dc08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 6
+  _componentIndexCache: 5
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   Health: 100
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
   _healthText: {fileID: 3208095534013791242}
 --- !u!114 &6483848118584978808
 MonoBehaviour:
@@ -645,6 +606,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _combatSystem: {fileID: 4268827610097334069}
   _weaponHolder: {fileID: 7800868568101946959}
+--- !u!114 &3545057823035152873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4268827610097334048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 549024164fff9124591cdc5e05d42f4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 6
+  _addedNetworkObject: {fileID: 5020579654786682326}
+  _networkObjectCache: {fileID: 5020579654786682326}
+  OnRespawn:
+    m_PersistentCalls:
+      m_Calls: []
+  _playerHealth: {fileID: 1707328605495123278}
+  _spawnPositions:
+  - {x: -30, y: -13, z: 0}
+  - {x: -30, y: -25, z: 0}
+  - {x: -3.5, y: -3, z: 0}
+  - {x: 7.5, y: 0, z: 0}
+  - {x: 9.2, y: -12.5, z: 0}
+  - {x: 14, y: -25, z: 0}
+  - {x: -30.5, y: -1, z: 0}
 --- !u!1 &5094635124909889969
 GameObject:
   m_ObjectHideFlags: 0
@@ -1320,6 +1308,10 @@ PrefabInstance:
     - target: {fileID: -5709648262544161962, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
       propertyPath: <IsNested>k__BackingField
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -5709648262544161962, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
+      propertyPath: <ComponentIndex>k__BackingField
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -5709648262544161962, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
       propertyPath: <ParentNetworkObject>k__BackingField
