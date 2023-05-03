@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using UnityEngine;
 
 public class Weapon : NetworkBehaviour
@@ -12,8 +13,10 @@ public class Weapon : NetworkBehaviour
 
     public bool IsShown = false;
     public bool IsFlippedY = false;
-    public bool IsEquipped = false;
     public float CurrentBloom = 0f;
+
+    [SyncVar]
+    public bool IsEquipped = false;
 
     public override void OnStartClient()
     {
@@ -68,6 +71,8 @@ public class Weapon : NetworkBehaviour
         transform.SetParent(weaponHolder);
         transform.localPosition = position;
         transform.localRotation = rotation;
+
+        IsEquipped = true;
         HideHighlight();
     }
 
@@ -79,6 +84,7 @@ public class Weapon : NetworkBehaviour
         var weaponPickups = GameObject.FindWithTag("WeaponPickups");
         transform.SetParent(weaponPickups.transform);
 
+        IsEquipped = false;
         Show(true);
         HideHighlight();
     }

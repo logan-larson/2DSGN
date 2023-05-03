@@ -85,6 +85,7 @@ public class WeaponHolder : NetworkBehaviour
         // Set defaults
         SetWeaponShow(false);
         SetFlipY(false);
+        CurrentWeapon.IsEquipped = true;
     }
 
     private void OnChangeToCombatMode(bool inCombat)

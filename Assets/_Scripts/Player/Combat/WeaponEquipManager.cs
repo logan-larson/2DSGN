@@ -27,7 +27,65 @@ public class WeaponEquipManager : MonoBehaviour
         // See if the player is aiming at a weapon
         // RaycastHit2D hit = Physics2D.Raycast(transform.position, _aimDirection, 3f, LayerMask.GetMask("Weapon"));
 
+        GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
+        GameObject closestWeapon = null;
+        float closestDistance = 5f;
+        Vector3 referencePosition = transform.position;
 
+        foreach (GameObject weapon in weapons)
+        {
+            if (weapon.GetComponent<Weapon>().IsEquipped) continue;
+
+            float distance = Vector3.Distance(weapon.transform.position, referencePosition);
+            if (distance < closestDistance)
+            {
+                closestWeapon = weapon;
+                closestDistance = distance;
+            }
+
+            weapon.GetComponent<Weapon>().HideHighlight();
+        }
+
+        if (closestWeapon != null)
+        {
+            Weapon weapon = closestWeapon.GetComponent<Weapon>();
+            if (weapon != null && weapon != _weaponHolder.CurrentWeapon)
+            {
+                _highlightedWeapon = weapon;
+                weapon.ShowHighlight();
+            }
+        }
+
+        /*
+        if (closestWeapon != null)
+        {
+            Weapon weapon = closestWeapon.GetComponent<Weapon>();
+            if (weapon != null && weapon != _weaponHolder.CurrentWeapon)
+            {
+                if (_highlightedWeapon != weapon)
+                {
+                    if (_highlightedWeapon != null)
+                    {
+                        _highlightedWeapon.HideHighlight();
+                    }
+
+                    _highlightedWeapon = weapon;
+                    _highlightedWeapon.ShowHighlight();
+                }
+            }
+        }
+        else
+        {
+            if (_highlightedWeapon != null)
+            {
+                _highlightedWeapon.HideHighlight();
+                _highlightedWeapon = null;
+            }
+        }
+        */
+
+
+        /*
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, _aimDirection, 3f, LayerMask.GetMask("Weapon"));
 
         bool hitSomething = false;
@@ -67,6 +125,7 @@ public class WeaponEquipManager : MonoBehaviour
                 _highlightedWeapon = null;
             }
         }
+        */
     }
 
     public void TryEquipWeapon()

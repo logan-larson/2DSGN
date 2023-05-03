@@ -6,6 +6,7 @@ TagManager:
   tags:
   - IPAddressInput
   - WeaponPickups
+  - Weapon
   layers:
   - Default
   - TransparentFX
