@@ -13,6 +13,7 @@ public class Weapon : NetworkBehaviour
     public bool IsShown = false;
     public bool IsFlippedY = false;
     public bool IsEquipped = false;
+    public float CurrentBloom = 0f;
 
     public override void OnStartClient()
     {

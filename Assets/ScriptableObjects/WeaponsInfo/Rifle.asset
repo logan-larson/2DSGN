@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Name: Rifle
   Damage: 23
-  FireRate: 0.3
+  FireRate: 0.23
   Range: 15
-  ReloadTime: 0
-  ClipSize: 0
+  IsAutomatic: 1
+  BulletsPerShot: 1
+  SpreadAngle: 0
+  MaxBloomAngle: 7
+  BloomAngleIncreasePerShot: 1

@@ -85,6 +85,11 @@ public class CombatSystem : NetworkBehaviour
         }
 
         CheckShoot();
+
+        if (!_isShooting)
+        {
+            SubtractBloom(_weaponHolder.CurrentWeapon.WeaponInfo);
+        }
     }
 
     private void OnDrawGizmos()
@@ -148,8 +153,6 @@ public class CombatSystem : NetworkBehaviour
 
         RaycastHit2D[][] allHits = GetHits(weapon, position, direction);
 
-
-
         bool hitSomething = false;
 
         foreach (RaycastHit2D[] hits in allHits) 
@@ -184,7 +187,7 @@ public class CombatSystem : NetworkBehaviour
                                 */
                             }
                             var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
-                            ShootObservers(position, dir, hit.distance);
+                            // ShootObservers(position, dir, hit.distance);
 
                             hitSomething = true;
                         }
@@ -197,7 +200,7 @@ public class CombatSystem : NetworkBehaviour
                     {
                         Debug.Log("Hit environment");
                         var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
-                        ShootObservers(position, dir, hit.distance);
+                        // ShootObservers(position, dir, hit.distance);
 
                         hitSomething = true;
                         break;
@@ -211,11 +214,12 @@ public class CombatSystem : NetworkBehaviour
 
                 // This technically isn't showing the proper miss position and I need to fix it in the future
                 // Otherwise people are going to be confused as to why they missed
-                Vector3 randomDirection = Quaternion.Euler(0f, 0f, Random.Range(-weapon.SpreadAngle, weapon.SpreadAngle)) * direction;
-                ShootObservers(position, randomDirection, weapon.Range);
+                // Vector3 randomDirection = Quaternion.Euler(0f, 0f, Random.Range(-weapon.SpreadAngle, weapon.SpreadAngle)) * direction;
+                // ShootObservers(position, direction, weapon.Range);
             }
         }
 
+        AddBloom(weapon);
     }
 
     private RaycastHit2D[][] GetHits(WeaponInfo weapon, Vector3 position, Vector3 direction)
@@ -224,7 +228,14 @@ public class CombatSystem : NetworkBehaviour
         if (weapon.BulletsPerShot == 1)
         {
             hits = new RaycastHit2D[1][];
-            hits[0] = Physics2D.RaycastAll(position, direction, weapon.Range);
+
+            var currentBloom = _weaponHolder.CurrentWeapon.CurrentBloom;
+            // var bloomDir = (new Vector3(direction.x, direction.y, 0f) + new Vector3(Random.Range(-currentBloom, currentBloom), Random.Range(-currentBloom, currentBloom), 0f)).normalized;
+            Vector3 bloomDir= Quaternion.Euler(0f, 0f, Random.Range(-currentBloom, currentBloom)) * direction;
+
+            hits[0] = Physics2D.RaycastAll(position, bloomDir, weapon.Range);
+
+            DrawShot(hits[0], position, bloomDir, weapon.Range);
         }
         else
         {
@@ -238,10 +249,32 @@ public class CombatSystem : NetworkBehaviour
                 RaycastHit2D[] bulletHits = Physics2D.RaycastAll(position, randomDirection, weapon.Range);
 
                 hits[i] = bulletHits;
+
+                DrawShot(hits[i], position, randomDirection, weapon.Range);
             }
         }
 
         return hits;
+    }
+
+    private void DrawShot(RaycastHit2D[] hits, Vector3 position, Vector3 direction, float distance)
+    {
+        bool hitSomething = false;
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.collider != null && hit.transform.GetComponentInChildren<Weapon>() == null)
+            {
+                ShootObservers(position, direction, hits[System.Array.IndexOf(hits, hit)].distance);
+
+                hitSomething = true;
+                break;
+            }
+        }
+
+        if (!hitSomething)
+        {
+            ShootObservers(position, direction, distance);
+        }
     }
 
     [ObserversRpc]
@@ -281,5 +314,26 @@ public class CombatSystem : NetworkBehaviour
 
         _bullet.enabled = false;
         */
+    }
+
+
+    private void AddBloom(WeaponInfo weapon)
+    {
+        if (weapon.BulletsPerShot != 1) return;
+
+        _weaponHolder.CurrentWeapon.CurrentBloom += weapon.BloomAngleIncreasePerShot;
+
+        if (_weaponHolder.CurrentWeapon.CurrentBloom > weapon.MaxBloomAngle)
+            _weaponHolder.CurrentWeapon.CurrentBloom = weapon.MaxBloomAngle;
+    }
+
+    private void SubtractBloom(WeaponInfo weapon)
+    {
+        if (weapon.BulletsPerShot != 1) return;
+
+        _weaponHolder.CurrentWeapon.CurrentBloom -= weapon.MaxBloomAngle * Time.deltaTime;
+
+        if (_weaponHolder.CurrentWeapon.CurrentBloom < 0f)
+            _weaponHolder.CurrentWeapon.CurrentBloom = 0f;
     }
 }
