@@ -44,12 +44,6 @@ public class CombatSystem : NetworkBehaviour
     public Vector3 AimDirection => _aimDirection;
 
 
-    // This needs to get moved sometime
-    [SerializeField]
-    private List<Vector3> _spawnPositions = new List<Vector3>();
-
-
-
     void Start()
     { // public void OnStart
         _bullet.enabled = false;
@@ -169,34 +163,13 @@ public class CombatSystem : NetworkBehaviour
 
                             if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
                                 enemyHealth.Health -= weapon.Damage;
-
-                                /*
-                                if (enemyHealth.Health <= 0)
-                                {
-                                    // Debug.Log("Killed user: " + hit.transform.GetComponentInChildren<PlayerName>().Username);
-
-                                    enemyHealth.Health = 100;
-
-                                    int randomSpawnPosition = Random.Range(0, _spawnPositions.Count);
-
-                                    Debug.Log("Spawned at position: " + randomSpawnPosition);
-
-                                    hit.transform.position = _spawnPositions[randomSpawnPosition];
-                                    hit.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-                                }
-                                */
                             }
                             var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
-                            // ShootObservers(position, dir, hit.distance);
 
                             hitSomething = true;
                         }
                     }
-                    else if (hit.transform.GetComponentInChildren<Weapon>() != null)
-                    {
-                        // Debug.Log("Hit weapon");
-                    }
-                    else
+                    else if (hit.transform.GetComponentInChildren<Weapon>() == null)
                     {
                         Debug.Log("Hit environment");
                         var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
@@ -206,16 +179,6 @@ public class CombatSystem : NetworkBehaviour
                         break;
                     }
                 }
-            }
-
-            if (!hitSomething)
-            {
-                Debug.Log("Miss");
-
-                // This technically isn't showing the proper miss position and I need to fix it in the future
-                // Otherwise people are going to be confused as to why they missed
-                // Vector3 randomDirection = Quaternion.Euler(0f, 0f, Random.Range(-weapon.SpreadAngle, weapon.SpreadAngle)) * direction;
-                // ShootObservers(position, direction, weapon.Range);
             }
         }
 
@@ -230,7 +193,6 @@ public class CombatSystem : NetworkBehaviour
             hits = new RaycastHit2D[1][];
 
             var currentBloom = _weaponHolder.CurrentWeapon.CurrentBloom;
-            // var bloomDir = (new Vector3(direction.x, direction.y, 0f) + new Vector3(Random.Range(-currentBloom, currentBloom), Random.Range(-currentBloom, currentBloom), 0f)).normalized;
             Vector3 bloomDir= Quaternion.Euler(0f, 0f, Random.Range(-currentBloom, currentBloom)) * direction;
 
             hits[0] = Physics2D.RaycastAll(position, bloomDir, weapon.Range);
@@ -302,18 +264,6 @@ public class CombatSystem : NetworkBehaviour
         }
 
         Destroy(bulletTrail.gameObject, bulletTrail.time);
-
-        /*
-        _bullet.SetPosition(0, position + direction);
-        _bullet.SetPosition(1, position + direction * distance);
-
-        _bullet.enabled = true;
-
-
-        yield return new WaitForSeconds(0.1f);
-
-        _bullet.enabled = false;
-        */
     }
 
 

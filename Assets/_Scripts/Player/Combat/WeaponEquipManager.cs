@@ -24,9 +24,6 @@ public class WeaponEquipManager : MonoBehaviour
 
     private void HighlightWeapon()
     {
-        // See if the player is aiming at a weapon
-        // RaycastHit2D hit = Physics2D.Raycast(transform.position, _aimDirection, 3f, LayerMask.GetMask("Weapon"));
-
         GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
         GameObject closestWeapon = null;
         float closestDistance = 5f;

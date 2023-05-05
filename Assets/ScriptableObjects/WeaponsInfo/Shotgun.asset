@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Shotgun
   m_EditorClassIdentifier: 
   Name: Shotgun
-  Damage: 80
+  Damage: 40
   FireRate: 0.5
   Range: 8
   IsAutomatic: 1
