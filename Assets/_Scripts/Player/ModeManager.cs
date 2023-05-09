@@ -55,24 +55,24 @@ public class ModeManager : NetworkBehaviour
     {
         if (CurrentMode == Mode.Parkour)
         {
-            CurrentMode = Mode.Combat;
+            ChangeModeServer(Mode.Combat);
         }
         else if (CurrentMode == Mode.Combat)
         {
-            CurrentMode = Mode.Parkour;
+            ChangeModeServer(Mode.Parkour);
         }
     }
 
     public void ChangeToParkourMode()
     {
         if (CurrentMode != Mode.Parkour)
-            CurrentMode = Mode.Parkour;
+            ChangeModeServer(Mode.Parkour);
     }
 
     public void ChangeToCombatMode()
     {
         if (CurrentMode != Mode.Combat)
-            CurrentMode = Mode.Combat;
+            ChangeModeServer(Mode.Combat);
     }
 
     /*
@@ -82,4 +82,10 @@ public class ModeManager : NetworkBehaviour
             CurrentMode = Mode.Sliding;
     }
     */
+
+    [ServerRpc]
+    private void ChangeModeServer(Mode mode)
+    {
+        CurrentMode = mode;
+    }
 }
