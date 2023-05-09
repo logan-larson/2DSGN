@@ -247,6 +247,7 @@ GameObject:
   - component: {fileID: 1707328605495123278}
   - component: {fileID: 6483848118584978808}
   - component: {fileID: 3545057823035152873}
+  - component: {fileID: 6537912511236322679}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -443,14 +444,6 @@ MonoBehaviour:
   _weaponHolder: {fileID: 7800868568101946959}
   _bullet: {fileID: 5339978170091014856}
   UserInfo: {fileID: 11400000, guid: 643573264b41f1240997b14195ca096f, type: 2}
-  _spawnPositions:
-  - {x: -30, y: -13, z: 0}
-  - {x: -30, y: -25, z: 0}
-  - {x: -3.5, y: -3, z: 0}
-  - {x: 7.5, y: 0, z: 0}
-  - {x: 9.2, y: -12.5, z: 0}
-  - {x: 14, y: -25, z: 0}
-  - {x: -30.5, y: -1, z: 0}
 --- !u!114 &5020579654786682326
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -633,6 +626,18 @@ MonoBehaviour:
   - {x: 9.2, y: -12.5, z: 0}
   - {x: 14, y: -25, z: 0}
   - {x: -30.5, y: -1, z: 0}
+--- !u!114 &6537912511236322679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4268827610097334048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9609862d7cb93fc4dbc9d76b09fcd509, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5094635124909889969
 GameObject:
   m_ObjectHideFlags: 0

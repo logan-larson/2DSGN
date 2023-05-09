@@ -57,7 +57,6 @@ public class CombatSystem : NetworkBehaviour
 
         _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
         _input = _inputSystem.InputValues;
-
     }
 
     private void Update()

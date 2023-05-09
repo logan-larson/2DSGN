@@ -22,6 +22,9 @@ public class PlayerName : NetworkBehaviour
     [SerializeField]
     private MovementSystem _movementSystem;
 
+    [SerializeField]
+    private ModeManager _modeManager;
+
     private void OnUsernameChanged(string oldValue, string newValue, bool isServer)
     {
         _usernameText.text = newValue;
@@ -54,9 +57,13 @@ public class PlayerName : NetworkBehaviour
         }
 
         _movementSystem = GetComponentInParent<MovementSystem>();
+        _modeManager = GetComponentInParent<ModeManager>();
 
-        _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
-        _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
+        _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
+        _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
+
+        // _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
+        // _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
 
         SetMode(0);
         
@@ -67,12 +74,12 @@ public class PlayerName : NetworkBehaviour
         ServerSetUsername(Username);
     }
 
-    private void OnChangeToCombatMode(bool inCombat)
+    private void OnChangeToCombatMode()
     {
         SetMode(1);
     }
 
-    private void OnChangeToParkourMode(bool inParkour)
+    private void OnChangeToParkourMode()
     {
         SetMode(0);
     }

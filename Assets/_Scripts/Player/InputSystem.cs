@@ -18,6 +18,7 @@ public class InputSystem : MonoBehaviour
     private MovementSystem _movement;
     private CombatSystem _combatSystem;
     private WeaponEquipManager _weaponEquipManager;
+    private ModeManager _modeManager;
 
     private PlayerInput _playerInput;
 
@@ -27,6 +28,7 @@ public class InputSystem : MonoBehaviour
         _combatSystem = _combatSystem ?? GetComponent<CombatSystem>();
         _weaponEquipManager = _weaponEquipManager ?? GetComponent<WeaponEquipManager>();
         _playerInput = _playerInput ?? GetComponent<PlayerInput>();
+        _modeManager = _modeManager ?? GetComponent<ModeManager>();
 
         InputValues = (PlayerInputValues)ScriptableObject.CreateInstance(typeof(PlayerInputValues));
     }
@@ -44,6 +46,11 @@ public class InputSystem : MonoBehaviour
     public void OnSprint(InputValue value)
     {
         InputValues.IsSprintKeyPressed = value.Get<float>() == 1f;
+
+        if (InputValues.IsSprintKeyPressed && !InputValues.IsFirePressed)
+            _modeManager.ChangeToParkourMode();
+        else if (InputValues.IsFirePressed)
+            _modeManager.ChangeToCombatMode();
     }
 
     // TODO: Move these events to triggers
@@ -57,11 +64,21 @@ public class InputSystem : MonoBehaviour
         InputValues.IsFirePressed = value.Get<float>() == 1f;
 
         _combatSystem.SetIsShooting(value.Get<float>() == 1f);
+
+        if (InputValues.IsFirePressed)
+            _modeManager.ChangeToCombatMode();
+        else if (InputValues.IsSprintKeyPressed)
+            _modeManager.ChangeToParkourMode();
     }
 
     public void OnInteract(InputValue value)
     {
         _weaponEquipManager.TryEquipWeapon();
+    }
+
+    public void OnMode(InputValue value)
+    {
+        _modeManager.ChangeMode();
     }
 
     public void OnControlsChanged()

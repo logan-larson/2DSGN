@@ -43,6 +43,7 @@ public class AnimationSystem : NetworkBehaviour
 
 
     private PlayerInputValues _playerInput;
+    private ModeManager _modeManager;
 
 
     /* States */
@@ -97,19 +98,23 @@ public class AnimationSystem : NetworkBehaviour
         if (!base.IsOwner) return;
 
         _movementSystem = GetComponent<MovementSystem>();
+        _modeManager = GetComponent<ModeManager>();
 
-        _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
-        _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
+        // _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
+        // _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
+
+        _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
+        _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
 
         SetMode(0);
     }
 
-    private void OnChangeToCombatMode(bool inCombat)
+    private void OnChangeToCombatMode()
     {
         SetMode(1);
     }
 
-    private void OnChangeToParkourMode(bool inParkour)
+    private void OnChangeToParkourMode()
     {
         SetMode(0);
     }

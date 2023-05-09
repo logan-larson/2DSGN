@@ -28,6 +28,9 @@ public class WeaponHolder : NetworkBehaviour
     private CombatSystem _combatSystem;
 
     [SerializeField]
+    private ModeManager _modeManager;
+
+    [SerializeField]
     private GameObject _defaultWeapon;
 
     public Weapon CurrentWeapon;
@@ -74,11 +77,15 @@ public class WeaponHolder : NetworkBehaviour
 
         _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
         _movementSystem = _movementSystem ?? GetComponent<MovementSystem>();
+        _modeManager = _modeManager ?? GetComponentInParent<ModeManager>();
 
         _input = _inputSystem.InputValues;
 
-        _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
-        _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
+        // _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
+        // _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
+
+        _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
+        _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
 
         _playerHealth.OnDeath.AddListener(OnDeath);
 
@@ -88,12 +95,12 @@ public class WeaponHolder : NetworkBehaviour
         CurrentWeapon.IsEquipped = true;
     }
 
-    private void OnChangeToCombatMode(bool inCombat)
+    private void OnChangeToCombatMode()
     {
         SetWeaponShow(true);
     }
 
-    private void OnChangeToParkourMode(bool inCombat)
+    private void OnChangeToParkourMode()
     {
         SetWeaponShow(false);
     }
