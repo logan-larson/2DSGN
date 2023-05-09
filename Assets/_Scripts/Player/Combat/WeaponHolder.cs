@@ -13,9 +13,6 @@ WeaponHolder is responsible for displaying the weapon sprite and pointing it in 
 public class WeaponHolder : NetworkBehaviour
 {
     [SerializeField]
-    private MovementSystem _movementSystem;
-
-    [SerializeField]
     private PlayerHealth _playerHealth;
 
     [SerializeField]
@@ -76,13 +73,9 @@ public class WeaponHolder : NetworkBehaviour
         CurrentWeapon = CurrentWeapon ?? gameObject.GetComponent<Weapon>();
 
         _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
-        _movementSystem = _movementSystem ?? GetComponent<MovementSystem>();
         _modeManager = _modeManager ?? GetComponentInParent<ModeManager>();
 
         _input = _inputSystem.InputValues;
-
-        // _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
-        // _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);

@@ -11,20 +11,6 @@ MovementSystem is responsible for handling all movement related actions.
 public class MovementSystem : NetworkBehaviour
 {
 
-    #region Events
-
-    /// <summary>
-    /// Called when the player changes to parkour mode.
-    /// </summary>
-    public event Action<bool> OnChangeToParkourMode;
-
-    /// <summary>
-    /// Called when the player changes to combat mode.
-    /// </summary>
-    public event Action<bool> OnChangeToCombatMode;
-
-    #endregion
-
     #region Types
 
     /// <summary>
@@ -317,8 +303,6 @@ public class MovementSystem : NetworkBehaviour
         {
             if (_inCombatMode)
             {
-                OnChangeToParkourMode?.Invoke(true);
-
                 _inCombatMode = false;
                 _inParkourMode = true;
             }
@@ -328,8 +312,6 @@ public class MovementSystem : NetworkBehaviour
         {
             if (_inParkourMode)
             {
-                OnChangeToCombatMode?.Invoke(true);
-
                 _inParkourMode = false;
                 _inCombatMode = true;
             }

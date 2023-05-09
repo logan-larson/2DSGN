@@ -23,8 +23,6 @@ public class AnimationSystem : NetworkBehaviour
 
     public float lerpValue = 0.1f;
 
-    private MovementSystem _movementSystem;
-
     [SerializeField]
     private SpriteRenderer _quad;
     [SerializeField]
@@ -97,11 +95,7 @@ public class AnimationSystem : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
-        _movementSystem = GetComponent<MovementSystem>();
         _modeManager = GetComponent<ModeManager>();
-
-        // _movementSystem.OnChangeToCombatMode += OnChangeToCombatMode;
-        // _movementSystem.OnChangeToParkourMode += OnChangeToParkourMode;
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
@@ -178,6 +172,7 @@ public class AnimationSystem : NetworkBehaviour
     { // public void OnUpdate
         if (!base.IsOwner) return;
 
+        /*
         if (_movementSystem.PublicData.InCombatMode)
         {
             // _bi.enabled = true;
@@ -188,6 +183,7 @@ public class AnimationSystem : NetworkBehaviour
             // _bi.enabled = false;
             // _quad.enabled = true;
         }
+        */
         /*
         if (_movementSystem.Velocity.x > 1f || _movementSystem.AirborneVelocity.x > 1f) {
             //_animator.CrossFade("Right", 0f, 0);
