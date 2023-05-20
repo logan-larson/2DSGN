@@ -87,7 +87,7 @@ public class Weapon : NetworkBehaviour
 
     public void Drop(Vector3 dropPosition)
     {
-        // if (!base.IsOwner) return;
+        if (!base.IsOwner) return;
 
         transform.position = dropPosition;
 

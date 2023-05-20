@@ -86,11 +86,6 @@ public class WeaponHolder : NetworkBehaviour
         // Set defaults
         SetWeaponShow(false);
         SetFlipY(false);
-
-        Debug.Log($"WeaponHolder OwnerID: {base.OwnerId}");
-
-        // CurrentWeapon.IsEquipped = true;
-        // CurrentWeapon.SetEquipped(true);
     }
 
     private void OnChangeToCombatMode()
@@ -147,25 +142,18 @@ public class WeaponHolder : NetworkBehaviour
 
         // Drop the current weapon where the new weapon to switch to is
         // Need to pass the weapon holder game object to the server because the weapon holder game object is the one that has the weapon component
-
-
-        // TESTING drop with default weapon
-        /*
         if (CurrentWeapon.gameObject != _defaultWeapon)
         {
-        */
             DropWeaponServer(CurrentWeapon.gameObject, dropPosition);
-        /*
         }
         else
         {
             // If the current weapon is the default weapon, destroy it
             CurrentWeapon.gameObject.GetComponent<NetworkObject>().Despawn();
         }
-        */
 
         // Equip the new weapon with the old weapon's visual properties
-        EquipWeaponServer(weapon, prevWeaponPos, prevWeaponRot, prevWeaponIsShown, prevWeaponIsFlippedY);
+        EquipWeaponServer(weapon, prevWeaponPos, prevWeaponRot, prevWeaponIsShown, prevWeaponIsFlippedY, base.Owner);
 
         CurrentWeapon = weapon.GetComponent<Weapon>();
 
@@ -207,5 +195,13 @@ public class WeaponHolder : NetworkBehaviour
         {
             weaponGameObj.GetComponent<NetworkObject>().GiveOwnership(newOwner);
         }
+
+        weaponGameObj.transform.SetParent(transform);
+
+        weaponGameObj.transform.localPosition = equipPosition;
+        weaponGameObj.transform.localRotation = equipRotation;
+
+        weaponGameObj.GetComponent<Weapon>().Show(showWeapon);
+        weaponGameObj.GetComponent<Weapon>().FlipY(flipY);
     }
 }
