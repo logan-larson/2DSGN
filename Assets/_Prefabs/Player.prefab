@@ -46,13 +46,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ada55423a3fc24f4a89b5b97832169dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 7
+  _componentIndexCache: 9
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   Username: 
   UserInfo: {fileID: 11400000, guid: 643573264b41f1240997b14195ca096f, type: 2}
   _usernameText: {fileID: 90841182616387876}
-  _movementSystem: {fileID: 0}
+  _modeManager: {fileID: 0}
   Mode: 0
 --- !u!1 &2410782452689698830
 GameObject:
@@ -465,7 +465,9 @@ MonoBehaviour:
   - {fileID: 8314681878889343522}
   - {fileID: -3006074405203397699}
   - {fileID: 1707328605495123278}
+  - {fileID: 6483848118584978808}
   - {fileID: 3545057823035152873}
+  - {fileID: 6537912511236322679}
   - {fileID: 6413919363218253851}
   - {fileID: 223301570187018686}
   - {fileID: 7084400194756443070}
@@ -597,7 +599,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b19a34780e366374d88b20cc80cd04d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _combatSystem: {fileID: 4268827610097334069}
+  _componentIndexCache: 6
+  _addedNetworkObject: {fileID: 5020579654786682326}
+  _networkObjectCache: {fileID: 5020579654786682326}
   _weaponHolder: {fileID: 7800868568101946959}
 --- !u!114 &3545057823035152873
 MonoBehaviour:
@@ -611,7 +615,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 549024164fff9124591cdc5e05d42f4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 6
+  _componentIndexCache: 7
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   OnRespawn:
@@ -638,6 +642,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9609862d7cb93fc4dbc9d76b09fcd509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 8
+  _addedNetworkObject: {fileID: 5020579654786682326}
+  _networkObjectCache: {fileID: 5020579654786682326}
+  OnChangeToParkour:
+    m_PersistentCalls:
+      m_Calls: []
+  OnChangeToCombat:
+    m_PersistentCalls:
+      m_Calls: []
+  CurrentMode: 0
 --- !u!1 &5094635124909889969
 GameObject:
   m_ObjectHideFlags: 0
@@ -909,7 +923,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21751bfdbf288504a91caf95ebb77c9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 9
+  _componentIndexCache: 11
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   InputSystem: {fileID: 4268827610097334073}
@@ -1059,7 +1073,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 347d0fb66e3b4b1489dabcc2b5b6aa3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 8
+  _componentIndexCache: 10
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   _movementProperties: {fileID: 11400000, guid: 70099ab69eee19c4cad9e629a3eb4742, type: 2}
@@ -1117,11 +1131,11 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 7300643456147865250}
-  _movementSystem: {fileID: 4268827610097334074}
   _playerHealth: {fileID: 1707328605495123278}
   _inputSystem: {fileID: 4268827610097334073}
   _input: {fileID: 0}
   _combatSystem: {fileID: 4268827610097334069}
+  _modeManager: {fileID: 0}
   _defaultWeapon: {fileID: 4168662063004538829}
   CurrentWeapon: {fileID: 8137224110724643508}
   WeaponShow: 0
@@ -1324,6 +1338,10 @@ PrefabInstance:
       propertyPath: <ParentNetworkObject>k__BackingField
       value: 
       objectReference: {fileID: 7300643456147865250}
+    - target: {fileID: -1446210289863654907, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
+      propertyPath: _clientAuthoritative
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2562105026587387031, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
       propertyPath: m_RootOrder
       value: 0

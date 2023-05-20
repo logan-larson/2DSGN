@@ -156,11 +156,6 @@ public class WeaponHolder : NetworkBehaviour
         EquipWeaponServer(weapon, prevWeaponPos, prevWeaponRot, prevWeaponIsShown, prevWeaponIsFlippedY, base.Owner);
 
         CurrentWeapon = weapon.GetComponent<Weapon>();
-
-        CurrentWeapon.Equip(transform, prevWeaponPos, prevWeaponRot);
-
-        CurrentWeapon.Show(prevWeaponIsShown);
-        CurrentWeapon.FlipY(prevWeaponIsFlippedY);
     }
 
     private void OnDeath()
@@ -183,8 +178,11 @@ public class WeaponHolder : NetworkBehaviour
     [ServerRpc(RequireOwnership = true)]
     private void DropWeaponServer(GameObject weaponGameObj, Vector3 dropPosition)
     {
+        var weapon = weaponGameObj.GetComponent<Weapon>();
+
+        weapon.Drop(dropPosition);
+
         weaponGameObj.GetComponent<NetworkObject>().RemoveOwnership();
-        weaponGameObj.GetComponent<Weapon>().Drop(dropPosition);
     }
 
 
@@ -194,14 +192,13 @@ public class WeaponHolder : NetworkBehaviour
         if (newOwner != null)
         {
             weaponGameObj.GetComponent<NetworkObject>().GiveOwnership(newOwner);
+            Debug.Log("Gave ownership of weapon to " + newOwner.ClientId);
         }
 
-        weaponGameObj.transform.SetParent(transform);
+        var weapon = weaponGameObj.GetComponent<Weapon>();
 
-        weaponGameObj.transform.localPosition = equipPosition;
-        weaponGameObj.transform.localRotation = equipRotation;
-
-        weaponGameObj.GetComponent<Weapon>().Show(showWeapon);
-        weaponGameObj.GetComponent<Weapon>().FlipY(flipY);
+        weapon.Show(showWeapon);
+        weapon.FlipY(flipY);
+        weapon.Equip(transform, equipPosition, equipRotation);
     }
 }

@@ -15,6 +15,8 @@ public class Weapon : NetworkBehaviour
     public bool IsFlippedY = false;
     public float CurrentBloom = 0f;
 
+    public int CurrentOwnerId = -1;
+
     [SyncVar]
     public bool IsEquipped = false;
 
@@ -34,6 +36,15 @@ public class Weapon : NetworkBehaviour
         {
             Show(true);
             FlipY(IsFlippedY);
+        }
+    }
+
+    // TESTING - owner check
+    private void Update()
+    {
+        if (CurrentOwnerId != base.OwnerId)
+        {
+            CurrentOwnerId = base.OwnerId;
         }
     }
 
@@ -72,41 +83,41 @@ public class Weapon : NetworkBehaviour
         WeaponSprite.color = Color.white;
     }
 
+    [Server]
     public void Equip(Transform weaponHolder, Vector3 position, Quaternion rotation)
     {
 
         if (!base.IsOwner) return;
 
         transform.SetParent(weaponHolder);
+
         transform.localPosition = position;
         transform.localRotation = rotation;
 
         HideHighlight();
-        SetEquippedServer(true);
+        IsEquipped = true;
     }
 
+    [Server]
     public void Drop(Vector3 dropPosition)
     {
+        Debug.Log($"Dropping {WeaponInfo.Name}");
+
         if (!base.IsOwner) return;
 
-        transform.position = dropPosition;
+        Debug.Log("Passed owner check");
+
+        IsEquipped = false;
+
 
         var weaponPickups = GameObject.FindWithTag("WeaponPickups");
         transform.SetParent(weaponPickups.transform);
 
-        SetEquippedServer(false);
+        transform.position = dropPosition;
+
+        IsEquipped = false;
         Show(true);
         HideHighlight();
-    }
-
-    public void SetEquipped(bool equipped)
-    {
-        if (!base.IsOwner) {
-            Debug.Log("Not owner");
-            return;
-        }
-
-        SetEquippedServer(equipped);
     }
 
     [ServerRpc]
