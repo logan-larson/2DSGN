@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using FishNet.Connection;
 using UnityEngine.InputSystem;
 
 /**
@@ -85,7 +86,11 @@ public class WeaponHolder : NetworkBehaviour
         // Set defaults
         SetWeaponShow(false);
         SetFlipY(false);
-        CurrentWeapon.IsEquipped = true;
+
+        Debug.Log($"WeaponHolder OwnerID: {base.OwnerId}");
+
+        // CurrentWeapon.IsEquipped = true;
+        // CurrentWeapon.SetEquipped(true);
     }
 
     private void OnChangeToCombatMode()
@@ -132,27 +137,42 @@ public class WeaponHolder : NetworkBehaviour
 
     public void EquipWeapon(GameObject weapon, Vector3 dropPosition)
     {
-        // Get current weapon's visual properties
-        var droppedWeaponPos = CurrentWeapon.transform.localPosition;
-        var droppedWeaponRot = CurrentWeapon.transform.localRotation;
-        var droppedWeaponIsShown = CurrentWeapon.IsShown;
-        var droppedWeaponIsFlippedY = CurrentWeapon.IsFlippedY;
-        // droppedWeaponPos = new Vector3();
+        if (!base.IsOwner) return;
+
+        // Get current weapon's properties for the new weapon to switch to
+        var prevWeaponPos = CurrentWeapon.transform.localPosition;
+        var prevWeaponRot = CurrentWeapon.transform.localRotation;
+        var prevWeaponIsShown = CurrentWeapon.IsShown;
+        var prevWeaponIsFlippedY = CurrentWeapon.IsFlippedY;
 
         // Drop the current weapon where the new weapon to switch to is
         // Need to pass the weapon holder game object to the server because the weapon holder game object is the one that has the weapon component
+
+
+        // TESTING drop with default weapon
+        /*
         if (CurrentWeapon.gameObject != _defaultWeapon)
         {
+        */
             DropWeaponServer(CurrentWeapon.gameObject, dropPosition);
+        /*
         }
         else
         {
             // If the current weapon is the default weapon, destroy it
-            Destroy(CurrentWeapon.gameObject);
+            CurrentWeapon.gameObject.GetComponent<NetworkObject>().Despawn();
         }
+        */
 
         // Equip the new weapon with the old weapon's visual properties
-        EquipWeaponServer(weapon, droppedWeaponPos, droppedWeaponRot, droppedWeaponIsShown, droppedWeaponIsFlippedY);
+        EquipWeaponServer(weapon, prevWeaponPos, prevWeaponRot, prevWeaponIsShown, prevWeaponIsFlippedY);
+
+        CurrentWeapon = weapon.GetComponent<Weapon>();
+
+        CurrentWeapon.Equip(transform, prevWeaponPos, prevWeaponRot);
+
+        CurrentWeapon.Show(prevWeaponIsShown);
+        CurrentWeapon.FlipY(prevWeaponIsFlippedY);
     }
 
     private void OnDeath()
@@ -172,32 +192,20 @@ public class WeaponHolder : NetworkBehaviour
         EquipWeaponServer(_defaultWeapon, Vector3.zero, Quaternion.identity, false, false);
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [ServerRpc(RequireOwnership = true)]
     private void DropWeaponServer(GameObject weaponGameObj, Vector3 dropPosition)
     {
-        DropWeaponObserver(weaponGameObj, dropPosition);
-    }
-
-    [ObserversRpc]
-    private void DropWeaponObserver(GameObject weaponGameObj, Vector3 dropPosition)
-    {
+        weaponGameObj.GetComponent<NetworkObject>().RemoveOwnership();
         weaponGameObj.GetComponent<Weapon>().Drop(dropPosition);
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    private void EquipWeaponServer(GameObject weaponGameObj, Vector3 equipPosition, Quaternion equipRotation, bool showWeapon, bool flipY)
+
+    [ServerRpc(RequireOwnership = true)]
+    private void EquipWeaponServer(GameObject weaponGameObj, Vector3 equipPosition, Quaternion equipRotation, bool showWeapon, bool flipY, NetworkConnection newOwner = null)
     {
-        EquipWeaponObserver(weaponGameObj, equipPosition, equipRotation, showWeapon, flipY);
-    }
-
-    [ObserversRpc]
-    private void EquipWeaponObserver(GameObject weapon, Vector3 equipPosition, Quaternion equipRotation, bool showWeapon, bool flipY)
-    {
-        CurrentWeapon = weapon.GetComponent<Weapon>();
-
-        CurrentWeapon.Equip(transform, equipPosition, equipRotation);
-
-        CurrentWeapon.Show(WeaponShow);
-        CurrentWeapon.FlipY(FlipY);
+        if (newOwner != null)
+        {
+            weaponGameObj.GetComponent<NetworkObject>().GiveOwnership(newOwner);
+        }
     }
 }

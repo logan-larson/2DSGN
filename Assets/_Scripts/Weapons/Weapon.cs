@@ -24,6 +24,12 @@ public class Weapon : NetworkBehaviour
 
         MuzzleFlashSprite.enabled = false;
 
+        // Determine if weapon is equipped.
+        if (transform.parent.GetComponent<WeaponHolder>() != null)
+        {
+            SetEquippedServer(true);
+        }
+
         if (IsEquipped)
         {
             Show(true);
@@ -68,24 +74,44 @@ public class Weapon : NetworkBehaviour
 
     public void Equip(Transform weaponHolder, Vector3 position, Quaternion rotation)
     {
+
+        if (!base.IsOwner) return;
+
         transform.SetParent(weaponHolder);
         transform.localPosition = position;
         transform.localRotation = rotation;
 
-        IsEquipped = true;
         HideHighlight();
+        SetEquippedServer(true);
     }
-
 
     public void Drop(Vector3 dropPosition)
     {
+        // if (!base.IsOwner) return;
+
         transform.position = dropPosition;
 
         var weaponPickups = GameObject.FindWithTag("WeaponPickups");
         transform.SetParent(weaponPickups.transform);
 
-        IsEquipped = false;
+        SetEquippedServer(false);
         Show(true);
         HideHighlight();
+    }
+
+    public void SetEquipped(bool equipped)
+    {
+        if (!base.IsOwner) {
+            Debug.Log("Not owner");
+            return;
+        }
+
+        SetEquippedServer(equipped);
+    }
+
+    [ServerRpc]
+    private void SetEquippedServer(bool equipped)
+    {
+        IsEquipped = equipped;
     }
 }

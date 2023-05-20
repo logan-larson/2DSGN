@@ -1,27 +1,38 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FishNet.Object;
 
-public class WeaponEquipManager : MonoBehaviour
+public class WeaponEquipManager : NetworkBehaviour
 {
 
     private Weapon _highlightedWeapon;
 
     [SerializeField]
-    private CombatSystem _combatSystem;
-
-    [SerializeField]
     private WeaponHolder _weaponHolder;
 
-    private Vector3 _aimDirection = Vector3.zero;
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+
+        if (!base.IsOwner) return;
+
+        _weaponHolder = _weaponHolder ?? GetComponentInChildren<WeaponHolder>();
+    }
+
 
     private void Update()
     {
-        _aimDirection = _combatSystem.AimDirection;
+        if (!base.IsOwner) return;
         
         HighlightWeapon();
     }
 
+    /**
+    <summary>
+    Highlight the closest weapon that isn't equipped and within a certain threshold distance.
+    </summary>
+    */
     private void HighlightWeapon()
     {
         GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
@@ -31,7 +42,10 @@ public class WeaponEquipManager : MonoBehaviour
 
         foreach (GameObject weapon in weapons)
         {
-            if (weapon.GetComponent<Weapon>().IsEquipped) continue;
+            weapon.GetComponent<Weapon>().HideHighlight();
+
+            if (weapon.GetComponent<Weapon>().IsEquipped)
+                continue;
 
             float distance = Vector3.Distance(weapon.transform.position, referencePosition);
             if (distance < closestDistance)
@@ -39,8 +53,6 @@ public class WeaponEquipManager : MonoBehaviour
                 closestWeapon = weapon;
                 closestDistance = distance;
             }
-
-            weapon.GetComponent<Weapon>().HideHighlight();
         }
 
         if (closestWeapon != null)
@@ -52,81 +64,17 @@ public class WeaponEquipManager : MonoBehaviour
                 weapon.ShowHighlight();
             }
         }
-
-        /*
-        if (closestWeapon != null)
-        {
-            Weapon weapon = closestWeapon.GetComponent<Weapon>();
-            if (weapon != null && weapon != _weaponHolder.CurrentWeapon)
-            {
-                if (_highlightedWeapon != weapon)
-                {
-                    if (_highlightedWeapon != null)
-                    {
-                        _highlightedWeapon.HideHighlight();
-                    }
-
-                    _highlightedWeapon = weapon;
-                    _highlightedWeapon.ShowHighlight();
-                }
-            }
-        }
-        else
-        {
-            if (_highlightedWeapon != null)
-            {
-                _highlightedWeapon.HideHighlight();
-                _highlightedWeapon = null;
-            }
-        }
-        */
-
-
-        /*
-        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, _aimDirection, 3f, LayerMask.GetMask("Weapon"));
-
-        bool hitSomething = false;
-
-        foreach (RaycastHit2D hit in hits)
-        {
-            // If the player is aiming at a weapon, highlight it
-            if (hit.collider != null)
-            {
-                Weapon weapon = hit.collider.GetComponent<Weapon>();
-
-                if (weapon != null && weapon != _weaponHolder.CurrentWeapon)
-                {
-                    Debug.DrawRay(transform.position, _aimDirection * 3f, Color.green);
-                    hitSomething = true;
-                    if (_highlightedWeapon != weapon)
-                    {
-                        if (_highlightedWeapon != null)
-                        {
-                            _highlightedWeapon.HideHighlight();
-                        }
-
-                        _highlightedWeapon = weapon;
-                        _highlightedWeapon.ShowHighlight();
-                    }
-                }
-            }
-        }
-
-        if (hitSomething == false)
-        {
-            // If the player is not aiming at a weapon, remove the highlight from the currently highlighted weapon
-            Debug.DrawRay(transform.position, _aimDirection * 3f, Color.red);
-            if (_highlightedWeapon != null)
-            {
-                _highlightedWeapon.HideHighlight();
-                _highlightedWeapon = null;
-            }
-        }
-        */
     }
 
+    /**
+    <summary>
+    Try to equip the highlighted weapon. Called by the player's input system.
+    </summary>
+    */
     public void TryEquipWeapon()
     {
+        if (!base.IsOwner) return;
+
         if (_highlightedWeapon == null) return;
 
         var weaponObj = _highlightedWeapon.gameObject;
