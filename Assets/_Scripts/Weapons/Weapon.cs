@@ -11,14 +11,14 @@ public class Weapon : NetworkBehaviour
     public SpriteRenderer MuzzleFlashSprite;
     public TrailRenderer BulletTrailRenderer;
 
-    public bool IsShown = false;
-    public bool IsFlippedY = false;
     public float CurrentBloom = 0f;
-
-    public int CurrentOwnerId = -1;
 
     [SyncVar]
     public bool IsEquipped = false;
+    [SyncVar]
+    public bool IsShown = false;
+    [SyncVar]
+    public bool IsFlippedY = false;
 
     public override void OnStartClient()
     {
@@ -31,21 +31,13 @@ public class Weapon : NetworkBehaviour
         {
             SetEquippedServer(true);
         }
-
-        if (IsEquipped)
+        else
         {
-            Show(true);
-            FlipY(IsFlippedY);
+            SetEquippedServer(false);
         }
-    }
 
-    // TESTING - owner check
-    private void Update()
-    {
-        if (CurrentOwnerId != base.OwnerId)
-        {
-            CurrentOwnerId = base.OwnerId;
-        }
+        SetShownServer(true);
+        SetFlippedYServer(false);
     }
 
     public void Show(bool show)
@@ -83,14 +75,9 @@ public class Weapon : NetworkBehaviour
         WeaponSprite.color = Color.white;
     }
 
-    [Server]
+    // [Server]
     public void Equip(Transform weaponHolder, Vector3 position, Quaternion rotation)
     {
-
-        if (!base.IsOwner) return;
-
-        transform.SetParent(weaponHolder);
-
         transform.localPosition = position;
         transform.localRotation = rotation;
 
@@ -98,26 +85,31 @@ public class Weapon : NetworkBehaviour
         IsEquipped = true;
     }
 
-    [Server]
     public void Drop(Vector3 dropPosition)
     {
-        Debug.Log($"Dropping {WeaponInfo.Name}");
-
-        if (!base.IsOwner) return;
-
-        Debug.Log("Passed owner check");
-
-        IsEquipped = false;
-
-
-        var weaponPickups = GameObject.FindWithTag("WeaponPickups");
-        transform.SetParent(weaponPickups.transform);
-
         transform.position = dropPosition;
 
         IsEquipped = false;
         Show(true);
         HideHighlight();
+    }
+
+    [Server]
+    public void SetEquipped(bool equipped)
+    {
+        IsEquipped = equipped;
+    }
+
+    [ServerRpc]
+    private void SetShownServer(bool isShown)
+    {
+        IsShown = isShown;
+    }
+
+    [ServerRpc]
+    private void SetFlippedYServer(bool isFlippedY)
+    {
+        IsFlippedY = isFlippedY;
     }
 
     [ServerRpc]

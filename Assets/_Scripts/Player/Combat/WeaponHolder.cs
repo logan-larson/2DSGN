@@ -17,6 +17,9 @@ public class WeaponHolder : NetworkBehaviour
     private PlayerHealth _playerHealth;
 
     [SerializeField]
+    private RespawnManager _respawnManager;
+
+    [SerializeField]
     private InputSystem _inputSystem;
 
     [SerializeField]
@@ -82,6 +85,8 @@ public class WeaponHolder : NetworkBehaviour
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
 
         _playerHealth.OnDeath.AddListener(OnDeath);
+        _respawnManager.OnRespawn.AddListener(OnRespawn);
+
 
         // Set defaults
         SetWeaponShow(false);
@@ -130,9 +135,11 @@ public class WeaponHolder : NetworkBehaviour
         FlipY = flipY;
     }
 
-    public void EquipWeapon(GameObject weapon, Vector3 dropPosition)
+    public void SwapWeapons(GameObject weapon)
     {
         if (!base.IsOwner) return;
+
+        if (CurrentWeapon == null) return;
 
         // Get current weapon's properties for the new weapon to switch to
         var prevWeaponPos = CurrentWeapon.transform.localPosition;
@@ -140,8 +147,9 @@ public class WeaponHolder : NetworkBehaviour
         var prevWeaponIsShown = CurrentWeapon.IsShown;
         var prevWeaponIsFlippedY = CurrentWeapon.IsFlippedY;
 
+        var dropPosition = weapon.transform.position;
+
         // Drop the current weapon where the new weapon to switch to is
-        // Need to pass the weapon holder game object to the server because the weapon holder game object is the one that has the weapon component
         if (CurrentWeapon.gameObject != _defaultWeapon)
         {
             DropWeaponServer(CurrentWeapon.gameObject, dropPosition);
@@ -149,7 +157,7 @@ public class WeaponHolder : NetworkBehaviour
         else
         {
             // If the current weapon is the default weapon, destroy it
-            CurrentWeapon.gameObject.GetComponent<NetworkObject>().Despawn();
+            DestroyWeaponServer(CurrentWeapon.gameObject);
         }
 
         // Equip the new weapon with the old weapon's visual properties
@@ -171,29 +179,106 @@ public class WeaponHolder : NetworkBehaviour
             Destroy(CurrentWeapon.gameObject);
         }
 
+        CurrentWeapon = null;
+    }
+
+    private void OnRespawn()
+    {
         // Equip the default weapon
-        EquipWeaponServer(_defaultWeapon, Vector3.zero, Quaternion.identity, false, false);
+        EquipDefaultWeapon();
+    }
+
+    private void EquipDefaultWeapon()
+    {
+        if (!base.IsOwner) return;
+
+        SpawnDefaultWeapon(base.Owner);
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    private void SpawnDefaultWeapon(NetworkConnection conn)
+    {
+        var weapon = Instantiate(_defaultWeapon, transform.position, Quaternion.identity);
+
+        base.Spawn(weapon, conn);
+
+        weapon.transform.SetParent(transform);
+        weapon.transform.localPosition = Vector3.zero;
+        weapon.transform.localRotation = Quaternion.identity;
+
+        SetCurrentWeapon(base.Owner, weapon);
+    }
+
+    [TargetRpc]
+    private void SetCurrentWeapon(NetworkConnection conn, GameObject weapon)
+    {
+        weapon.transform.SetParent(transform);
+
+        CurrentWeapon = weapon.GetComponent<Weapon>();
+    }
+
+    [ServerRpc(RequireOwnership = true)]
+    private void DestroyWeaponServer(GameObject weaponGameObj)
+    {
+        weaponGameObj.GetComponent<NetworkObject>().Despawn();
     }
 
     [ServerRpc(RequireOwnership = true)]
     private void DropWeaponServer(GameObject weaponGameObj, Vector3 dropPosition)
     {
+        weaponGameObj.GetComponent<NetworkObject>().RemoveOwnership();
+
         var weapon = weaponGameObj.GetComponent<Weapon>();
 
-        weapon.Drop(dropPosition);
+        var weaponPickups = GameObject.FindWithTag("WeaponPickups");
+        weapon.transform.SetParent(weaponPickups.transform);
 
-        weaponGameObj.GetComponent<NetworkObject>().RemoveOwnership();
+        weapon.transform.position = dropPosition;
+        weapon.transform.rotation = Quaternion.identity;
+
+        weapon.SetEquipped(false);
+    
+        weapon.Show(true);
+
+        DropWeaponObservers(weaponGameObj, dropPosition);
+
+
+        // weapon.Drop(dropPosition);
     }
 
+    [ObserversRpc]
+    private void DropWeaponObservers(GameObject weaponGameObj, Vector3 dropPosition)
+    {
+        var weapon = weaponGameObj.GetComponent<Weapon>();
+
+        weapon.Show(true);
+
+        // var weaponPickups = GameObject.FindWithTag("WeaponPickups");
+        // weapon.transform.SetParent(weaponPickups.transform);
+
+        // weapon.Drop(dropPosition);
+    }
 
     [ServerRpc(RequireOwnership = true)]
-    private void EquipWeaponServer(GameObject weaponGameObj, Vector3 equipPosition, Quaternion equipRotation, bool showWeapon, bool flipY, NetworkConnection newOwner = null)
+    private void EquipWeaponServer(GameObject weaponGameObj, Vector3 equipPosition, Quaternion equipRotation, bool showWeapon, bool flipY, NetworkConnection newOwner)
     {
-        if (newOwner != null)
-        {
-            weaponGameObj.GetComponent<NetworkObject>().GiveOwnership(newOwner);
-            Debug.Log("Gave ownership of weapon to " + newOwner.ClientId);
-        }
+        weaponGameObj.GetComponent<NetworkObject>().GiveOwnership(newOwner);
+
+        weaponGameObj.transform.SetParent(transform);
+
+        var weapon = weaponGameObj.GetComponent<Weapon>();
+
+        weapon.Show(showWeapon);
+        weapon.FlipY(flipY);
+        weapon.Equip(transform, equipPosition, equipRotation);
+
+        EquipWeaponObservers(weaponGameObj, equipPosition, equipRotation, showWeapon, flipY);
+    }
+
+    [ObserversRpc]
+    private void EquipWeaponObservers(GameObject weaponGameObj, Vector3 equipPosition, Quaternion equipRotation, bool showWeapon, bool flipY)
+    {
+        weaponGameObj.transform.SetParent(transform);
 
         var weapon = weaponGameObj.GetComponent<Weapon>();
 

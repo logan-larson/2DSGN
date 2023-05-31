@@ -63,6 +63,9 @@ public class WeaponEquipManager : NetworkBehaviour
                 _highlightedWeapon = weapon;
                 weapon.ShowHighlight();
             }
+        } else
+        {
+            _highlightedWeapon = null;
         }
     }
 
@@ -79,7 +82,7 @@ public class WeaponEquipManager : NetworkBehaviour
 
         var weaponObj = _highlightedWeapon.gameObject;
 
-        _weaponHolder.EquipWeapon(weaponObj, _highlightedWeapon.transform.position);
+        _weaponHolder.SwapWeapons(weaponObj);
 
         _highlightedWeapon = null;
     }

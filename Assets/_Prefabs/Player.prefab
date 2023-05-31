@@ -1132,6 +1132,7 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 7300643456147865250}
   _playerHealth: {fileID: 1707328605495123278}
+  _respawnManager: {fileID: 3545057823035152873}
   _inputSystem: {fileID: 4268827610097334073}
   _input: {fileID: 0}
   _combatSystem: {fileID: 4268827610097334069}
@@ -1384,6 +1385,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2562105026587387031, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2973064127713107434, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6059912039733264002, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
