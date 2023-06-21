@@ -6,7 +6,7 @@ using FishNet.Object;
 public class WeaponEquipManager : NetworkBehaviour
 {
 
-    private Weapon _highlightedWeapon;
+    private WeaponPickup _highlightedWeapon;
 
     [SerializeField]
     private WeaponHolder _weaponHolder;
@@ -35,33 +35,30 @@ public class WeaponEquipManager : NetworkBehaviour
     */
     private void HighlightWeapon()
     {
-        GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
-        GameObject closestWeapon = null;
+        GameObject[] weapons = GameObject.FindGameObjectsWithTag("WeaponPickup");
+        GameObject closestWeaponPickup = null;
         float closestDistance = 5f;
         Vector3 referencePosition = transform.position;
 
         foreach (GameObject weapon in weapons)
         {
-            weapon.GetComponent<Weapon>().HideHighlight();
-
-            if (weapon.GetComponent<Weapon>().IsEquipped)
-                continue;
+            weapon.GetComponent<WeaponPickup>().HideHighlight();
 
             float distance = Vector3.Distance(weapon.transform.position, referencePosition);
             if (distance < closestDistance)
             {
-                closestWeapon = weapon;
+                closestWeaponPickup = weapon;
                 closestDistance = distance;
             }
         }
 
-        if (closestWeapon != null)
+        if (closestWeaponPickup != null)
         {
-            Weapon weapon = closestWeapon.GetComponent<Weapon>();
-            if (weapon != null && weapon != _weaponHolder.CurrentWeapon)
+            WeaponPickup weaponPickup = closestWeaponPickup.GetComponent<WeaponPickup>();
+            if (weaponPickup != null && weaponPickup.Name != _weaponHolder.CurrentWeapon.WeaponInfo.Name)
             {
-                _highlightedWeapon = weapon;
-                weapon.ShowHighlight();
+                _highlightedWeapon = weaponPickup;
+                weaponPickup.ShowHighlight();
             }
         } else
         {

@@ -36,6 +36,12 @@ public class WeaponHolder : NetworkBehaviour
 
     public Weapon CurrentWeapon;
 
+    [SerializeField]
+    private GameObject _currentWeaponGO;
+
+    [SerializeField]
+    private List<GameObject> _weapons;
+
     private Vector3 _aimDirection = Vector3.zero;
 
     [SyncVar(OnChange = nameof(OnChangeWeaponShow))]
@@ -75,6 +81,13 @@ public class WeaponHolder : NetworkBehaviour
         if (!base.IsOwner) return;
 
         CurrentWeapon = CurrentWeapon ?? gameObject.GetComponent<Weapon>();
+        _currentWeaponGO = CurrentWeapon.gameObject;
+        var weapons = gameObject.GetComponentsInChildren<Weapon>(true);
+
+        foreach (var w in weapons)
+        {
+            _weapons.Add(w.gameObject);
+        }
 
         _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
         _modeManager = _modeManager ?? GetComponentInParent<ModeManager>();
@@ -86,7 +99,6 @@ public class WeaponHolder : NetworkBehaviour
 
         _playerHealth.OnDeath.AddListener(OnDeath);
         _respawnManager.OnRespawn.AddListener(OnRespawn);
-
 
         // Set defaults
         SetWeaponShow(false);
@@ -140,6 +152,13 @@ public class WeaponHolder : NetworkBehaviour
         if (!base.IsOwner) return;
 
         if (CurrentWeapon == null) return;
+
+        // TODO: Implement this new system!
+        // 1. Check if the weapon is already equipped, if so, return.
+        // 2. Disable the current weapon.
+        // 3. Enable the new weapon.
+        // 4. Destroy the weapon pickup.
+        // 5. Spawn the old weapon pickup in place of the new one.
 
         // Get current weapon's properties for the new weapon to switch to
         var prevWeaponPos = CurrentWeapon.transform.localPosition;
