@@ -205,11 +205,6 @@ public class MovementSystem : NetworkBehaviour
             Debug.LogError("InputValues not found on InputSystem.");
     }
 
-    private void Update()
-    {
-        // PerformAnimation();
-    }
-
     private void OnTick()
     {
         if (base.IsOwner)

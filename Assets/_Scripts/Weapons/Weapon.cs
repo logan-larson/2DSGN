@@ -19,12 +19,26 @@ public class Weapon : NetworkBehaviour
     public bool IsShown = false;
     [SyncVar]
     public bool IsFlippedY = false;
+    [SyncVar (OnChange = nameof(ToggleSprite))]
+    public bool IsMuzzleFlashShown = false;
+
+    private void ToggleSprite(bool oldValue, bool newValue, bool isServer)
+    {
+        if (newValue)
+        {
+            MuzzleFlashSprite.enabled = true;
+        }
+        else
+        {
+            MuzzleFlashSprite.enabled = false;
+        }
+    }   
 
     public override void OnStartClient()
     {
         base.OnStartClient();
 
-        MuzzleFlashSprite.enabled = false;
+        if (!base.IsOwner) return;
 
         // Determine if weapon is equipped.
         if (transform.parent.GetComponent<WeaponHolder>() != null)
@@ -38,6 +52,28 @@ public class Weapon : NetworkBehaviour
 
         SetShownServer(true);
         SetFlippedYServer(false);
+        SetMuzzleFlashShown(false);
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        MuzzleFlashSprite.enabled = false;
+
+        // Determine if weapon is equipped.
+        if (transform.parent.GetComponent<WeaponHolder>() != null)
+        {
+            IsEquipped = true;
+        }
+        else
+        {
+            IsEquipped = false;
+        }
+
+        IsShown = true;
+        IsFlippedY = false;
+        IsMuzzleFlashShown = false;
     }
 
     public void Show(bool show)
@@ -82,7 +118,6 @@ public class Weapon : NetworkBehaviour
         transform.localRotation = rotation;
 
         HideHighlight();
-        IsEquipped = true;
     }
 
     public void Drop(Vector3 dropPosition)
@@ -116,5 +151,11 @@ public class Weapon : NetworkBehaviour
     private void SetEquippedServer(bool equipped)
     {
         IsEquipped = equipped;
+    }
+
+    [ServerRpc]
+    private void SetMuzzleFlashShown(bool isMuzzleFlashShown)
+    {
+        IsMuzzleFlashShown = isMuzzleFlashShown;
     }
 }

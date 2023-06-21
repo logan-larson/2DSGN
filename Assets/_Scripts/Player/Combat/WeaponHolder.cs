@@ -270,7 +270,13 @@ public class WeaponHolder : NetworkBehaviour
 
         weapon.Show(showWeapon);
         weapon.FlipY(flipY);
-        weapon.Equip(transform, equipPosition, equipRotation);
+
+        weapon.transform.position = equipPosition;
+        weapon.transform.rotation = equipRotation;
+
+        weapon.SetEquipped(true);
+
+        // weapon.Equip(transform, equipPosition, equipRotation);
 
         EquipWeaponObservers(weaponGameObj, equipPosition, equipRotation, showWeapon, flipY);
     }
@@ -284,6 +290,8 @@ public class WeaponHolder : NetworkBehaviour
 
         weapon.Show(showWeapon);
         weapon.FlipY(flipY);
-        weapon.Equip(transform, equipPosition, equipRotation);
+
+
+        // weapon.Equip(transform, equipPosition, equipRotation);
     }
 }
