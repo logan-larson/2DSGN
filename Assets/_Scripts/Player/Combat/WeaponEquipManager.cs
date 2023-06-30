@@ -54,10 +54,8 @@ public class WeaponEquipManager : NetworkBehaviour
 
         for (int i = 0; i < Weapons.Length; i++)
         {
-            SetWeaponShowServer(false, i);
+            SetWeaponShowServer(i == _currentWeaponIndex, i);
         }
-
-        SetWeaponShowServer(true, _currentWeaponIndex);
     }
 
     public override void OnStartServer()
@@ -203,7 +201,7 @@ public class WeaponEquipManager : NetworkBehaviour
 
         if (weapon == null) return;
 
-        weapon.Show(isActive);
+        weapon.IsShown = isActive;
 
         //if (isActive) _currentWeaponIndex = index;
 
@@ -217,7 +215,7 @@ public class WeaponEquipManager : NetworkBehaviour
 
         if (weapon == null) return;
 
-        weapon.Show(isActive);
+        //weapon.Show(isActive);
 
         if (Owner.ClientId == clientId)
         {

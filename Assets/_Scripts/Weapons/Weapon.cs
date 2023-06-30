@@ -55,7 +55,7 @@ public class Weapon : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
-        //SetShownServer(true);
+        //SetShownServer(false);
         SetFlippedYServer(false);
         SetMuzzleFlashShown(false);
     }
@@ -64,19 +64,12 @@ public class Weapon : NetworkBehaviour
     {
         base.OnStartServer();
 
-        MuzzleFlashSprite.enabled = false;
+        //IsShown = false;
 
         /*
-        IsShown = true;
         IsFlippedY = false;
         IsMuzzleFlashShown = false;
         */
-    }
-
-    public void Show(bool show)
-    {
-        WeaponSprite.enabled = show;
-        IsShown = show;
     }
 
     public void FlipY(bool flipY)
