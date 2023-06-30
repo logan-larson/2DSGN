@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 6990942574324534672}
   - component: {fileID: -5875584354621863892}
   - component: {fileID: -890550743892668196}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: RiflePickup
-  m_TagString: Untagged
+  m_TagString: WeaponPickup
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -48,9 +48,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a7c2953b6ebdf544aadc3159d6f16d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 0
   _addedNetworkObject: {fileID: -5875584354621863892}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: -5875584354621863892}
   WeaponSprite: {fileID: 2973064127713107434}
   Name: Rifle
 --- !u!212 &2973064127713107434
@@ -146,7 +146,7 @@ MonoBehaviour:
   <IsNested>k__BackingField: 0
   <ComponentIndex>k__BackingField: 0
   _networkBehaviours:
-  - {fileID: 0}
+  - {fileID: 6848226952501131218}
   - {fileID: -890550743892668196}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []

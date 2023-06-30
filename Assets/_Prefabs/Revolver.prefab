@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: -1446210289863654907}
   m_Layer: 10
   m_Name: Revolver
-  m_TagString: Untagged
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -192,6 +192,7 @@ MonoBehaviour:
   WeaponSprite: {fileID: 2973064127713107434}
   MuzzleFlashSprite: {fileID: 781558754384109670}
   BulletTrailRenderer: {fileID: 7365057579148312717, guid: abaa1bdfe97d19245a6bb699ff9173c0, type: 3}
+  WeaponPickup: {fileID: 6059912039733264002, guid: cd647b285c80db6449741b06735100b0, type: 3}
   CurrentBloom: 0
   IsEquipped: 0
   IsShown: 0
@@ -246,7 +247,7 @@ MonoBehaviour:
   _isGlobal: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: 5
+  <PrefabId>k__BackingField: 7
   _scenePathHash: 0
   <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 7891346041705931610

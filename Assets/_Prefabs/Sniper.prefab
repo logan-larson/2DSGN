@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -4337507330290827725}
   m_Layer: 10
   m_Name: Sniper
-  m_TagString: Untagged
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -108,11 +108,12 @@ MonoBehaviour:
   WeaponSprite: {fileID: 2973064127713107434}
   MuzzleFlashSprite: {fileID: 295105370526668722}
   BulletTrailRenderer: {fileID: 7365057579148312717, guid: abaa1bdfe97d19245a6bb699ff9173c0, type: 3}
+  WeaponPickup: {fileID: 6059912039733264002, guid: 41766a529861144409b75da197836d86, type: 3}
+  CurrentBloom: 0
+  IsEquipped: 0
   IsShown: 0
   IsFlippedY: 0
-  CurrentBloom: 0
-  CurrentOwnerId: -1
-  IsEquipped: 0
+  IsMuzzleFlashShown: 0
 --- !u!61 &6990942574324534672
 BoxCollider2D:
   m_ObjectHideFlags: 0

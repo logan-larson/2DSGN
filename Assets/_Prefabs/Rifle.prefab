@@ -16,11 +16,11 @@ GameObject:
   - component: {fileID: -890550743892668196}
   m_Layer: 10
   m_Name: Rifle
-  m_TagString: Untagged
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2562105026587387031
 Transform:
   m_ObjectHideFlags: 0
@@ -108,6 +108,7 @@ MonoBehaviour:
   WeaponSprite: {fileID: 2973064127713107434}
   MuzzleFlashSprite: {fileID: 295105370526668722}
   BulletTrailRenderer: {fileID: 7365057579148312717, guid: abaa1bdfe97d19245a6bb699ff9173c0, type: 3}
+  WeaponPickup: {fileID: 6059912039733264002, guid: 384b4a55d0ef0084fa74e7640a770c37, type: 3}
   CurrentBloom: 0
   IsEquipped: 0
   IsShown: 0
@@ -162,7 +163,7 @@ MonoBehaviour:
   _isGlobal: 0
   _defaultDespawnType: 0
   NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: 6
+  <PrefabId>k__BackingField: 8
   _scenePathHash: 0
   <SceneId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 8706903510893332492
