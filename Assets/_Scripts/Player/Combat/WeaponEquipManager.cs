@@ -54,7 +54,7 @@ public class WeaponEquipManager : NetworkBehaviour
 
         for (int i = 0; i < Weapons.Length; i++)
         {
-            SetWeaponShowServer(i == _currentWeaponIndex, i);
+            SetWeaponShowServer(false, i);
         }
     }
 
