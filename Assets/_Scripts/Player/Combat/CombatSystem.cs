@@ -28,7 +28,7 @@ public class CombatSystem : NetworkBehaviour
     private PlayerInputValues _input;
 
     [SerializeField]
-    private WeaponHolder _weaponHolder;
+    private GameObject _weaponHolder;
 
     [SerializeField]
     private WeaponEquipManager _weaponEquipManager;

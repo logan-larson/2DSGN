@@ -11,7 +11,7 @@ public class WeaponEquipManager : NetworkBehaviour
     private WeaponPickup _highlightedWeapon;
 
     [SerializeField]
-    private WeaponHolder _weaponHolder;
+    private GameObject _weaponHolder;
 
     [SerializeField]
     private PlayerHealth _playerHealth;
@@ -38,7 +38,7 @@ public class WeaponEquipManager : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
-        _weaponHolder = _weaponHolder ?? GetComponentInChildren<WeaponHolder>();
+        _weaponHolder = _weaponHolder ?? GetComponentInChildren<GameObject>();
 
         _playerHealth.OnDeath.AddListener(OnDeath);
         _respawnManager.OnRespawn.AddListener(OnRespawn);
@@ -62,7 +62,7 @@ public class WeaponEquipManager : NetworkBehaviour
     {
         base.OnStartServer();
 
-        _weaponHolder = _weaponHolder ?? GetComponentInChildren<WeaponHolder>();
+        _weaponHolder = _weaponHolder ?? GetComponentInChildren<GameObject>();
 
         Weapons = _weaponHolder
             .GetComponentsInChildren<Weapon>(true);
@@ -196,7 +196,6 @@ public class WeaponEquipManager : NetworkBehaviour
     [ServerRpc]
     private void ChangeWeaponActivationServer(int index, bool isActive, int clientId)
     {
-        Debug.Log($"ServerWeapon name = {name} : active = {isActive}");
         var weapon = Weapons[index];
 
         if (weapon == null) return;

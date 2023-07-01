@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Transactions;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
@@ -12,10 +13,16 @@ public class Weapon : NetworkBehaviour
     public TrailRenderer BulletTrailRenderer;
     public GameObject WeaponPickup;
 
+    [SerializeField]
+    private CombatSystem _combatSystem;
+
+    [SerializeField]
+    private WeaponEquipManager _weaponEquipManager;
+
     public float CurrentBloom = 0f;
 
     [SyncVar (OnChange = nameof(SetSpriteShown))]
-    public bool IsShown = false;
+    public bool IsShown = true;
 
     private void SetSpriteShown(bool oldValue, bool newValue, bool isServer)
     {
@@ -31,8 +38,17 @@ public class Weapon : NetworkBehaviour
         }
     }
     
-    [SyncVar]
+    [SyncVar (OnChange = nameof(FlipY))]
     public bool IsFlippedY = false;
+
+    private void FlipY(bool oldValue, bool newValue, bool isServer)
+    {
+        WeaponSprite.flipY = newValue;
+        MuzzleFlashSprite.flipY = newValue;
+    }
+
+    [SyncVar]
+    public Vector3 AimDirection = Vector3.zero;
 
     [SyncVar (OnChange = nameof(ToggleSprite))]
     public bool IsMuzzleFlashShown = false;
@@ -55,29 +71,49 @@ public class Weapon : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
-        //SetShownServer(false);
+        _combatSystem = _combatSystem ?? transform.parent.GetComponentInParent<CombatSystem>();
+        _weaponEquipManager = _weaponEquipManager ?? transform.parent.GetComponentInParent<WeaponEquipManager>();
+
+        SetShownServer(false);
         SetFlippedYServer(false);
         SetMuzzleFlashShown(false);
+
+        WeaponSprite.enabled = false;
+        MuzzleFlashSprite.enabled = false;
     }
 
     public override void OnStartServer()
     {
         base.OnStartServer();
-
-        //IsShown = false;
-
-        /*
-        IsFlippedY = false;
-        IsMuzzleFlashShown = false;
-        */
     }
 
-    public void FlipY(bool flipY)
+    public void Update()
     {
-        WeaponSprite.flipY = flipY;
-        MuzzleFlashSprite.flipY = flipY;
-        IsFlippedY = flipY;
+        if (!base.IsOwner) return;
+
+        if (_weaponEquipManager.CurrentWeapon.WeaponInfo.Name != WeaponInfo.Name) return;
+
+        AimDirection = _combatSystem.AimDirection;
+
+        transform.rotation = Quaternion.LookRotation(Vector3.forward, AimDirection) * Quaternion.Euler(0f, 0f, 90f);
+
+        // If past vertical, flip sprite.
+        float angleDifference = Mathf.DeltaAngle(transform.parent.rotation.eulerAngles.z, transform.rotation.eulerAngles.z);
+
+        bool isFlippedY = angleDifference > 90f || angleDifference < -90f;
+
+        if (isFlippedY == IsFlippedY) return; 
+
+        if (base.IsServer)
+        {
+            IsFlippedY = isFlippedY;
+        }
+        else
+        {
+            SetFlippedYServer(isFlippedY);
+        }
     }
+
 
     public void ShowMuzzleFlash()
     {
