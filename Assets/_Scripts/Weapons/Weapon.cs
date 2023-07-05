@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Transactions;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
@@ -10,15 +11,42 @@ public class Weapon : NetworkBehaviour
     public SpriteRenderer WeaponSprite;
     public SpriteRenderer MuzzleFlashSprite;
     public TrailRenderer BulletTrailRenderer;
+    public GameObject WeaponPickup;
+
+    [SerializeField]
+    private CombatSystem _combatSystem;
+
+    [SerializeField]
+    private WeaponEquipManager _weaponEquipManager;
 
     public float CurrentBloom = 0f;
 
-    [SyncVar]
-    public bool IsEquipped = false;
-    [SyncVar]
-    public bool IsShown = false;
-    [SyncVar]
+    [SyncVar (OnChange = nameof(SetSpriteShown))]
+    public bool IsShown = true;
+
+    private void SetSpriteShown(bool oldValue, bool newValue, bool isServer)
+    {
+        if (newValue)
+        {
+            WeaponSprite.enabled = true;
+            MuzzleFlashSprite.enabled = false;
+        }
+        else
+        {
+            WeaponSprite.enabled = false;
+            MuzzleFlashSprite.enabled = false;
+        }
+    }
+    
+    [SyncVar (OnChange = nameof(FlipY))]
     public bool IsFlippedY = false;
+
+    private void FlipY(bool oldValue, bool newValue, bool isServer)
+    {
+        WeaponSprite.flipY = newValue;
+        MuzzleFlashSprite.flipY = newValue;
+    }
+
     [SyncVar (OnChange = nameof(ToggleSprite))]
     public bool IsMuzzleFlashShown = false;
 
@@ -40,54 +68,47 @@ public class Weapon : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
-        // Determine if weapon is equipped.
-        if (transform.parent.GetComponent<WeaponHolder>() != null)
-        {
-            SetEquippedServer(true);
-        }
-        else
-        {
-            SetEquippedServer(false);
-        }
+        _combatSystem = _combatSystem ?? transform.parent.GetComponentInParent<CombatSystem>();
+        _weaponEquipManager = _weaponEquipManager ?? transform.parent.GetComponentInParent<WeaponEquipManager>();
 
-        SetShownServer(true);
+        SetShownServer(false);
         SetFlippedYServer(false);
         SetMuzzleFlashShown(false);
+
+        WeaponSprite.enabled = false;
+        MuzzleFlashSprite.enabled = false;
     }
 
     public override void OnStartServer()
     {
         base.OnStartServer();
+    }
 
-        MuzzleFlashSprite.enabled = false;
+    public void Update()
+    {
+        if (!base.IsOwner) return;
 
-        // Determine if weapon is equipped.
-        if (transform.parent.GetComponent<WeaponHolder>() != null)
+        if (_weaponEquipManager.CurrentWeapon.WeaponInfo.Name != WeaponInfo.Name) return;
+
+        transform.rotation = Quaternion.LookRotation(Vector3.forward, _combatSystem.AimDirection) * Quaternion.Euler(0f, 0f, 90f);
+
+        // If past vertical, flip sprite.
+        float angleDifference = Mathf.DeltaAngle(transform.parent.rotation.eulerAngles.z, transform.rotation.eulerAngles.z);
+
+        bool isFlippedY = angleDifference > 90f || angleDifference < -90f;
+
+        if (isFlippedY == IsFlippedY) return; 
+
+        if (base.IsServer)
         {
-            IsEquipped = true;
+            IsFlippedY = isFlippedY;
         }
         else
         {
-            IsEquipped = false;
+            SetFlippedYServer(isFlippedY);
         }
-
-        IsShown = true;
-        IsFlippedY = false;
-        IsMuzzleFlashShown = false;
     }
 
-    public void Show(bool show)
-    {
-        WeaponSprite.enabled = show;
-        IsShown = show;
-    }
-
-    public void FlipY(bool flipY)
-    {
-        WeaponSprite.flipY = flipY;
-        MuzzleFlashSprite.flipY = flipY;
-        IsFlippedY = flipY;
-    }
 
     public void ShowMuzzleFlash()
     {
@@ -101,39 +122,21 @@ public class Weapon : NetworkBehaviour
         MuzzleFlashSprite.enabled = false;
     }
 
-    public void ShowHighlight()
+    public void Show()
     {
-        WeaponSprite.color = Color.blue;
-    }
+        Debug.Log($"Showing weapon {WeaponInfo.Name} on client: {base.OwnerId}");
 
-    public void HideHighlight()
+        WeaponSprite.enabled = true;
+        MuzzleFlashSprite.enabled = false;
+    }   
+
+    public void Hide()
     {
-        WeaponSprite.color = Color.white;
-    }
+        Debug.Log($"Hiding weapon {WeaponInfo.Name} on client: {base.OwnerId}");
 
-    // [Server]
-    public void Equip(Transform weaponHolder, Vector3 position, Quaternion rotation)
-    {
-        transform.localPosition = position;
-        transform.localRotation = rotation;
-
-        HideHighlight();
-    }
-
-    public void Drop(Vector3 dropPosition)
-    {
-        transform.position = dropPosition;
-
-        IsEquipped = false;
-        Show(true);
-        HideHighlight();
-    }
-
-    [Server]
-    public void SetEquipped(bool equipped)
-    {
-        IsEquipped = equipped;
-    }
+        WeaponSprite.enabled = false;
+        MuzzleFlashSprite.enabled = false;
+    }   
 
     [ServerRpc]
     private void SetShownServer(bool isShown)
@@ -145,12 +148,6 @@ public class Weapon : NetworkBehaviour
     private void SetFlippedYServer(bool isFlippedY)
     {
         IsFlippedY = isFlippedY;
-    }
-
-    [ServerRpc]
-    private void SetEquippedServer(bool equipped)
-    {
-        IsEquipped = equipped;
     }
 
     [ServerRpc]

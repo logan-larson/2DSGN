@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -8885587227430105862}
   m_Layer: 10
   m_Name: SMG
-  m_TagString: Untagged
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -108,11 +108,13 @@ MonoBehaviour:
   WeaponSprite: {fileID: 2973064127713107434}
   MuzzleFlashSprite: {fileID: 295105370526668722}
   BulletTrailRenderer: {fileID: 7365057579148312717, guid: abaa1bdfe97d19245a6bb699ff9173c0, type: 3}
+  WeaponPickup: {fileID: 6059912039733264002, guid: 84605a09567e51c45a71a368889f0f8c, type: 3}
+  _combatSystem: {fileID: 0}
+  _weaponEquipManager: {fileID: 0}
+  CurrentBloom: 0
   IsShown: 0
   IsFlippedY: 0
-  CurrentBloom: 0
-  CurrentOwnerId: -1
-  IsEquipped: 0
+  IsMuzzleFlashShown: 0
 --- !u!61 &6990942574324534672
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -129,7 +131,7 @@ BoxCollider2D:
   m_Offset: {x: 0.047759026, y: -0.13322142}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5491192}
+    pivot: {x: 0.33, y: 0.5491192}
     oldSize: {x: 1.5, y: 1}
     newSize: {x: 1.5, y: 0.75}
     adaptiveTilingThreshold: 0.5

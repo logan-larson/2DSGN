@@ -5,19 +5,20 @@ using UnityEngine.Events;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 
-/*
-Currently commenting out all references to sliding as it is not yet implemented.
-*/
-
-public enum Mode
-{
-    Parkour,
-    Combat,
-    // Sliding
-}
 
 public class ModeManager : NetworkBehaviour
 {
+    /*
+    Currently commenting out all references to sliding as it is not yet implemented.
+    */
+
+    public enum Mode
+    {
+        Parkour,
+        Combat,
+        // Sliding
+    }
+
     public UnityEvent OnChangeToParkour = new UnityEvent();
     public UnityEvent OnChangeToCombat = new UnityEvent();
     // public UnityEvent ChangeToSliding = new UnityEvent();
@@ -85,6 +86,13 @@ public class ModeManager : NetworkBehaviour
 
     [ServerRpc]
     private void ChangeModeServer(Mode mode)
+    {
+        CurrentMode = mode;
+        ChangeModeObservers(mode);
+    }
+
+    [ObserversRpc]
+    private void ChangeModeObservers(Mode mode)
     {
         CurrentMode = mode;
     }

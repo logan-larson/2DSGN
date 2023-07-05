@@ -5,8 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - IPAddressInput
-  - WeaponPickups
   - Weapon
+  - WeaponPickup
+  - WeaponPickups
   layers:
   - Default
   - TransparentFX
@@ -17,9 +18,9 @@ TagManager:
   - Obstacle
   - Player
   - Enemy
-  - Pickup
-  - Weapon
   - 
+  - Weapon
+  - WeaponPickup
   - 
   - 
   - 

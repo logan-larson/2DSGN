@@ -17,7 +17,7 @@ public class NetworkDirection : NetworkBehaviour
     private PlayerInputValues _input;
 
     [SyncVar(OnChange = nameof(OnChangeDirection))]
-    public bool IsFacingRight;
+    public bool IsFacingRight = true;
 
     private void OnChangeDirection(bool oldValue, bool newValue, bool isServer)
     {
@@ -38,6 +38,8 @@ public class NetworkDirection : NetworkBehaviour
         if (base.IsOwner)
         {
             _input = InputSystem.InputValues;
+
+            ServerSetDirection(true);
         }
     }
 
