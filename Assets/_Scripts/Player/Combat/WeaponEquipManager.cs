@@ -200,9 +200,10 @@ public class WeaponEquipManager : NetworkBehaviour
 
         if (weapon == null) return;
 
-        weapon.IsShown = isActive;
-
-        //if (isActive) _currentWeaponIndex = index;
+        if (_modeManager.CurrentMode == Mode.Combat)
+            weapon.IsShown = isActive;
+        else
+            weapon.IsShown = false;
 
         ChangeWeaponActivationObservers(index, isActive, clientId);
     }
@@ -214,7 +215,10 @@ public class WeaponEquipManager : NetworkBehaviour
 
         if (weapon == null) return;
 
-        //weapon.Show(isActive);
+        if (_modeManager.CurrentMode == Mode.Combat)
+            weapon.IsShown = isActive;
+        else
+            weapon.IsShown = false;
 
         if (Owner.ClientId == clientId)
         {

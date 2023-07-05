@@ -1630,10 +1630,6 @@ PrefabInstance:
       propertyPath: <ParentNetworkObject>k__BackingField
       value: 
       objectReference: {fileID: 7300643456147865250}
-    - target: {fileID: -1446210289863654907, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
-      propertyPath: _clientAuthoritative
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2562105026587387031, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
       propertyPath: m_RootOrder
       value: 0

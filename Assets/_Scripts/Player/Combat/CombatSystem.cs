@@ -202,6 +202,7 @@ public class CombatSystem : NetworkBehaviour
 
     private RaycastHit2D[][] GetHits(WeaponInfo weapon, Vector3 position, Vector3 direction)
     {
+        LayerMask nonHittable = LayerMask.GetMask("WeaponPickup");
         RaycastHit2D[][] hits = new RaycastHit2D[0][];
         if (weapon.BulletsPerShot == 1)
         {
@@ -210,7 +211,7 @@ public class CombatSystem : NetworkBehaviour
             var currentBloom = _weaponEquipManager.CurrentWeapon.CurrentBloom;
             Vector3 bloomDir= Quaternion.Euler(0f, 0f, Random.Range(-currentBloom, currentBloom)) * direction;
 
-            hits[0] = Physics2D.RaycastAll(position, bloomDir, weapon.Range);
+            hits[0] = Physics2D.RaycastAll(position, bloomDir, weapon.Range, ~nonHittable);
 
             DrawShot(hits[0], position, bloomDir, weapon.Range);
         }
@@ -223,7 +224,7 @@ public class CombatSystem : NetworkBehaviour
 
                 Debug.DrawRay(position, randomDirection * weapon.Range, Color.green, 0.5f);
 
-                RaycastHit2D[] bulletHits = Physics2D.RaycastAll(position, randomDirection, weapon.Range);
+                RaycastHit2D[] bulletHits = Physics2D.RaycastAll(position, randomDirection, weapon.Range, ~nonHittable);
 
                 hits[i] = bulletHits;
 
@@ -241,6 +242,7 @@ public class CombatSystem : NetworkBehaviour
         {
             if (hit.collider != null && hit.transform.GetComponentInChildren<Weapon>() == null)
             {
+                DrawShotServer(position, direction, hits[System.Array.IndexOf(hits, hit)].distance);
                 ShootObservers(position, direction, hits[System.Array.IndexOf(hits, hit)].distance);
 
                 hitSomething = true;
@@ -250,8 +252,17 @@ public class CombatSystem : NetworkBehaviour
 
         if (!hitSomething)
         {
+            DrawShotServer(position, direction, distance);
             ShootObservers(position, direction, distance);
         }
+    }
+
+    [Server]
+    public void DrawShotServer(Vector3 position, Vector3 direction, float distance)
+    {
+        TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
+        
+        StartCoroutine(ShootCoroutine(position, direction, distance, bulletTrail));
     }
 
     [ObserversRpc]

@@ -20,7 +20,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2562105026587387031
 Transform:
   m_ObjectHideFlags: 0
@@ -109,8 +109,9 @@ MonoBehaviour:
   MuzzleFlashSprite: {fileID: 295105370526668722}
   BulletTrailRenderer: {fileID: 7365057579148312717, guid: abaa1bdfe97d19245a6bb699ff9173c0, type: 3}
   WeaponPickup: {fileID: 6059912039733264002, guid: f61ae11b94827e74f9e162261b9e4a7e, type: 3}
+  _combatSystem: {fileID: 0}
+  _weaponEquipManager: {fileID: 0}
   CurrentBloom: 0
-  IsEquipped: 0
   IsShown: 0
   IsFlippedY: 0
   IsMuzzleFlashShown: 0
@@ -130,7 +131,7 @@ BoxCollider2D:
   m_Offset: {x: -0.04869634, y: -0.04412663}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.45426825}
+    pivot: {x: 0.23, y: 0.45426825}
     oldSize: {x: 1.5, y: 1}
     newSize: {x: 1.5, y: 0.75}
     adaptiveTilingThreshold: 0.5

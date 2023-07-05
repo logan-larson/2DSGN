@@ -70,14 +70,10 @@ public class AnimationSystem : NetworkBehaviour
         if (newValue == 0) // Parkour
         {
             _spriteRenderer.sprite = _quadSprite;
-            // _quad.enabled = true;
-            // _bi.enabled = false;
         }
         else if (newValue == 1) // Combat
         {
             _spriteRenderer.sprite = _biSprite;
-            // _quad.enabled = false;
-            // _bi.enabled = true;
         }
     }
 

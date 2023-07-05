@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6990942574324534672}
   - component: {fileID: 8598898094873270413}
   - component: {fileID: -8885587227430105862}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: SMGPickup
   m_TagString: WeaponPickup
   m_Icon: {fileID: 0}
@@ -121,7 +121,7 @@ BoxCollider2D:
   m_Offset: {x: 0.047759026, y: -0.13322142}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5491192}
+    pivot: {x: 0.33, y: 0.5491192}
     oldSize: {x: 1.5, y: 1}
     newSize: {x: 1.5, y: 0.75}
     adaptiveTilingThreshold: 0.5

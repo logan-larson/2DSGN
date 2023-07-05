@@ -47,9 +47,6 @@ public class Weapon : NetworkBehaviour
         MuzzleFlashSprite.flipY = newValue;
     }
 
-    [SyncVar]
-    public Vector3 AimDirection = Vector3.zero;
-
     [SyncVar (OnChange = nameof(ToggleSprite))]
     public bool IsMuzzleFlashShown = false;
 
@@ -93,9 +90,7 @@ public class Weapon : NetworkBehaviour
 
         if (_weaponEquipManager.CurrentWeapon.WeaponInfo.Name != WeaponInfo.Name) return;
 
-        AimDirection = _combatSystem.AimDirection;
-
-        transform.rotation = Quaternion.LookRotation(Vector3.forward, AimDirection) * Quaternion.Euler(0f, 0f, 90f);
+        transform.rotation = Quaternion.LookRotation(Vector3.forward, _combatSystem.AimDirection) * Quaternion.Euler(0f, 0f, 90f);
 
         // If past vertical, flip sprite.
         float angleDifference = Mathf.DeltaAngle(transform.parent.rotation.eulerAngles.z, transform.rotation.eulerAngles.z);
