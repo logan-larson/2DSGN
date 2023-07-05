@@ -4,6 +4,7 @@ using UnityEngine;
 using FishNet.Managing;
 using FishNet.Object;
 using System.Linq;
+using static ModeManager;
 
 public class WeaponEquipManager : NetworkBehaviour
 {

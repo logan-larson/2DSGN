@@ -186,9 +186,7 @@ public class CombatSystem : NetworkBehaviour
                     }
                     else if (hit.transform.GetComponentInChildren<Weapon>() == null)
                     {
-                        //Debug.Log("Hit environment");
                         var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
-                        // ShootObservers(position, dir, hit.distance);
 
                         hitSomething = true;
                         break;
@@ -243,7 +241,7 @@ public class CombatSystem : NetworkBehaviour
             if (hit.collider != null && hit.transform.GetComponentInChildren<Weapon>() == null)
             {
                 DrawShotServer(position, direction, hits[System.Array.IndexOf(hits, hit)].distance);
-                ShootObservers(position, direction, hits[System.Array.IndexOf(hits, hit)].distance);
+                DrawShotObservers(position, direction, hits[System.Array.IndexOf(hits, hit)].distance);
 
                 hitSomething = true;
                 break;
@@ -253,7 +251,7 @@ public class CombatSystem : NetworkBehaviour
         if (!hitSomething)
         {
             DrawShotServer(position, direction, distance);
-            ShootObservers(position, direction, distance);
+            DrawShotObservers(position, direction, distance);
         }
     }
 
@@ -266,7 +264,7 @@ public class CombatSystem : NetworkBehaviour
     }
 
     [ObserversRpc]
-    public void ShootObservers(Vector3 position, Vector3 direction, float distance)
+    public void DrawShotObservers(Vector3 position, Vector3 direction, float distance)
     {
         TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
         
