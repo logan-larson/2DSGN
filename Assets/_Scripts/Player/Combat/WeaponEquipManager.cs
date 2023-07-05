@@ -37,9 +37,17 @@ public class WeaponEquipManager : NetworkBehaviour
     {
         base.OnStartClient();
 
-        if (!base.IsOwner) return;
-
         _weaponHolder = _weaponHolder ?? GetComponentInChildren<GameObject>();
+
+        Weapons = _weaponHolder
+            .GetComponentsInChildren<Weapon>(true);
+
+        for (int i = 0; i < Weapons.Length; i++)
+        {
+            SetWeaponShowServer(false, i);
+        }
+
+        if (!base.IsOwner) return;
 
         _playerHealth.OnDeath.AddListener(OnDeath);
         _respawnManager.OnRespawn.AddListener(OnRespawn);
@@ -49,14 +57,6 @@ public class WeaponEquipManager : NetworkBehaviour
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
 
-
-        Weapons = _weaponHolder
-            .GetComponentsInChildren<Weapon>(true);
-
-        for (int i = 0; i < Weapons.Length; i++)
-        {
-            SetWeaponShowServer(false, i);
-        }
     }
 
     public override void OnStartServer()
@@ -112,14 +112,25 @@ public class WeaponEquipManager : NetworkBehaviour
     [ServerRpc]
     public void SetWeaponShowServer(bool show, int index)
     {
-        Weapons[index].IsShown = show;
+        //Weapons[index].IsShown = show;
+
+        if (show)
+            Weapons[index].Show();
+        else
+            Weapons[index].Hide();
+
         SetWeaponShowObservers(show, index);
     }
 
     [ObserversRpc]
     public void SetWeaponShowObservers(bool show, int index)
     {
-        Weapons[index].IsShown = show;
+        //Weapons[index].IsShown = show;
+
+        if (show)
+            Weapons[index].Show();
+        else
+            Weapons[index].Hide();
     }
 
     /**

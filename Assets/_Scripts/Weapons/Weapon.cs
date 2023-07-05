@@ -122,6 +122,22 @@ public class Weapon : NetworkBehaviour
         MuzzleFlashSprite.enabled = false;
     }
 
+    public void Show()
+    {
+        Debug.Log($"Showing weapon {WeaponInfo.Name} on client: {base.OwnerId}");
+
+        WeaponSprite.enabled = true;
+        MuzzleFlashSprite.enabled = false;
+    }   
+
+    public void Hide()
+    {
+        Debug.Log($"Hiding weapon {WeaponInfo.Name} on client: {base.OwnerId}");
+
+        WeaponSprite.enabled = false;
+        MuzzleFlashSprite.enabled = false;
+    }   
+
     [ServerRpc]
     private void SetShownServer(bool isShown)
     {
