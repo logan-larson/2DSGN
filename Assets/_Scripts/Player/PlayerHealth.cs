@@ -29,6 +29,17 @@ public class PlayerHealth : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
+        //OnDeath = OnDeath ?? new UnityEvent();
+
+        //_respawnManager = GetComponent<RespawnManager>();
+
+        //_respawnManager.OnRespawn.AddListener(ResetHealth);
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
         OnDeath = OnDeath ?? new UnityEvent();
 
         _respawnManager = GetComponent<RespawnManager>();
@@ -40,13 +51,15 @@ public class PlayerHealth : NetworkBehaviour
     {
         _healthText.text = $"Health: {Health.ToString()}";
 
+        if (!base.IsServer) return;
+
         if (Health <= 0)
         {
-            ResetHealth();
             OnDeath.Invoke();
         }
     }
 
+    [Server]
     public void TakeDamage(int damage)
     {
         if (!base.IsOwner) return;

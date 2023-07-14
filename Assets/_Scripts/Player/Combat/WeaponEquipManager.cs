@@ -42,21 +42,19 @@ public class WeaponEquipManager : NetworkBehaviour
         Weapons = _weaponHolder
             .GetComponentsInChildren<Weapon>(true);
 
-        for (int i = 0; i < Weapons.Length; i++)
-        {
-            SetWeaponShowServer(false, i);
-        }
-
         if (!base.IsOwner) return;
-
-        _playerHealth.OnDeath.AddListener(OnDeath);
-        _respawnManager.OnRespawn.AddListener(OnRespawn);
 
         _modeManager = _modeManager ?? GetComponentInParent<ModeManager>();
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
 
+        foreach (Weapon weapon in Weapons)
+        {
+            weapon.Initialize();
+        }
+
+        Weapons[_currentWeaponIndex].IsShown = _modeManager.CurrentMode == Mode.Combat;
     }
 
     public override void OnStartServer()
@@ -67,8 +65,17 @@ public class WeaponEquipManager : NetworkBehaviour
 
         Weapons = _weaponHolder
             .GetComponentsInChildren<Weapon>(true);
-    }
 
+        _playerHealth.OnDeath.AddListener(OnDeath);
+        _respawnManager.OnRespawn.AddListener(OnRespawn);
+
+        foreach (Weapon weapon in Weapons)
+        {
+            weapon.Initialize();
+        }
+
+        Weapons[_currentWeaponIndex].IsShown = _modeManager.CurrentMode == Mode.Combat;
+    }
 
     private void Update()
     {
@@ -112,12 +119,7 @@ public class WeaponEquipManager : NetworkBehaviour
     [ServerRpc]
     public void SetWeaponShowServer(bool show, int index)
     {
-        //Weapons[index].IsShown = show;
-
-        if (show)
-            Weapons[index].Show();
-        else
-            Weapons[index].Hide();
+        Weapons[index].IsShown = show;
 
         SetWeaponShowObservers(show, index);
     }
@@ -125,12 +127,7 @@ public class WeaponEquipManager : NetworkBehaviour
     [ObserversRpc]
     public void SetWeaponShowObservers(bool show, int index)
     {
-        //Weapons[index].IsShown = show;
-
-        if (show)
-            Weapons[index].Show();
-        else
-            Weapons[index].Hide();
+        Weapons[index].IsShown = show;
     }
 
     /**
