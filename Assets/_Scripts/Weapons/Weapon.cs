@@ -21,10 +21,10 @@ public class Weapon : NetworkBehaviour
 
     public float CurrentBloom = 0f;
 
-    [SyncVar (OnChange = nameof(SetSpriteShown))]
-    public bool IsShown = true;
+    [SyncVar (OnChange = nameof(ToggleWeaponSprite))]
+    public bool IsShown = false;
 
-    private void SetSpriteShown(bool oldValue, bool newValue, bool isServer)
+    private void ToggleWeaponSprite(bool oldValue, bool newValue, bool isServer)
     {
         if (newValue)
         {
@@ -47,10 +47,10 @@ public class Weapon : NetworkBehaviour
         MuzzleFlashSprite.flipY = newValue;
     }
 
-    [SyncVar (OnChange = nameof(ToggleSprite))]
+    [SyncVar (OnChange = nameof(ToggleMuzzleFlashSprite))]
     public bool IsMuzzleFlashShown = false;
 
-    private void ToggleSprite(bool oldValue, bool newValue, bool isServer)
+    private void ToggleMuzzleFlashSprite(bool oldValue, bool newValue, bool isServer)
     {
         if (newValue)
         {
@@ -70,18 +70,21 @@ public class Weapon : NetworkBehaviour
 
         _combatSystem = _combatSystem ?? transform.parent.GetComponentInParent<CombatSystem>();
         _weaponEquipManager = _weaponEquipManager ?? transform.parent.GetComponentInParent<WeaponEquipManager>();
-
-        SetShownServer(false);
-        SetFlippedYServer(false);
-        SetMuzzleFlashShown(false);
-
-        WeaponSprite.enabled = false;
-        MuzzleFlashSprite.enabled = false;
     }
 
     public override void OnStartServer()
     {
         base.OnStartServer();
+    }
+
+    public void Initialize()
+    {
+        WeaponSprite.enabled = false;
+        MuzzleFlashSprite.enabled = false;
+
+        if (!base.IsServer) return;
+
+        IsShown = false;
     }
 
     public void Update()
@@ -109,7 +112,6 @@ public class Weapon : NetworkBehaviour
         }
     }
 
-
     public void ShowMuzzleFlash()
     {
         MuzzleFlashSprite.enabled = true;
@@ -122,37 +124,9 @@ public class Weapon : NetworkBehaviour
         MuzzleFlashSprite.enabled = false;
     }
 
-    public void Show()
-    {
-        Debug.Log($"Showing weapon {WeaponInfo.Name} on client: {base.OwnerId}");
-
-        WeaponSprite.enabled = true;
-        MuzzleFlashSprite.enabled = false;
-    }   
-
-    public void Hide()
-    {
-        Debug.Log($"Hiding weapon {WeaponInfo.Name} on client: {base.OwnerId}");
-
-        WeaponSprite.enabled = false;
-        MuzzleFlashSprite.enabled = false;
-    }   
-
-    [ServerRpc]
-    private void SetShownServer(bool isShown)
-    {
-        IsShown = isShown;
-    }
-
     [ServerRpc]
     private void SetFlippedYServer(bool isFlippedY)
     {
         IsFlippedY = isFlippedY;
-    }
-
-    [ServerRpc]
-    private void SetMuzzleFlashShown(bool isMuzzleFlashShown)
-    {
-        IsMuzzleFlashShown = isMuzzleFlashShown;
     }
 }
