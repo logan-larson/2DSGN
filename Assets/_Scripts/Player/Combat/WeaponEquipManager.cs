@@ -47,9 +47,14 @@ public class WeaponEquipManager : NetworkBehaviour
         if (!base.IsOwner) return;
 
         _modeManager = _modeManager ?? GetComponentInParent<ModeManager>();
+        _respawnManager = _respawnManager ?? GetComponentInParent<RespawnManager>();
+        _playerHealth = _playerHealth ?? GetComponentInParent<PlayerHealth>();
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
+
+        _playerHealth.OnDeath.AddListener(OnDeath);
+        _respawnManager.OnRespawn.AddListener(OnRespawn);
 
         foreach (Weapon weapon in Weapons)
         {
@@ -95,6 +100,7 @@ public class WeaponEquipManager : NetworkBehaviour
         }
 
         ChangeWeaponActivationServer(_currentWeaponIndex, false, -1);
+        //ChangeWeaponActivationServer(_currentWeaponIndex, false, Owner.ClientId);
     }
 
     private void OnRespawn()
