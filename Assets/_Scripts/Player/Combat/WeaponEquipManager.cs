@@ -33,6 +33,8 @@ public class WeaponEquipManager : NetworkBehaviour
 
     private int _currentWeaponIndex = 0;
 
+    private int _currentWeaponPickupID;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -89,45 +91,25 @@ public class WeaponEquipManager : NetworkBehaviour
         // Drop the current weapon, if it isn't the default weapon
         if (_currentWeaponIndex != _defaultWeaponIndex)
         {
-            //DropWeaponServer(CurrentWeapon.gameObject, transform.position);
-        }
-        else
-        {
-            // If the current weapon is the default weapon, destroy it
-            //Destroy(CurrentWeapon.gameObject);
+            DropWeaponPickupServer(_currentWeaponPickupID);
         }
 
-        //CurrentWeapon = null;
+        ChangeWeaponActivationServer(_currentWeaponIndex, false, -1);
     }
 
     private void OnRespawn()
     {
-        // Equip the default weapon
-        //EquipDefaultWeapon();
+        ChangeWeaponActivationServer(_defaultWeaponIndex, true, Owner.ClientId);
     }
 
     private void OnChangeToCombatMode()
     {
-        SetWeaponShowServer(true, _currentWeaponIndex);
+        ChangeWeaponActivationServer(_currentWeaponIndex, true, -1);
     }
 
     private void OnChangeToParkourMode()
     {
-        SetWeaponShowServer(false, _currentWeaponIndex);
-    }
-
-    [ServerRpc]
-    public void SetWeaponShowServer(bool show, int index)
-    {
-        Weapons[index].IsShown = show;
-
-        SetWeaponShowObservers(show, index);
-    }
-
-    [ObserversRpc]
-    public void SetWeaponShowObservers(bool show, int index)
-    {
-        Weapons[index].IsShown = show;
+        ChangeWeaponActivationServer(_currentWeaponIndex, false, -1);
     }
 
     /**
@@ -185,19 +167,20 @@ public class WeaponEquipManager : NetworkBehaviour
         // 1. Check if the weapon is already equipped, if so, return.
         if (highlightedWeaponIndex == _currentWeaponIndex) return;
 
-        // 2. Disable the current weapon.
+        // 2. Disable the current weapon in inventory.
         ChangeWeaponActivationServer(_currentWeaponIndex, false, Owner.ClientId);
 
-        // 3. Enable the new weapon.
+        // 3. Enable the new weapon in inventory.
         ChangeWeaponActivationServer(highlightedWeaponIndex, true, Owner.ClientId);
 
-        /*
-        // 4. Destroy the weapon pickup.
-        DespawnWeaponPickupServer(_highlightedWeapon.gameObject);
+        // 4. Pickup the weapon pickup.
+        PickupWeaponPickupServer(_highlightedWeapon.WeaponID);
 
-        // 5. Spawn the old weapon pickup in place of the new one.
-        SpawnWeaponPickupServer(oldWeaponPickup, _highlightedWeapon.transform.position);
-        */
+        // 5. Drop the current weapon pickup.
+        DropWeaponPickupServer(_currentWeaponPickupID);
+
+
+        _currentWeaponPickupID = _highlightedWeapon.WeaponID;
 
         _highlightedWeapon = null;
     }
@@ -236,18 +219,26 @@ public class WeaponEquipManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void DespawnWeaponPickupServer(GameObject weaponPickup)
+    private void PickupWeaponPickupServer(int weaponPickupID)
     {
-        ServerManager.Despawn(weaponPickup);
+        GameObject[] weapons = GameObject.FindGameObjectsWithTag("WeaponPickup");
+
+        var weaponPickup = weapons.Length > 0 ? weapons.FirstOrDefault(w => w.GetComponent<WeaponPickup>().WeaponID == weaponPickupID) : null;
+
+        if (weaponPickup == null) return;
+
+        weaponPickup.GetComponent<WeaponPickup>().Pickup();
     }
 
-    [ServerRpc]
-    private void SpawnWeaponPickupServer(GameObject weaponPickup, Vector3 position)
+    [ServerRpc(RequireOwnership = false)]
+    private void DropWeaponPickupServer(int weaponPickupID)
     {
-        GameObject weaponPickups = GameObject.FindWithTag("WeaponPickups");
-        GameObject spawnedPickup = Instantiate(weaponPickup, position, Quaternion.identity, weaponPickups.transform);
-        spawnedPickup.tag = "WeaponPickup";
+        GameObject[] weapons = GameObject.FindGameObjectsWithTag("WeaponPickup");
 
-        ServerManager.Spawn(spawnedPickup);
+        var weaponPickup = weapons.Length > 0 ? weapons.FirstOrDefault(w => w.GetComponent<WeaponPickup>().WeaponID == weaponPickupID) : null;
+
+        if (weaponPickup == null) return;
+
+        weaponPickup.GetComponent<WeaponPickup>().Drop();
     }
 }
