@@ -20,10 +20,6 @@ public class RespawnManager : NetworkBehaviour
         base.OnStartClient();
 
         if (!base.IsOwner) return;
-
-        //OnRespawn = OnRespawn ?? new UnityEvent();
-
-        //_playerHealth.OnDeath.AddListener(Respawn);
     }
 
     public override void OnStartServer()

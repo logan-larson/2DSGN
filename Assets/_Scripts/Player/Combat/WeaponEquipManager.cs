@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FishNet.Managing;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System.Linq;
 using static ModeManager;
 
@@ -33,6 +34,7 @@ public class WeaponEquipManager : NetworkBehaviour
 
     private int _currentWeaponIndex = 0;
 
+    [SyncVar]
     private int _currentWeaponPickupID;
 
     public override void OnStartClient()
@@ -52,9 +54,6 @@ public class WeaponEquipManager : NetworkBehaviour
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
-
-        _playerHealth.OnDeath.AddListener(OnDeath);
-        _respawnManager.OnRespawn.AddListener(OnRespawn);
 
         foreach (Weapon weapon in Weapons)
         {
@@ -96,16 +95,38 @@ public class WeaponEquipManager : NetworkBehaviour
         // Drop the current weapon, if it isn't the default weapon
         if (_currentWeaponIndex != _defaultWeaponIndex)
         {
-            DropWeaponPickupServer(_currentWeaponPickupID);
+            GameObject[] weapons = GameObject.FindGameObjectsWithTag("WeaponPickup");
+
+            var weaponPickup = weapons.Length > 0 ? weapons.FirstOrDefault(w => w.GetComponent<WeaponPickup>().WeaponID == _currentWeaponPickupID) : null;
+
+            if (weaponPickup == null) return;
+
+            weaponPickup.GetComponent<WeaponPickup>().Drop();
         }
 
-        ChangeWeaponActivationServer(_currentWeaponIndex, false, -1);
-        //ChangeWeaponActivationServer(_currentWeaponIndex, false, Owner.ClientId);
+        var weapon = Weapons[_currentWeaponIndex];
+
+        if (weapon == null) return;
+
+        weapon.IsShown = false;
+
+        ChangeWeaponActivationObservers(_currentWeaponIndex, false, Owner.ClientId);
+
+        _currentWeaponPickupID = 0;
     }
 
     private void OnRespawn()
     {
-        ChangeWeaponActivationServer(_defaultWeaponIndex, true, Owner.ClientId);
+        var weapon = Weapons[_defaultWeaponIndex];
+
+        if (weapon == null) return;
+
+        if (_modeManager.CurrentMode == Mode.Combat)
+            weapon.IsShown = true;
+        else
+            weapon.IsShown = false;
+
+        ChangeWeaponActivationObservers(_defaultWeaponIndex, true, Owner.ClientId);
     }
 
     private void OnChangeToCombatMode()
@@ -185,11 +206,17 @@ public class WeaponEquipManager : NetworkBehaviour
         // 5. Drop the current weapon pickup.
         DropWeaponPickupServer(_currentWeaponPickupID);
 
-
-        _currentWeaponPickupID = _highlightedWeapon.WeaponID;
+        SetCurrentWeaponPickupIDServerRPC(_highlightedWeapon.WeaponID);
 
         _highlightedWeapon = null;
     }
+
+    [ServerRpc]
+    private void SetCurrentWeaponPickupIDServerRPC(int id)
+    {
+        _currentWeaponPickupID = id;
+    }
+
 
     [ServerRpc]
     private void ChangeWeaponActivationServer(int index, bool isActive, int clientId)
@@ -202,6 +229,11 @@ public class WeaponEquipManager : NetworkBehaviour
             weapon.IsShown = isActive;
         else
             weapon.IsShown = false;
+
+        if (Owner.ClientId == clientId)
+        {
+            _currentWeaponIndex = index;
+        }
 
         ChangeWeaponActivationObservers(index, isActive, clientId);
     }

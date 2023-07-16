@@ -28,12 +28,6 @@ public class PlayerHealth : NetworkBehaviour
         base.OnStartClient();
 
         if (!base.IsOwner) return;
-
-        //OnDeath = OnDeath ?? new UnityEvent();
-
-        //_respawnManager = GetComponent<RespawnManager>();
-
-        //_respawnManager.OnRespawn.AddListener(ResetHealth);
     }
 
     public override void OnStartServer()
