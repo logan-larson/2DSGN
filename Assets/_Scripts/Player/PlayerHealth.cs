@@ -18,9 +18,6 @@ public class PlayerHealth : NetworkBehaviour
 
     public UnityEvent OnDeath;
 
-    [SerializeField]
-    private TMP_Text _healthText;
-
     private RespawnManager _respawnManager;
 
     [SerializeField]
@@ -46,8 +43,6 @@ public class PlayerHealth : NetworkBehaviour
 
     private void Update()
     {
-        _healthText.text = $"Health: {Health.ToString()}";
-
         if (!base.IsServer) return;
 
         if (Health <= 0)
