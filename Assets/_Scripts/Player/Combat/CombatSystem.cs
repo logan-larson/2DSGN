@@ -174,10 +174,8 @@ public class CombatSystem : NetworkBehaviour
                     {
                         if (hit.transform.GetComponentInChildren<PlayerName>().Username != username)
                         {
-                            //Debug.Log("Hit user: " + hit.transform.GetComponentInChildren<PlayerName>().Username);
-
                             if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
-                                enemyHealth.Health -= weapon.Damage;
+                                enemyHealth.TakeDamage(weapon.Damage);
                             }
                             var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
 

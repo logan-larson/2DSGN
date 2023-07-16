@@ -424,7 +424,6 @@ MonoBehaviour:
   _biSprite: {fileID: 21300000, guid: 152097aa19fdca14b87308dae6ac74a6, type: 3}
   _spriteRenderer: {fileID: 8997367718474366262}
   _currentMode: 0
-  Mode: 0
 --- !u!114 &4268827610097334069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -589,6 +588,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   _healthText: {fileID: 3208095534013791242}
+  _damageIndicatorPrefab: {fileID: 3693752882580872442, guid: dc8c980b93d120147ad8cbb5e2d5233d, type: 3}
 --- !u!114 &6483848118584978808
 MonoBehaviour:
   m_ObjectHideFlags: 0

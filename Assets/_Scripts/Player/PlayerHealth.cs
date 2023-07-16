@@ -23,6 +23,9 @@ public class PlayerHealth : NetworkBehaviour
 
     private RespawnManager _respawnManager;
 
+    [SerializeField]
+    private GameObject _damageIndicatorPrefab;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -56,9 +59,25 @@ public class PlayerHealth : NetworkBehaviour
     [Server]
     public void TakeDamage(int damage)
     {
-        if (!base.IsOwner) return;
+        //if (!base.IsOwner) return;
 
         Health -= damage;
+
+        // Spawn damage indicator
+        GameObject damageIndicator = Instantiate(_damageIndicatorPrefab, transform.position, Quaternion.identity);
+        damageIndicator.GetComponentInChildren<DamageIndicator>().SetDamageValue(damage);
+
+        if (base.IsHost) return;
+
+        // Spawn damage indicator on clients
+        SpawnDamageIndicatorObserversRpc(transform.position, damage);
+    }
+
+    [ObserversRpc]
+    private void SpawnDamageIndicatorObserversRpc(Vector3 position, int damage)
+    {
+        GameObject damageIndicator = Instantiate(_damageIndicatorPrefab, position, Quaternion.identity);
+        damageIndicator.GetComponentInChildren<DamageIndicator>().SetDamageValue(damage);
     }
 
     private void ResetHealth()
