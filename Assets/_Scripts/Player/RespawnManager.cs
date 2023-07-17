@@ -48,6 +48,8 @@ public class RespawnManager : NetworkBehaviour
 
     private void Respawn()
     {
+        transform.position = new Vector3(0, 80f, 0);
+
         // Delay respawn
         StartCoroutine(RespawnCoroutine());
     }
