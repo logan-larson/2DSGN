@@ -7,8 +7,8 @@ public class DamageIndicator : MonoBehaviour
 {
     private TMP_Text _damageValue;
 
-    private float _initialYVelocity = 3f;
-    private float _initialXVelocityRange = 1.5f;
+    private float _initialYVelocityRange = 2f;
+    private float _initialXVelocityRange = 2f;
     private float _lifetime = 0.5f;
 
     private Vector3 _velocity;
@@ -20,9 +20,7 @@ public class DamageIndicator : MonoBehaviour
 
     private void Start()
     {
-        _velocity = new Vector3(Random.Range(-_initialXVelocityRange, _initialXVelocityRange), _initialYVelocity);
-
-        transform.SetPositionAndRotation(transform.position + new Vector3(0f, 1f), Quaternion.identity);
+        _velocity = new Vector3(Random.Range(-_initialXVelocityRange, _initialXVelocityRange), Random.Range(-_initialYVelocityRange, _initialYVelocityRange)).normalized * 2f;
 
         Destroy(gameObject, _lifetime);
     }

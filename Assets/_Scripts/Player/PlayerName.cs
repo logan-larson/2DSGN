@@ -87,5 +87,7 @@ public class PlayerName : NetworkBehaviour
     public void ServerSetUsername(string username)
     {
         Username = username;
+
+        PlayerManager.Instance.SetUsername(transform.parent.gameObject.GetInstanceID(), username);
     }
 }

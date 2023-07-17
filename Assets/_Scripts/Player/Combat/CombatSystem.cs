@@ -162,8 +162,6 @@ public class CombatSystem : NetworkBehaviour
 
         RaycastHit2D[][] allHits = GetHits(weapon, position, direction);
 
-        bool hitSomething = false;
-
         foreach (RaycastHit2D[] hits in allHits) 
         {
             foreach (RaycastHit2D hit in hits)
@@ -175,18 +173,17 @@ public class CombatSystem : NetworkBehaviour
                         if (hit.transform.GetComponentInChildren<PlayerName>().Username != username)
                         {
                             if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
-                                enemyHealth.TakeDamage(weapon.Damage);
+                                //enemyHealth.TakeDamage(weapon.Damage);
+                                DamagePlayerServer(hit.transform.gameObject, weapon.Damage, weapon.Name);
                             }
                             var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
 
-                            hitSomething = true;
                         }
                     }
                     else if (hit.transform.GetComponentInChildren<Weapon>() == null)
                     {
                         var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
 
-                        hitSomething = true;
                         break;
                     }
                 }
@@ -194,6 +191,11 @@ public class CombatSystem : NetworkBehaviour
         }
 
         AddBloom(weapon);
+    }
+
+    private void DamagePlayerServer(GameObject playerHit, int damage, string weaponName)
+    {
+        PlayerManager.Instance.DamagePlayer(playerHit.GetInstanceID(), damage, gameObject.GetInstanceID(), weaponName);
     }
 
     private RaycastHit2D[][] GetHits(WeaponInfo weapon, Vector3 position, Vector3 direction)

@@ -57,3 +57,9 @@ TagManager:
   - name: DamageMask
     uniqueID: 2593454533
     locked: 0
+  - name: Weapon
+    uniqueID: 3791316063
+    locked: 0
+  - name: DamageIndicator
+    uniqueID: 3456797297
+    locked: 0

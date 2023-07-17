@@ -30,9 +30,6 @@ public class AnimationSystem : NetworkBehaviour
     [SerializeField]
     private SpriteRenderer _damagedSpriteRenderer;
 
-    [SerializeField]
-    private Mode _currentMode = Mode.Parkour;
-
 
 
     private PlayerInputValues _playerInput;
