@@ -19,9 +19,7 @@ public class PlayerHealth : NetworkBehaviour
     public UnityEvent OnDeath;
 
     [SerializeField]
-    private TMP_Text _healthText;
-
-    private RespawnManager _respawnManager;
+    private GameObject _damageIndicatorPrefab;
 
     public override void OnStartClient()
     {
@@ -35,33 +33,33 @@ public class PlayerHealth : NetworkBehaviour
         base.OnStartServer();
 
         OnDeath = OnDeath ?? new UnityEvent();
-
-        _respawnManager = GetComponent<RespawnManager>();
-
-        _respawnManager.OnRespawn.AddListener(ResetHealth);
-    }
-
-    private void Update()
-    {
-        _healthText.text = $"Health: {Health.ToString()}";
-
-        if (!base.IsServer) return;
-
-        if (Health <= 0)
-        {
-            OnDeath.Invoke();
-        }
     }
 
     [Server]
     public void TakeDamage(int damage)
     {
-        if (!base.IsOwner) return;
 
-        Health -= damage;
+        Health = PlayerManager.Instance.Players[gameObject.GetInstanceID()].Health;
+
+        // Spawn damage indicator
+        GameObject damageIndicator = Instantiate(_damageIndicatorPrefab, transform.position, Quaternion.identity);
+        damageIndicator.GetComponentInChildren<DamageIndicator>().SetDamageValue(damage);
+
+        if (base.IsHost) return;
+
+        // Spawn damage indicator on clients
+        SpawnDamageIndicatorObserversRpc(transform.position, damage);
     }
 
-    private void ResetHealth()
+    [ObserversRpc]
+    private void SpawnDamageIndicatorObserversRpc(Vector3 position, int damage)
+    {
+        GameObject damageIndicator = Instantiate(_damageIndicatorPrefab, position, Quaternion.identity);
+        damageIndicator.GetComponentInChildren<DamageIndicator>().SetDamageValue(damage);
+    }
+
+    [Server]
+    public void ResetHealth()
     {
         Health = 100;
     }

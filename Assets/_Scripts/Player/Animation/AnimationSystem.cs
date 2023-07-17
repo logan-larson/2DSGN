@@ -19,15 +19,7 @@ public class AnimationSystem : NetworkBehaviour
     // Bones
     GameObject boneBody;
 
-    // Child sprite
-    //public Transform childSprite;
-
     public float lerpValue = 0.1f;
-
-    [SerializeField]
-    private SpriteRenderer _quad;
-    [SerializeField]
-    private SpriteRenderer _bi;
 
     [SerializeField]
     private Sprite _quadSprite;
@@ -35,9 +27,8 @@ public class AnimationSystem : NetworkBehaviour
     private Sprite _biSprite;
     [SerializeField]
     private SpriteRenderer _spriteRenderer;
-
     [SerializeField]
-    private Mode _currentMode = Mode.Parkour;
+    private SpriteRenderer _damagedSpriteRenderer;
 
 
 
@@ -74,11 +65,13 @@ public class AnimationSystem : NetworkBehaviour
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
 
         _spriteRenderer.sprite = _quadSprite;
+        _damagedSpriteRenderer.sprite = _quadSprite;
     }
 
     private void OnChangeToCombatMode()
     {
         _spriteRenderer.sprite = _biSprite;
+        _damagedSpriteRenderer.sprite = _biSprite;
         OnChangeToCombatModeServer();
     }
 
@@ -86,6 +79,7 @@ public class AnimationSystem : NetworkBehaviour
     private void OnChangeToCombatModeServer()
     {
         _spriteRenderer.sprite = _biSprite;
+        _damagedSpriteRenderer.sprite = _biSprite;
         OnChangeToCombatModeObservers();
     }
 
@@ -93,11 +87,13 @@ public class AnimationSystem : NetworkBehaviour
     private void OnChangeToCombatModeObservers()
     {
         _spriteRenderer.sprite = _biSprite;
+        _damagedSpriteRenderer.sprite = _biSprite;
     }
 
     private void OnChangeToParkourMode()
     {
         _spriteRenderer.sprite = _quadSprite;
+        _damagedSpriteRenderer.sprite = _quadSprite;
         OnChangeToParkourModeServer();
     }
 
@@ -105,6 +101,7 @@ public class AnimationSystem : NetworkBehaviour
     private void OnChangeToParkourModeServer()
     {
         _spriteRenderer.sprite = _quadSprite;
+        _damagedSpriteRenderer.sprite = _quadSprite;
         OnChangeToParkourModeObservers();
     }
 
@@ -112,5 +109,6 @@ public class AnimationSystem : NetworkBehaviour
     private void OnChangeToParkourModeObservers()
     {
         _spriteRenderer.sprite = _quadSprite;
+        _damagedSpriteRenderer.sprite = _quadSprite;
     }
 }

@@ -1,5 +1,9 @@
 # Squirrels Gone Nuts - Master's Capstone Project
 
+## Current Project Timeline
+
+![Alt text](/Assets/Sprites/README_Images/Gantt.png?raw=true "Project Timeline")
+
 ## Objective
 
 Build a fast-paced, 2D, multiplayer, arena shooter. This project aims to develop a multiplayer videogame that produces a competitive
