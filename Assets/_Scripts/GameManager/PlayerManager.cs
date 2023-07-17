@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using FishNet.Object;
+using FishNet.Connection;
 
 public class PlayerManager : NetworkBehaviour
 {
@@ -19,26 +20,36 @@ public class PlayerManager : NetworkBehaviour
     
     public Dictionary<int, Player> Players = new Dictionary<int, Player>();
 
-    public void DamagePlayer(int playerID, int damage, int attackerID, string weaponName)
+    public void DamagePlayer(int playerID, int damage, int attackerID, string weaponName, NetworkConnection playerConn = null)
     {
         if (!base.IsServer) return;
 
-        Players[playerID].Health -= damage;
+        var player = Players[playerID];
+        var attacker = Players[attackerID];
 
-        Players[playerID].PlayerHealth.TakeDamage(damage);
+        if (player.IsDead) return;
 
-        if (Players[playerID].Health <= 0 && !Players[playerID].IsDead)
+        player.Health -= damage;
+
+        player.PlayerHealth.TakeDamage(damage);
+
+
+        if (player.Health <= 0)
         {
-            Players[playerID].IsDead = true;
+            player.IsDead = true;
 
             PlayerKilled(playerID, attackerID, weaponName);
+
+            if (playerConn != null)
+            {
+                player.GameObject.GetComponent<CameraManager>().SetPlayerFollowTargetRpc(player.Connection, attacker.GameObject);
+            }
         }    
     }
 
     private void PlayerKilled(int playerID, int attackerID, string weaponName)
     {
 
-        //Debug.Log($"Player {Players[playerID].Username} killed by {Players[attackerID].Username}");
         var attackerUsername = attackerID == -1 ? "Suicide" : Players[attackerID].Username;
 
         OnPlayerKilled.Invoke(Players[playerID].Username, attackerUsername, weaponName);
@@ -70,5 +81,7 @@ public class PlayerManager : NetworkBehaviour
         public int Health { get; set; }
         public bool IsDead { get; set; }
         public PlayerHealth PlayerHealth { get; set; }
+        public GameObject GameObject { get; set; }
+        public NetworkConnection Connection { get; set; }
     }
 }

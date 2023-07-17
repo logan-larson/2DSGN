@@ -3,6 +3,7 @@ using FishNet.Object;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using FishNet.Connection;
 
 /**
 <summary>
@@ -173,16 +174,16 @@ public class CombatSystem : NetworkBehaviour
                         if (hit.transform.GetComponentInChildren<PlayerName>().Username != username)
                         {
                             if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
-                                //enemyHealth.TakeDamage(weapon.Damage);
-                                DamagePlayerServer(hit.transform.gameObject, weapon.Damage, weapon.Name);
+                                var nob = hit.transform.GetComponent<NetworkObject>();
+                                DamagePlayerServer(hit.transform.gameObject, weapon.Damage, weapon.Name, nob.LocalConnection);
                             }
-                            var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
+                            //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
 
                         }
                     }
                     else if (hit.transform.GetComponentInChildren<Weapon>() == null)
                     {
-                        var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
+                        //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
 
                         break;
                     }
@@ -193,9 +194,9 @@ public class CombatSystem : NetworkBehaviour
         AddBloom(weapon);
     }
 
-    private void DamagePlayerServer(GameObject playerHit, int damage, string weaponName)
+    private void DamagePlayerServer(GameObject playerHit, int damage, string weaponName, NetworkConnection playerConn)
     {
-        PlayerManager.Instance.DamagePlayer(playerHit.GetInstanceID(), damage, gameObject.GetInstanceID(), weaponName);
+        PlayerManager.Instance.DamagePlayer(playerHit.GetInstanceID(), damage, gameObject.GetInstanceID(), weaponName, playerConn);
     }
 
     private RaycastHit2D[][] GetHits(WeaponInfo weapon, Vector3 position, Vector3 direction)

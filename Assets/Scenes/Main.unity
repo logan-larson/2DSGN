@@ -4064,12 +4064,13 @@ MonoBehaviour:
   <SceneId>k__BackingField: 1693455143686878468
   <AssetPathHash>k__BackingField: 0
   _sceneNetworkObjects:
-  - {fileID: 1475965011}
+  - {fileID: 1919249585}
   - {fileID: 211285961}
   - {fileID: 596029611}
   - {fileID: 875225096}
   - {fileID: 905765988}
   - {fileID: 1159364315}
+  - {fileID: 1475965011}
   - {fileID: 1691890811}
 --- !u!114 &875225097
 MonoBehaviour:
@@ -6037,12 +6038,13 @@ MonoBehaviour:
   <SceneId>k__BackingField: 1693455147380624972
   <AssetPathHash>k__BackingField: 0
   _sceneNetworkObjects:
-  - {fileID: 1475965011}
+  - {fileID: 1919249585}
   - {fileID: 211285961}
   - {fileID: 596029611}
   - {fileID: 875225096}
   - {fileID: 905765988}
   - {fileID: 1159364315}
+  - {fileID: 1475965011}
   - {fileID: 1691890811}
 --- !u!1 &1519694960
 GameObject:
@@ -13069,6 +13071,7 @@ GameObject:
   - component: {fileID: 1919249583}
   - component: {fileID: 1919249582}
   - component: {fileID: 1919249584}
+  - component: {fileID: 1919249585}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -13088,6 +13091,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 661bbfcdf6f7bc0408827e35d5a7e505, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 1919249585}
+  _networkObjectCache: {fileID: 1919249585}
   cam: {fileID: 1919249584}
   player: {fileID: 0}
   posLerpValue: 0.05
@@ -13152,6 +13158,41 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1919249585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919249581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <IsNested>k__BackingField: 0
+  <ComponentIndex>k__BackingField: 0
+  _networkBehaviours:
+  - {fileID: 1919249582}
+  <ParentNetworkObject>k__BackingField: {fileID: 0}
+  <ChildNetworkObjects>k__BackingField: []
+  _isNetworked: 1
+  _isGlobal: 0
+  _defaultDespawnType: 0
+  NetworkObserver: {fileID: 0}
+  <PrefabId>k__BackingField: -1
+  _scenePathHash: 394288251
+  <SceneId>k__BackingField: 1693455144315272825
+  <AssetPathHash>k__BackingField: 0
+  _sceneNetworkObjects:
+  - {fileID: 1919249585}
+  - {fileID: 211285961}
+  - {fileID: 596029611}
+  - {fileID: 875225096}
+  - {fileID: 905765988}
+  - {fileID: 1159364315}
+  - {fileID: 1475965011}
+  - {fileID: 1691890811}
 --- !u!4 &2088536037 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8205171986642942063, guid: 6da586fca7afcb84eade92da06a66e19, type: 3}
