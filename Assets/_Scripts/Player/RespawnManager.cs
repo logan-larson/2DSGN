@@ -37,7 +37,12 @@ public class RespawnManager : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            _playerHealth.TakeDamage(100);
+            PlayerManager.Instance.DamagePlayer(gameObject.GetInstanceID(), 100, -1, "Revolver");
+        }
+
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            PlayerManager.Instance.DamagePlayer(gameObject.GetInstanceID(), 7, -1, "Revolver");
         }
     }
 
@@ -53,6 +58,8 @@ public class RespawnManager : NetworkBehaviour
         yield return new WaitForSeconds(0f);
 
         OnRespawn.Invoke();
+
+        PlayerManager.Instance.RespawnPlayer(gameObject.GetInstanceID());
 
         Vector3 spawnPosition = _spawnPositions[Random.Range(0, _spawnPositions.Count)];
 

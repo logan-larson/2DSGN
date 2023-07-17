@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ada55423a3fc24f4a89b5b97832169dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 9
+  _componentIndexCache: 10
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   Username: 
@@ -415,6 +415,7 @@ GameObject:
   - component: {fileID: 3545057823035152873}
   - component: {fileID: 6537912511236322679}
   - component: {fileID: 1072261995597177620}
+  - component: {fileID: 1690121214485609034}
   m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
@@ -588,7 +589,6 @@ MonoBehaviour:
   _biSprite: {fileID: 21300000, guid: 152097aa19fdca14b87308dae6ac74a6, type: 3}
   _spriteRenderer: {fileID: 5389636029938750216}
   _damagedSpriteRenderer: {fileID: 2005276591024148065}
-  _currentMode: 0
 --- !u!114 &4268827610097334069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -634,6 +634,7 @@ MonoBehaviour:
   - {fileID: 6483848118584978808}
   - {fileID: 3545057823035152873}
   - {fileID: 6537912511236322679}
+  - {fileID: 1690121214485609034}
   - {fileID: 6413919363218253851}
   - {fileID: 223301570187018686}
   - {fileID: 7084400194756443070}
@@ -752,7 +753,6 @@ MonoBehaviour:
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
-  _healthText: {fileID: 0}
   _damageIndicatorPrefab: {fileID: 3693752882580872442, guid: dc8c980b93d120147ad8cbb5e2d5233d, type: 3}
 --- !u!114 &6483848118584978808
 MonoBehaviour:
@@ -835,6 +835,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf950f1d63d34974a8cf69fc61e1e0a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1690121214485609034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4268827610097334048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93aef17e833e54240a3e052777843362, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 9
+  _addedNetworkObject: {fileID: 5020579654786682326}
+  _networkObjectCache: {fileID: 5020579654786682326}
+  _playerHealth: {fileID: 1707328605495123278}
 --- !u!1 &6111030698262587285
 GameObject:
   m_ObjectHideFlags: 0
@@ -883,7 +899,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21751bfdbf288504a91caf95ebb77c9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 11
+  _componentIndexCache: 12
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   InputSystem: {fileID: 4268827610097334073}
@@ -1046,7 +1062,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 347d0fb66e3b4b1489dabcc2b5b6aa3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 10
+  _componentIndexCache: 11
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   _movementProperties: {fileID: 11400000, guid: 70099ab69eee19c4cad9e629a3eb4742, type: 2}
@@ -1422,25 +1438,13 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2973064127713107434, guid: 82b3a8527518cea4f8912f67a7338e68, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6059912039733264002, guid: 82b3a8527518cea4f8912f67a7338e68, type: 3}
       propertyPath: m_Name
       value: SMG
       objectReference: {fileID: 0}
-    - target: {fileID: 6059912039733264002, guid: 82b3a8527518cea4f8912f67a7338e68, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8598898094873270413, guid: 82b3a8527518cea4f8912f67a7338e68, type: 3}
       propertyPath: <IsNested>k__BackingField
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8598898094873270413, guid: 82b3a8527518cea4f8912f67a7338e68, type: 3}
-      propertyPath: <ComponentIndex>k__BackingField
-      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8598898094873270413, guid: 82b3a8527518cea4f8912f67a7338e68, type: 3}
       propertyPath: <ParentNetworkObject>k__BackingField
@@ -1515,25 +1519,13 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2973064127713107434, guid: dea2769fc51e9e3489d1b50c939a723d, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6059912039733264002, guid: dea2769fc51e9e3489d1b50c939a723d, type: 3}
       propertyPath: m_Name
       value: Sniper
       objectReference: {fileID: 0}
-    - target: {fileID: 6059912039733264002, guid: dea2769fc51e9e3489d1b50c939a723d, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6965038925219821015, guid: dea2769fc51e9e3489d1b50c939a723d, type: 3}
       propertyPath: <IsNested>k__BackingField
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6965038925219821015, guid: dea2769fc51e9e3489d1b50c939a723d, type: 3}
-      propertyPath: <ComponentIndex>k__BackingField
-      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6965038925219821015, guid: dea2769fc51e9e3489d1b50c939a723d, type: 3}
       propertyPath: <ParentNetworkObject>k__BackingField
@@ -1569,10 +1561,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -7738960433620130544, guid: 3eec599d95e59d54f8211e788e0e679f, type: 3}
-      propertyPath: <ComponentIndex>k__BackingField
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: -7738960433620130544, guid: 3eec599d95e59d54f8211e788e0e679f, type: 3}
       propertyPath: <ParentNetworkObject>k__BackingField
       value: 
       objectReference: {fileID: 7300643456147865250}
@@ -1620,17 +1608,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2973064127713107434, guid: 3eec599d95e59d54f8211e788e0e679f, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6059912039733264002, guid: 3eec599d95e59d54f8211e788e0e679f, type: 3}
       propertyPath: m_Name
       value: Shotgun
-      objectReference: {fileID: 0}
-    - target: {fileID: 6059912039733264002, guid: 3eec599d95e59d54f8211e788e0e679f, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3eec599d95e59d54f8211e788e0e679f, type: 3}
@@ -1662,10 +1642,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -5709648262544161962, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
-      propertyPath: <ComponentIndex>k__BackingField
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: -5709648262544161962, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
       propertyPath: <ParentNetworkObject>k__BackingField
       value: 
       objectReference: {fileID: 7300643456147865250}
@@ -1713,17 +1689,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2973064127713107434, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6059912039733264002, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
       propertyPath: m_Name
       value: Revolver
-      objectReference: {fileID: 0}
-    - target: {fileID: 6059912039733264002, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
-      propertyPath: m_TagString
-      value: Weapon
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a993f1a6d3e9dd94481e48d6f9000389, type: 3}
@@ -1755,10 +1723,6 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -5875584354621863892, guid: 7cc334eb39f72f84fa1bf1d6ca1dfac5, type: 3}
-      propertyPath: <ComponentIndex>k__BackingField
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: -5875584354621863892, guid: 7cc334eb39f72f84fa1bf1d6ca1dfac5, type: 3}
       propertyPath: <ParentNetworkObject>k__BackingField
       value: 
       objectReference: {fileID: 7300643456147865250}
@@ -1806,21 +1770,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2973064127713107434, guid: 7cc334eb39f72f84fa1bf1d6ca1dfac5, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6059912039733264002, guid: 7cc334eb39f72f84fa1bf1d6ca1dfac5, type: 3}
       propertyPath: m_Name
       value: Rifle
-      objectReference: {fileID: 0}
-    - target: {fileID: 6059912039733264002, guid: 7cc334eb39f72f84fa1bf1d6ca1dfac5, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6059912039733264002, guid: 7cc334eb39f72f84fa1bf1d6ca1dfac5, type: 3}
-      propertyPath: m_TagString
-      value: Weapon
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7cc334eb39f72f84fa1bf1d6ca1dfac5, type: 3}
