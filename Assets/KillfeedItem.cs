@@ -14,8 +14,6 @@ public class KillfeedItem : MonoBehaviour
 
     public void Setup(string playerKilledUsername, string killerUsername, string weaponName)
     {
-        Debug.Log("KillfeedItem Setup");
-
         _playerKilled.text = playerKilledUsername;
 
         foreach (var weaponObject in _weaponObjects)

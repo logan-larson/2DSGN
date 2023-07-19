@@ -16,5 +16,8 @@ MonoBehaviour:
   Damage: 110
   FireRate: 1.5
   Range: 20
-  ReloadTime: 0
-  ClipSize: 0
+  IsAutomatic: 1
+  BulletsPerShot: 1
+  SpreadAngle: 0
+  MaxBloomAngle: 1
+  BloomAngleIncreasePerShot: 0

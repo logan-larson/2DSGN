@@ -48,6 +48,8 @@ public class RespawnManager : NetworkBehaviour
 
     private void Respawn()
     {
+        transform.position = new Vector3(0, 80f, 0);
+
         // Delay respawn
         StartCoroutine(RespawnCoroutine());
     }
@@ -55,7 +57,7 @@ public class RespawnManager : NetworkBehaviour
     private IEnumerator RespawnCoroutine()
     {
         // No delay for now, until I can make the player invulnerable
-        yield return new WaitForSeconds(0f);
+        yield return new WaitForSeconds(3f);
 
         OnRespawn.Invoke();
 

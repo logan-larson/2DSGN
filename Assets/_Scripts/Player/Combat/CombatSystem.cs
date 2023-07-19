@@ -3,6 +3,8 @@ using FishNet.Object;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using FishNet.Connection;
+using FishNet.Object.Synchronizing;
 
 /**
 <summary>
@@ -37,6 +39,9 @@ public class CombatSystem : NetworkBehaviour
     private LineRenderer _bullet;
 
     private float _shootTimer = 0f;
+    private float _bloomTimer = 0f;
+
+    [SyncVar]
     private bool _isShooting = false;
 
     private Vector3 _aimDirection = Vector3.zero;
@@ -61,6 +66,8 @@ public class CombatSystem : NetworkBehaviour
         _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
         _weaponEquipManager = _weaponEquipManager ?? GetComponent<WeaponEquipManager>();
 
+        _weaponEquipManager.ChangeWeapon.AddListener(OnWeaponChanged);
+
         _input = _inputSystem.InputValues;
     }
 
@@ -74,29 +81,47 @@ public class CombatSystem : NetworkBehaviour
         _input = _inputSystem.InputValues;
     }
 
+    private void OnWeaponChanged()
+    {
+        // When you switch weapons, allow the player to shoot right away
+        _shootTimer = _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate;
+    }
+
     private void Update()
     {
-        if (!base.IsOwner) return;
-
-        if (_weaponEquipManager.CurrentWeapon == null)
+        if (base.IsOwner)
         {
-            Debug.Log("No weapon");
-            return;
+            if (_weaponEquipManager.CurrentWeapon == null)
+            {
+                Debug.Log("No weapon");
+                return;
+            }
+
+            UpdateAimDirection();
+
+            if (_shootTimer < _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate)
+            {
+                _shootTimer += Time.deltaTime;
+                return;
+            }
+
+            CheckShoot();
         }
 
-        UpdateAimDirection();
-
-        if (_shootTimer < _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate)
+        if (base.IsServer)
         {
-            _shootTimer += Time.deltaTime;
-            return;
-        }
-
-        CheckShoot();
-
-        if (!_isShooting)
-        {
-            SubtractBloom(_weaponEquipManager.CurrentWeapon.WeaponInfo);
+            if (!_isShooting)
+            {
+                if (_bloomTimer > _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate)
+                {
+                    SubtractBloom(_weaponEquipManager.CurrentWeapon.WeaponInfo);
+                    _bloomTimer = 0f;
+                }
+                else
+                {
+                    _bloomTimer += Time.deltaTime;
+                }
+            }
         }
     }
 
@@ -130,7 +155,8 @@ public class CombatSystem : NetworkBehaviour
 
     }
 
-    public void SetIsShooting(bool isShooting)
+    [ServerRpc]
+    public void SetIsShootingServerRpc(bool isShooting)
     {
         _isShooting = isShooting;
     }
@@ -148,8 +174,6 @@ public class CombatSystem : NetworkBehaviour
         if (_shootTimer < _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate) return;
 
         _shootTimer = 0f;
-
-        Debug.DrawRay(transform.position, _aimDirection * _weaponEquipManager.CurrentWeapon.WeaponInfo.Range, Color.red, 1f);
 
         // TODO: Change bullet spawn location to be related to WeaponInfo.MuzzlePosition
         ShootServer(_weaponEquipManager.CurrentWeapon.WeaponInfo, _weaponHolder.transform.position, _aimDirection, UserInfo.Username);
@@ -173,16 +197,16 @@ public class CombatSystem : NetworkBehaviour
                         if (hit.transform.GetComponentInChildren<PlayerName>().Username != username)
                         {
                             if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
-                                //enemyHealth.TakeDamage(weapon.Damage);
-                                DamagePlayerServer(hit.transform.gameObject, weapon.Damage, weapon.Name);
+                                var nob = hit.transform.GetComponent<NetworkObject>();
+                                DamagePlayerServer(hit.transform.gameObject, weapon.Damage, weapon.Name, nob.LocalConnection);
                             }
-                            var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
+                            //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
 
                         }
                     }
                     else if (hit.transform.GetComponentInChildren<Weapon>() == null)
                     {
-                        var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
+                        //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
 
                         break;
                     }
@@ -193,9 +217,9 @@ public class CombatSystem : NetworkBehaviour
         AddBloom(weapon);
     }
 
-    private void DamagePlayerServer(GameObject playerHit, int damage, string weaponName)
+    private void DamagePlayerServer(GameObject playerHit, int damage, string weaponName, NetworkConnection playerConn)
     {
-        PlayerManager.Instance.DamagePlayer(playerHit.GetInstanceID(), damage, gameObject.GetInstanceID(), weaponName);
+        PlayerManager.Instance.DamagePlayer(playerHit.GetInstanceID(), damage, gameObject.GetInstanceID(), weaponName, playerConn);
     }
 
     private RaycastHit2D[][] GetHits(WeaponInfo weapon, Vector3 position, Vector3 direction)
@@ -207,6 +231,7 @@ public class CombatSystem : NetworkBehaviour
             hits = new RaycastHit2D[1][];
 
             var currentBloom = _weaponEquipManager.CurrentWeapon.CurrentBloom;
+            Debug.Log(currentBloom);
             Vector3 bloomDir= Quaternion.Euler(0f, 0f, Random.Range(-currentBloom, currentBloom)) * direction;
 
             hits[0] = Physics2D.RaycastAll(position, bloomDir, weapon.Range, ~nonHittable);
@@ -297,6 +322,8 @@ public class CombatSystem : NetworkBehaviour
 
         _weaponEquipManager.CurrentWeapon.CurrentBloom += weapon.BloomAngleIncreasePerShot;
 
+        Debug.Log("Adding Bloom");
+
         if (_weaponEquipManager.CurrentWeapon.CurrentBloom > weapon.MaxBloomAngle)
             _weaponEquipManager.CurrentWeapon.CurrentBloom = weapon.MaxBloomAngle;
     }
@@ -305,7 +332,7 @@ public class CombatSystem : NetworkBehaviour
     {
         if (weapon.BulletsPerShot != 1) return;
 
-        _weaponEquipManager.CurrentWeapon.CurrentBloom -= weapon.MaxBloomAngle * Time.deltaTime;
+        _weaponEquipManager.CurrentWeapon.CurrentBloom -= weapon.BloomAngleIncreasePerShot * 1.5f;
 
         if (_weaponEquipManager.CurrentWeapon.CurrentBloom < 0f)
             _weaponEquipManager.CurrentWeapon.CurrentBloom = 0f;

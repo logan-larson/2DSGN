@@ -1,3 +1,5 @@
+using FishNet.Connection;
+using FishNet.Object;
 using UnityEngine;
 
 /**
@@ -5,10 +7,10 @@ using UnityEngine;
 CameraController moves the camera's position and rotation to follow the player's position and rotation.
 </summary>
 */
-public class CameraController : MonoBehaviour
+public class CameraController : NetworkBehaviour
 {
     [SerializeField] private Camera cam;
-    [SerializeField] private Transform player = null;
+    public Transform player = null;
     [SerializeField] private float posLerpValue = 0.05f;
     [SerializeField] private float rotLerpValue = 0.05f;
 
@@ -19,6 +21,8 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float zFactor = 0.4f;
 
     private MovementSystem movementSystem;
+
+    public float CurrentZ => this.transform.position.z;
 
 
     private void Awake()
@@ -36,6 +40,12 @@ public class CameraController : MonoBehaviour
     {
         player = obj;
         movementSystem = go.GetComponent<MovementSystem>();
+        go.GetComponent<CameraManager>().SetCamera(cam, this);
+    }
+
+    public void SetPlayer(Transform player)
+    {
+        this.player = player;
     }
 
 

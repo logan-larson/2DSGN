@@ -63,7 +63,7 @@ public class InputSystem : MonoBehaviour
     {
         InputValues.IsFirePressed = value.Get<float>() == 1f;
 
-        _combatSystem.SetIsShooting(value.Get<float>() == 1f);
+        _combatSystem.SetIsShootingServerRpc(value.Get<float>() == 1f);
 
         if (InputValues.IsFirePressed)
             _modeManager.ChangeToCombatMode();

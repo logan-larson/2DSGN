@@ -14,12 +14,14 @@ public class PlayerInitializer : NetworkBehaviour
         base.OnStartClient();
 
         InitializeServerRpc();
+
+        Cursor.visible = false;
     }
 
     [ServerRpc]
     private void InitializeServerRpc()
     {
-        PlayerManager.Instance.Players.Add(gameObject.GetInstanceID(), new PlayerManager.Player() { Health = 100, Username = "user123", PlayerHealth = _playerHealth });
+        PlayerManager.Instance.Players.Add(gameObject.GetInstanceID(), new PlayerManager.Player() { Health = 100, Username = "user123", PlayerHealth = _playerHealth, GameObject = gameObject, Connection = base.Owner });
     }
 
 }
