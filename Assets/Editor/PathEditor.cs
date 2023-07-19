@@ -27,16 +27,16 @@ public class PathEditor : Editor
             Creator.CreatePath();
         }
 
-        if (GUILayout.Button("Set Collider"))
-        {
-            Undo.RecordObject(Creator, "Set Collider");
-            Creator.SetCollider();
-        }
-
         if (GUILayout.Button("Match Sprite Shape Spline"))
         {
             Undo.RecordObject(Creator, "Match Sprite Shape Spline");
             Creator.MatchSpriteShapeSpline();
+        }
+
+        if (GUILayout.Button("Set Collider"))
+        {
+            Undo.RecordObject(Creator, "Set Collider");
+            Creator.SetCollider();
         }
 
         bool isClosed = GUILayout.Toggle(_path.IsClosed, "Closed");
