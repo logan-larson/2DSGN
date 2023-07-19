@@ -6,6 +6,7 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using System.Linq;
 using static ModeManager;
+using UnityEngine.Events;
 
 public class WeaponEquipManager : NetworkBehaviour
 {
@@ -31,6 +32,8 @@ public class WeaponEquipManager : NetworkBehaviour
     public Weapon[] Weapons { get; private set; }
 
     public Weapon CurrentWeapon => Weapons[_currentWeaponIndex];
+
+    public UnityEvent ChangeWeapon = new UnityEvent();
 
     private int _currentWeaponIndex = 0;
 
@@ -253,6 +256,8 @@ public class WeaponEquipManager : NetworkBehaviour
         if (Owner.ClientId == clientId)
         {
             _currentWeaponIndex = index;
+
+            ChangeWeapon.Invoke();
         }
     }
 

@@ -14,6 +14,8 @@ public class PlayerInitializer : NetworkBehaviour
         base.OnStartClient();
 
         InitializeServerRpc();
+
+        Cursor.visible = false;
     }
 
     [ServerRpc]

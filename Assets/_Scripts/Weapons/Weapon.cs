@@ -19,6 +19,7 @@ public class Weapon : NetworkBehaviour
     [SerializeField]
     private WeaponEquipManager _weaponEquipManager;
 
+    [SyncVar]
     public float CurrentBloom = 0f;
 
     [SyncVar (OnChange = nameof(ToggleWeaponSprite))]

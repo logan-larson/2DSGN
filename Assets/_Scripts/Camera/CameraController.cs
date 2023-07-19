@@ -22,6 +22,8 @@ public class CameraController : NetworkBehaviour
 
     private MovementSystem movementSystem;
 
+    public float CurrentZ => this.transform.position.z;
+
 
     private void Awake()
     {
