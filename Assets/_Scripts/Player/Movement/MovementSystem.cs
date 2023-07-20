@@ -36,6 +36,7 @@ public class MovementSystem : NetworkBehaviour
         public bool IsGrounded;
         public bool InParkourMode;
         public bool InCombatMode;
+        public float TimeOnGround;
     }
 
     /// <summary>
@@ -110,6 +111,12 @@ public class MovementSystem : NetworkBehaviour
     /// </summary>
     [SerializeField]
     private float _timeSinceGrounded = 0f;
+
+    /// <summary>
+    /// Time since player has been grounded, used for jumping and re-enabling grounded.
+    /// </summary>
+    [SerializeField]
+    private float _timeOnGround = 0f;
 
     /// <summary>
     /// True if the player is allowed to jump.
@@ -228,7 +235,8 @@ public class MovementSystem : NetworkBehaviour
                 Rotation = new Quaternion(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w),
                 IsGrounded = _isGrounded,
                 InParkourMode = _inParkourMode,
-                InCombatMode = _inCombatMode
+                InCombatMode = _inCombatMode,
+                TimeOnGround = _timeOnGround
             };
 
             Reconciliation(reconcileData, true);
@@ -290,6 +298,7 @@ public class MovementSystem : NetworkBehaviour
         _isGrounded = data.IsGrounded;
         _inParkourMode = data.InParkourMode;
         _inCombatMode = data.InCombatMode;
+        _timeOnGround = data.TimeOnGround;
     }
 
     private void UpdateMode(MoveData moveData = new MoveData())
@@ -323,13 +332,18 @@ public class MovementSystem : NetworkBehaviour
 
     private void UpdateGrounded()
     {
+        if (_isGrounded && _timeOnGround <= MovementProperties.MinimumJumpTime * 2f)
+            _timeOnGround += (float)TimeManager.TickDelta;
+        else if (!_isGrounded)
+            _timeOnGround = 0f;
+
         // If the player is currently grounded, check if they are still grounded and set ground distance
         if (_isGrounded || _timeSinceGrounded > MovementProperties.MinimumJumpTime)
         {
             RaycastHit2D groundedHit = Physics2D.Raycast(transform.position, -transform.up, MovementProperties.GroundedHeight, MovementProperties.ObstacleMask);
             _isGrounded = groundedHit.collider != null;
             _groundDistance = groundedHit.distance;
-            if (_isGrounded)
+            if (_isGrounded && _timeOnGround > MovementProperties.MinimumJumpTime * 2f)
                 _canJump = true;
         }
         // Otherwise, increase the time since grounded

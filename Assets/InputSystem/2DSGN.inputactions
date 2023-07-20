@@ -36,7 +36,7 @@
                     "name": "Jump",
                     "type": "Value",
                     "id": "c26de51c-55b3-45d8-8fb3-a1e14d2e0a7f",
-                    "expectedControlType": "",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -370,7 +370,7 @@
                 {
                     "name": "",
                     "id": "c09d8fa9-9a5c-44f1-acfb-d53ae8f0e7d3",
-                    "path": "<Keyboard>/leftCtrl",
+                    "path": "<Keyboard>/leftAlt",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
