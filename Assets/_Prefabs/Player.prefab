@@ -568,6 +568,7 @@ MonoBehaviour:
   MovementProperties: {fileID: 11400000, guid: 70099ab69eee19c4cad9e629a3eb4742, type: 2}
   _currentVelocity: {x: 0, y: 0, z: 0}
   _timeSinceGrounded: 0
+  _timeOnGround: 0
   _inParkourMode: 1
   _inCombatMode: 0
   groundChangeSpeed: 2
@@ -858,6 +859,8 @@ MonoBehaviour:
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   _playerHealth: {fileID: 1707328605495123278}
+  _crosshair: {fileID: 8990207482072156506}
+  _lineRenderer: {fileID: 5339978170091014856}
 --- !u!114 &3251875225647411122
 MonoBehaviour:
   m_ObjectHideFlags: 0

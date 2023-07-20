@@ -35,20 +35,21 @@ public class RespawnManager : NetworkBehaviour
     {
         if (!base.IsOwner) return;
 
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.P))
         {
-            PlayerManager.Instance.DamagePlayer(gameObject.GetInstanceID(), 100, -1, "Revolver");
+            ForceRespawnServerRpc(gameObject.GetInstanceID());
         }
+    }
 
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            PlayerManager.Instance.DamagePlayer(gameObject.GetInstanceID(), 7, -1, "Revolver");
-        }
+    [ServerRpc]
+    private void ForceRespawnServerRpc(int id)
+    {
+        PlayerManager.Instance.DamagePlayer(id, 100, id, "Revolver");
     }
 
     private void Respawn()
     {
-        transform.position = new Vector3(0, 80f, 0);
+        transform.SetPositionAndRotation(new Vector3(0, 80f, 0), Quaternion.identity);
 
         // Delay respawn
         StartCoroutine(RespawnCoroutine());

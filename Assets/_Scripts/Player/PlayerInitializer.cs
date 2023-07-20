@@ -9,6 +9,12 @@ public class PlayerInitializer : NetworkBehaviour
     [SerializeField]
     private PlayerHealth _playerHealth;
 
+    [SerializeField]
+    private GameObject _crosshair;
+
+    [SerializeField]
+    private LineRenderer _lineRenderer;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -16,6 +22,13 @@ public class PlayerInitializer : NetworkBehaviour
         InitializeServerRpc();
 
         Cursor.visible = false;
+        
+        _lineRenderer.enabled = false;
+
+        if (!base.IsOwner)
+        {
+            _crosshair.SetActive(false);
+        }
     }
 
     [ServerRpc]

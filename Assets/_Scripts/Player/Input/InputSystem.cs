@@ -19,6 +19,10 @@ public class InputSystem : MonoBehaviour
     private CombatSystem _combatSystem;
     private WeaponEquipManager _weaponEquipManager;
     private ModeManager _modeManager;
+    private PlayerHealth _playerHealth;
+    private RespawnManager _respawnManager;
+
+    private bool _isEnabled = true;
 
     private PlayerInput _playerInput;
 
@@ -30,21 +34,33 @@ public class InputSystem : MonoBehaviour
         _playerInput = _playerInput ?? GetComponent<PlayerInput>();
         _modeManager = _modeManager ?? GetComponent<ModeManager>();
 
+        _playerHealth = _playerHealth ?? GetComponent<PlayerHealth>();
+        _playerHealth.OnDeath.AddListener(() => _isEnabled = false);
+
+        _respawnManager = _respawnManager ?? GetComponent<RespawnManager>();
+        _respawnManager.OnRespawn.AddListener(() => _isEnabled = true);
+
         InputValues = (PlayerInputValues)ScriptableObject.CreateInstance(typeof(PlayerInputValues));
     }
 
     private void Update()
     {
+        if (!_isEnabled) return;
+
         InputValues.AimInput = _playerInput.actions["Aim"].ReadValue<Vector2>();
     }
 
     public void OnMove(InputValue value)
     {
+        if (!_isEnabled) return;
+
         InputValues.HorizontalMovementInput = value.Get<Vector2>().x;
     }
 
     public void OnSprint(InputValue value)
     {
+        if (!_isEnabled) return;
+
         InputValues.IsSprintKeyPressed = value.Get<float>() == 1f;
 
         if (InputValues.IsSprintKeyPressed && !InputValues.IsFirePressed)
@@ -56,11 +72,15 @@ public class InputSystem : MonoBehaviour
     // TODO: Move these events to triggers
     public void OnJump(InputValue value)
     {
+        if (!_isEnabled) return;
+
         InputValues.IsJumpKeyPressed = value.Get<float>() == 1f;
     }
 
     public void OnFire(InputValue value)
     {
+        if (!_isEnabled) return;
+
         InputValues.IsFirePressed = value.Get<float>() == 1f;
 
         _combatSystem.SetIsShootingServerRpc(value.Get<float>() == 1f);
@@ -73,11 +93,15 @@ public class InputSystem : MonoBehaviour
 
     public void OnInteract(InputValue value)
     {
+        if (!_isEnabled) return;
+
         _weaponEquipManager.TryEquipWeapon();
     }
 
     public void OnMode(InputValue value)
     {
+        if (!_isEnabled) return;
+
         _modeManager.ChangeMode();
     }
 
