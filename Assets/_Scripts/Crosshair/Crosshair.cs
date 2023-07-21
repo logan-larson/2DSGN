@@ -10,6 +10,7 @@ public class Crosshair : NetworkBehaviour
     private WeaponEquipManager _weaponEquipManager;
     private Weapon _weapon;
     private CameraController _cameraController;
+    private InputSystem _input;
 
     [SerializeField]
     private float _minSize = 5f;
@@ -25,6 +26,7 @@ public class Crosshair : NetworkBehaviour
     private void Start()
     {
         _crosshair = GetComponent<RectTransform>();
+        _input = GetComponentInParent<InputSystem>();
     }
 
     public override void OnStartClient()
@@ -50,17 +52,30 @@ public class Crosshair : NetworkBehaviour
 
         _crosshair.sizeDelta = new Vector2(size, size);
 
-        var mousePosition = Input.mousePosition;
+        if (_input.InputValues.IsGamepad)
+        {
+            if (_input.InputValues.AimInput != Vector2.zero)
+            {
+                var aimDirection = transform.localRotation * _input.InputValues.AimInput.normalized;
 
-        if (_cameraController == null || _camera == null) return;
+                aimDirection *= 5f;
 
-        mousePosition.z = _cameraController.CurrentZ * -1f;
+                _crosshair.parent.position = transform.parent.parent.position + aimDirection;
+            }
+        }
+        else
+        {
+            var mousePosition = Input.mousePosition;
 
-        Vector3 mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
+            if (_cameraController == null || _camera == null) return;
 
-        mouseWorldPosition.z = 0f;
+            mousePosition.z = _cameraController.CurrentZ * -1f;
 
-        _crosshair.parent.position = mouseWorldPosition;
+            Vector3 mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
 
+            mouseWorldPosition.z = 0f;
+
+            _crosshair.parent.position = mouseWorldPosition;
+        }
     }
 }
