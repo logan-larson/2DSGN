@@ -24,7 +24,7 @@ MonoBehaviour:
   JumpVelocity: 10
   MinimumJumpTime: 0.1
   FFactor: 7.5
-  GroundedHeight: 1.5
+  GroundedHeight: 1.1
   ObstacleMask:
     serializedVersion: 2
     m_Bits: 64

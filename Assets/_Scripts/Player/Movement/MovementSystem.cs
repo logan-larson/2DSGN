@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using FishNet.Object;
 using FishNet.Object.Prediction;
 using UnityEngine;
@@ -137,6 +138,14 @@ public class MovementSystem : NetworkBehaviour
     /// True if the predicted landing position and normal should be recalculated.
     /// </summary>
     private bool _recalculateLanding = false;
+
+    /// <summary>
+    /// True if the landing position and normal should be recalculated in the next second.
+    /// </summary>
+    private bool _recalculateNextLanding = false;
+
+    private IEnumerator _recalculateLandingCoroutine;
+    private bool _recalculateLandingCoroutineIsRunning;
 
     /// <summary>
     /// True if the player is in parkour mode.
@@ -392,17 +401,24 @@ public class MovementSystem : NetworkBehaviour
                 _currentVelocity += transform.up * MovementProperties.JumpVelocity;
 
                 RecalculateLandingPosition();
+
+                _recalculateNextLanding = true;
+
+                _recalculateLandingCoroutine = RecalculateNextLandingCoroutine();
+
+                _recalculateLandingCoroutineIsRunning = true;
+
+                StartCoroutine(_recalculateLandingCoroutine);
             }
             // Set height relative to ground
             else
             {
-                if (_groundDistance < 0.95f)
+                _recalculateNextLanding = false;
+
+                if (_recalculateLandingCoroutineIsRunning)
                 {
-                    _currentVelocity += transform.up * groundChangeSpeed;
-                }
-                else if (_groundDistance > 1.05f)
-                {
-                    _currentVelocity -= transform.up * groundChangeSpeed;
+                    StopCoroutine(_recalculateLandingCoroutine);
+                    _recalculateLandingCoroutineIsRunning = false;
                 }
             }
         }
@@ -417,6 +433,7 @@ public class MovementSystem : NetworkBehaviour
             //recalculateLanding = false;
         }
 
+        //CheckNeedRecalc();
 
         // If we are not grounded and we have not predicted a landing position then we need to calculate it
         // Or if we manually trigger a recalculation
@@ -426,9 +443,42 @@ public class MovementSystem : NetworkBehaviour
         }
     }
 
+    private IEnumerator RecalculateNextLandingCoroutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.1f);
+
+            Vector2? normal = RecalculateNextLandingNormal();
+            Debug.Log("Recalculated normal");
+
+            if (normal != null)
+            {
+                Vector2 diff = (Vector2)_predictedNormal - (Vector2)normal;
+
+                if (diff.magnitude > 0.1f)
+                {
+                    _predictedNormal = (Vector2)normal;
+                }
+                else
+                {
+                    yield break;
+                }
+            }
+        }
+
+    }
+
     private void UpdatePosition()
     {
-        Vector3 finalPosition = transform.position + _currentVelocity * (float)TimeManager.TickDelta;
+        Vector3 changeGround = Vector3.zero;
+
+        if (_isGrounded)
+        {
+            changeGround = transform.up * (1f - _groundDistance);
+        }
+
+        Vector3 finalPosition = (transform.position + changeGround) + _currentVelocity * (float)TimeManager.TickDelta;
 
 
         if (_isGrounded)
@@ -476,6 +526,9 @@ public class MovementSystem : NetworkBehaviour
 
     private void RecalculateLandingPosition()
     {
+
+        _recalculateLanding = false;
+
         // Predict the landing spot 
         RaycastHit2D predictHit = new RaycastHit2D();
         RaycastHit2D predictHit2 = new RaycastHit2D();
@@ -524,6 +577,63 @@ public class MovementSystem : NetworkBehaviour
 
             _predictedNormal = predictHit2.normal;
         }
+    }
+
+    private Vector2? RecalculateNextLandingNormal()
+    {
+
+        _recalculateLanding = false;
+
+        // Predict the landing spot 
+        RaycastHit2D predictHit = new RaycastHit2D();
+        RaycastHit2D predictHit2 = new RaycastHit2D();
+        Vector2 pos = transform.position - (transform.up * 0.7f);
+        Vector2 pos2 = transform.position + (transform.up * 0.7f);
+
+        Vector2 velo = new Vector2(_currentVelocity.x, _currentVelocity.y) * Time.fixedDeltaTime * MovementProperties.FFactor;
+
+        int count = 0;
+        while ((predictHit.collider == null && predictHit2.collider == null) && count < 100)
+        {
+
+            // Generate new ray
+            Ray2D ray = new Ray2D(pos, velo.normalized);
+            Ray2D ray2 = new Ray2D(pos2, velo.normalized);
+
+            Color randColor = UnityEngine.Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 1f);
+
+            Debug.DrawRay(ray.origin, ray.direction * velo.magnitude, randColor, 2f);
+            Debug.DrawRay(ray2.origin, ray2.direction * velo.magnitude, randColor, 2f);
+
+            // Update predictHit
+            predictHit = Physics2D.Raycast(ray.origin, ray.direction, velo.magnitude, MovementProperties.ObstacleMask);
+            predictHit2 = Physics2D.Raycast(ray2.origin, ray2.direction, velo.magnitude, MovementProperties.ObstacleMask);
+
+            // Update position to end of predictHit ray
+            pos += (ray.direction * velo.magnitude);
+            pos2 += (ray2.direction * velo.magnitude);
+
+            velo += (Vector2.down * MovementProperties.Gravity * Time.fixedDeltaTime);
+
+            count++;
+        }
+
+        // Set the predicted landing position and normal
+        // By nature this will get the closer of the two landing positions
+        if (predictHit.collider != null)
+        {
+            //_predictedPosition = predictHit.point;
+
+            return predictHit.normal;
+        }
+        else if (predictHit2.collider != null)
+        {
+            //_predictedPosition = predictHit2.point;
+
+            return predictHit2.normal;
+        }
+        
+        return null;
     }
 
     private void SetPublicMovementData()
