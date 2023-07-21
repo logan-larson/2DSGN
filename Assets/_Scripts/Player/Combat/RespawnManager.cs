@@ -64,7 +64,7 @@ public class RespawnManager : NetworkBehaviour
 
         PlayerManager.Instance.RespawnPlayer(gameObject.GetInstanceID());
 
-        Vector3 spawnPosition = _spawnPositions[Random.Range(0, _spawnPositions.Count)];
+        Vector3 spawnPosition = PlayerManager.Instance.GetSpawnPosition();
 
         transform.position = spawnPosition;
         transform.rotation = Quaternion.identity;

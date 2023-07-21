@@ -151,7 +151,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 53163287}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.9, y: 88.61, z: 0}
+  m_LocalPosition: {x: -8.3, y: 87.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4065,10 +4065,12 @@ MonoBehaviour:
   - {fileID: 596029611}
   - {fileID: 875225096}
   - {fileID: 905765988}
-  - {fileID: 0}
+  - {fileID: 918655266}
+  - {fileID: 1244146996}
   - {fileID: 1475965011}
   - {fileID: 1691890811}
   - {fileID: 1919249585}
+  - {fileID: 2001524906}
 --- !u!114 &875225097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4087,6 +4089,14 @@ MonoBehaviour:
   OnPlayerKilled:
     m_PersistentCalls:
       m_Calls: []
+  _spawnPositions:
+  - {x: -30, y: -13, z: 0}
+  - {x: -30, y: -25, z: 0}
+  - {x: -3.5, y: -3, z: 0}
+  - {x: 7.5, y: 0, z: 0}
+  - {x: 9.2, y: -12.5, z: 0}
+  - {x: 14, y: -25, z: 0}
+  - {x: -30.5, y: -1, z: 0}
 --- !u!4 &875225098
 Transform:
   m_ObjectHideFlags: 0
@@ -5747,10 +5757,12 @@ MonoBehaviour:
   - {fileID: 596029611}
   - {fileID: 875225096}
   - {fileID: 905765988}
-  - {fileID: 0}
+  - {fileID: 918655266}
+  - {fileID: 1244146996}
   - {fileID: 1475965011}
   - {fileID: 1691890811}
   - {fileID: 1919249585}
+  - {fileID: 2001524906}
 --- !u!1 &1519694960
 GameObject:
   m_ObjectHideFlags: 0
@@ -13422,10 +13434,12 @@ MonoBehaviour:
   - {fileID: 596029611}
   - {fileID: 875225096}
   - {fileID: 905765988}
-  - {fileID: 0}
+  - {fileID: 918655266}
+  - {fileID: 1244146996}
   - {fileID: 1475965011}
   - {fileID: 1691890811}
   - {fileID: 1919249585}
+  - {fileID: 2001524906}
 --- !u!1001 &2001524905
 PrefabInstance:
   m_ObjectHideFlags: 0

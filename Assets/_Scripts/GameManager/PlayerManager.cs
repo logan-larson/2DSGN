@@ -4,12 +4,16 @@ using UnityEngine;
 using UnityEngine.Events;
 using FishNet.Object;
 using FishNet.Connection;
+using System.Linq;
 
 public class PlayerManager : NetworkBehaviour
 {
     public static PlayerManager Instance { get; private set; }
 
     public UnityEvent<string, string, string> OnPlayerKilled;
+
+    [SerializeField]
+    private List<Vector3> _spawnPositions = new List<Vector3>();
 
     private void Awake()
     {
@@ -73,6 +77,36 @@ public class PlayerManager : NetworkBehaviour
         if (!base.IsServer) return;
 
         Players[playerID].Username = username;
+    }
+
+    public Vector3 GetSpawnPosition()
+    {
+        Transform[] playerPositions = Players.Values.Where(p => !p.IsDead).Select(p => p.GameObject.transform).ToArray();
+
+        // Find spawn point furthest away from all players
+        Vector3 furthestSpawnPoint = Vector3.zero;
+        float maxDistance = 0f;
+
+        foreach (Vector3 spawnPoint in _spawnPositions)
+        {
+            // Calculate the distance from each player to the spawn point
+            float distanceSum = 0f;
+
+            foreach (Transform playerPos in playerPositions)
+            {
+                distanceSum += Vector3.Distance(spawnPoint, playerPos.position);
+            }
+
+            // Check if the distance is greater than the previous max distance
+            if (distanceSum > maxDistance)
+            {
+                maxDistance = distanceSum;
+                furthestSpawnPoint = spawnPoint;
+            }
+        }
+
+        // furthestSpawnPoint will contain the spawn point furthest from all players
+        return furthestSpawnPoint;
     }
 
     public class Player
