@@ -56,11 +56,15 @@ public class Crosshair : NetworkBehaviour
         {
             if (_input.InputValues.AimInput != Vector2.zero)
             {
-                var aimDirection = transform.localRotation * _input.InputValues.AimInput.normalized;
+                var aimDirection = transform.parent.parent.localRotation * _input.InputValues.AimInput.normalized;
 
-                aimDirection *= 5f;
+                var aimMagnitude = _input.InputValues.AimInput.magnitude;
 
-                _crosshair.parent.position = transform.parent.parent.position + aimDirection;
+                aimMagnitude = aimMagnitude > 0.3f ? aimMagnitude : 0.3f;
+
+                aimDirection *= 10f;
+
+                _crosshair.parent.position = transform.parent.parent.position + (aimDirection * aimMagnitude);
             }
         }
         else

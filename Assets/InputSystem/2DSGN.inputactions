@@ -36,7 +36,7 @@
                     "name": "Jump",
                     "type": "Value",
                     "id": "c26de51c-55b3-45d8-8fb3-a1e14d2e0a7f",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -60,9 +60,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Mode",
+                    "name": "SwitchMode",
                     "type": "Button",
-                    "id": "2ab4df35-1f9a-4f29-b969-f8e9cc049c60",
+                    "id": "b3fec61d-4601-4e88-854e-f5608cb3990e",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -359,7 +359,7 @@
                 {
                     "name": "",
                     "id": "1213a538-6eef-45ce-9353-1fbae691d128",
-                    "path": "<Gamepad>/buttonWest",
+                    "path": "<Gamepad>/buttonNorth",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -369,23 +369,12 @@
                 },
                 {
                     "name": "",
-                    "id": "c09d8fa9-9a5c-44f1-acfb-d53ae8f0e7d3",
+                    "id": "ae749eec-1cd4-46ad-83ea-e30147ce9c3c",
                     "path": "<Keyboard>/leftAlt",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Mode",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "058f10bc-aff7-44d9-bdd5-5b9a0129d991",
-                    "path": "<Gamepad>/buttonNorth",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Mode",
+                    "action": "SwitchMode",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
