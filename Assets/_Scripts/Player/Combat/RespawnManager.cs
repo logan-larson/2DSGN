@@ -49,7 +49,7 @@ public class RespawnManager : NetworkBehaviour
 
     private void Respawn()
     {
-        transform.SetPositionAndRotation(new Vector3(0, 80f, 0), Quaternion.identity);
+        transform.SetPositionAndRotation(new Vector3(0, 100f, 0), Quaternion.Euler(new Vector3(0f, 0f, 0f)));
 
         // Delay respawn
         StartCoroutine(RespawnCoroutine());
@@ -62,9 +62,9 @@ public class RespawnManager : NetworkBehaviour
 
         OnRespawn.Invoke();
 
-        PlayerManager.Instance.RespawnPlayer(gameObject.GetInstanceID());
-
         Vector3 spawnPosition = PlayerManager.Instance.GetSpawnPosition();
+
+        PlayerManager.Instance.RespawnPlayer(gameObject.GetInstanceID());
 
         transform.position = spawnPosition;
         transform.rotation = Quaternion.identity;

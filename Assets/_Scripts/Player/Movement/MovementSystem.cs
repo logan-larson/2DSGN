@@ -72,7 +72,7 @@ public class MovementSystem : NetworkBehaviour
     private PlayerInputValues _input;
 
     [SerializeField]
-    private Animator _animator;
+    private PlayerHealth _playerHealth;
 
     [SerializeField]
     private PlayerMovementProperties MovementProperties;
@@ -211,6 +211,9 @@ public class MovementSystem : NetworkBehaviour
     private void Awake()
     {
         InputSystem = InputSystem ?? GetComponent<InputSystem>();
+        _playerHealth = _playerHealth ?? GetComponent<PlayerHealth>();
+
+        _playerHealth.OnDeath.AddListener(() => {  });
     }
 
     private void Start()

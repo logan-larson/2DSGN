@@ -21,7 +21,15 @@ public class PlayerManager : NetworkBehaviour
 
         OnPlayerKilled = OnPlayerKilled ?? new UnityEvent<string, string, string>();
     }
-    
+
+    private void OnDrawGizmos()
+    {
+        foreach (var position in _spawnPositions)
+        {
+            Gizmos.DrawSphere(position, 1f);
+        }
+    }
+
     public Dictionary<int, Player> Players = new Dictionary<int, Player>();
 
     public void DamagePlayer(int playerID, int damage, int attackerID, string weaponName, NetworkConnection playerConn = null)
@@ -83,8 +91,10 @@ public class PlayerManager : NetworkBehaviour
     {
         Transform[] playerPositions = Players.Values.Where(p => !p.IsDead).Select(p => p.GameObject.transform).ToArray();
 
+        Debug.Log(playerPositions.Length);
+
         // Find spawn point furthest away from all players
-        Vector3 furthestSpawnPoint = Vector3.zero;
+        Vector3 furthestSpawnPoint = _spawnPositions[0];
         float maxDistance = 0f;
 
         foreach (Vector3 spawnPoint in _spawnPositions)
