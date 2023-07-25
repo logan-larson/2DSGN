@@ -41,6 +41,28 @@ public class InputSystem : MonoBehaviour
         _respawnManager.OnRespawn.AddListener(() => _isEnabled = true);
 
         InputValues = (PlayerInputValues)ScriptableObject.CreateInstance(typeof(PlayerInputValues));
+
+    }
+
+    private void Start()
+    {
+        GameStateManager.Instance.OnGameEnd.AddListener(() =>
+        {
+            _isEnabled = false;
+            Cursor.visible = true;
+        });
+        GameStateManager.Instance.OnGameStart.AddListener(() =>
+        {
+            _isEnabled = true;
+            Cursor.visible = false;
+        });
+        GameStateManager.Instance.OnLobbyStart.AddListener(() =>
+        {
+            _isEnabled = false;
+            Cursor.visible = true;
+        });
+
+
     }
 
     private void Update()

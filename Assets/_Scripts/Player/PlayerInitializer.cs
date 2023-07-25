@@ -20,8 +20,6 @@ public class PlayerInitializer : NetworkBehaviour
         base.OnStartClient();
 
         InitializeServerRpc();
-
-        Cursor.visible = false;
         
         _lineRenderer.enabled = false;
 
@@ -35,7 +33,9 @@ public class PlayerInitializer : NetworkBehaviour
     private void InitializeServerRpc()
     {
         PlayerManager.Instance.Players.Add(gameObject.GetInstanceID(), new PlayerManager.Player() { PlayerHealth = _playerHealth, GameObject = gameObject, Connection = base.Owner });
-        GameStateManager.Instance.Players.Add(gameObject.GetInstanceID(), new GameStateManager.Player() { Connection = base.Owner });
+        //GameStateManager.Instance.Players.Add(gameObject.GetInstanceID(), new GameStateManager.Player() { Connection = base.Owner });
+
+        GameStateManager.Instance.PlayerJoined(gameObject.GetInstanceID(), new GameStateManager.Player() { Connection = base.Owner });
     }
 
 }

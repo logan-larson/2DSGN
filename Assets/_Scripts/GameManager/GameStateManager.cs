@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using FishNet.Object;
 using UnityEngine.Events;
+using System.Linq;
+using UnityEngine.UI;
 
 public class GameStateManager : NetworkBehaviour
 {
@@ -12,21 +14,82 @@ public class GameStateManager : NetworkBehaviour
     public Dictionary<int, Player> Players = new Dictionary<int, Player>();
 
 
+    /// <summary>
+    /// Called at the end of each game.
+    /// </summary>
     public UnityEvent OnGameEnd = new UnityEvent();
+    /// <summary>
+    /// Called when all players are ready.
+    /// </summary>
     public UnityEvent OnInitiateCountdown = new UnityEvent();
+    /// <summary>
+    /// Called at the beginning of each game.
+    /// </summary>
     public UnityEvent OnGameStart = new UnityEvent();
+
+    /// <summary>
+    /// Called once at the beginning of the session. When the lobby is loaded.
+    /// </summary>
+    public UnityEvent OnLobbyStart = new UnityEvent();
+
+
     public UnityEvent OnPlayerKilled = new UnityEvent();
 
+    [SerializeField]
+    private GameObject _lobbyLeaderboard;
 
     [SerializeField]
-    private int _countdownTime = 5;
+    private GameObject _playersList;
+
+    [SerializeField]
+    private GameObject _playersListItem;
+
+    [SerializeField]
+    private int _countdownTime = 3;
 
     [SerializeField]
     private int _killsToWin = 3;
 
+    private bool _isReady = false;
+
+    public GameState CurrentGameState { get; private set; } = GameState.Lobby;
+
+    public Button ReadyButton;
+
     private void Awake()
     {
         Instance = this;
+    }
+
+    private void Start()
+    {
+        OnLobbyStart.Invoke();
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        _lobbyLeaderboard.SetActive(false);
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+
+        if (!base.IsOwner) return;
+
+        ReadyButton.onClick.AddListener(OnPlayerReady);
+    }
+
+
+    public void PlayerJoined(int playerID, Player player)
+    {
+        if (!base.IsServer) return;
+
+        Players.Add(playerID, player);
+
+        SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
     }
 
     public void PlayerKilled(int playerID, int attackerID)
@@ -43,8 +106,25 @@ public class GameStateManager : NetworkBehaviour
     {
         if (Players[playerID].Kills >= _killsToWin)
         {
+            _lobbyLeaderboard.SetActive(true);
+
             OnGameEnd.Invoke();
+            ToggleLeaderboard();
+            CurrentGameState = GameState.Lobby;
         }   
+    }
+
+    private void ToggleLeaderboard()
+    {
+        _lobbyLeaderboard.SetActive(!_lobbyLeaderboard.activeSelf);
+
+        ToggleLeaderboardObserversRpc(!_lobbyLeaderboard.activeSelf);
+    }
+
+    [ObserversRpc]
+    private void ToggleLeaderboardObserversRpc(bool isActive)
+    {
+        _lobbyLeaderboard.SetActive(isActive);
     }
 
     public void SetUsername(int playerID, string username)
@@ -52,6 +132,61 @@ public class GameStateManager : NetworkBehaviour
         if (!base.IsServer) return;
 
         Players[playerID].Username = username;
+
+        SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
+    }
+
+    public void OnPlayerReady()
+    {
+        Debug.Log("Ready button clicked");
+        _isReady = !_isReady;
+        SetPlayerReadyServerRpc(base.LocalConnection, _isReady);
+    }
+
+    [ServerRpc]
+    private void SetPlayerReadyServerRpc(NetworkConnection conn, bool isReady)
+    {
+        Players.Values.First(x => x.Connection == conn).IsReady = isReady;
+
+        SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
+
+        if (Players.Values.All(x => x.IsReady))
+        {
+            CurrentGameState = GameState.Countdown;
+            OnInitiateCountdown.Invoke();
+            ToggleLeaderboard();
+            StartCoroutine(CountdownCoroutine());
+        }
+    }
+
+    [ObserversRpc]
+    private void SetLeaderboardStateObserversRpc(Player[] playersList)
+    {
+        for (var i = _playersList.transform.childCount - 1; i >= 1; i--)
+        {
+            Object.Destroy(_playersList.transform.GetChild(i).gameObject);
+        }
+
+        foreach (var player in playersList)
+        {
+            var playerListItem = Instantiate(_playersListItem, _playersList.transform);
+            playerListItem.GetComponent<PlayerListItem>().SetPlayer(player);
+        }
+    }
+
+    private IEnumerator CountdownCoroutine()
+    {
+        if (_countdownTime > 0)
+        {
+            _countdownTime--;
+
+            yield return new WaitForSeconds(1f);
+        }
+
+        OnGameStart.Invoke();
+        CurrentGameState = GameState.Game;
+        _countdownTime = 3;
+        yield return null;
     }
 
     public class Player
@@ -61,5 +196,12 @@ public class GameStateManager : NetworkBehaviour
         public int Kills { get; set; } = 0;
         public int Deaths { get; set; } = 0;
         public bool IsReady { get; set; } = false;
+    }
+
+    public enum GameState
+    {
+        Lobby,
+        Countdown,
+        Game
     }
 }
