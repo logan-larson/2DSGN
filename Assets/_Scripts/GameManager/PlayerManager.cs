@@ -73,11 +73,13 @@ public class PlayerManager : NetworkBehaviour
     {
         if (!base.IsServer) return;
 
-        Players[playerID].Health = 100;
+        var player = Players[playerID];
 
-        Players[playerID].IsDead = false;
+        player.Health = 100;
 
-        Players[playerID].PlayerHealth.ResetHealth();
+        player.IsDead = false;
+
+        player.PlayerHealth.ResetHealth();
     }   
 
     public void SetUsername(int playerID, string username)

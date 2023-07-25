@@ -13,6 +13,9 @@ public class RespawnManager : NetworkBehaviour
     private PlayerHealth _playerHealth;
 
     [SerializeField]
+    private MovementSystem _movementSystem;
+
+    [SerializeField]
     private List<Vector3> _spawnPositions = new List<Vector3>();
 
     public override void OnStartClient()
@@ -29,6 +32,8 @@ public class RespawnManager : NetworkBehaviour
         OnRespawn = OnRespawn ?? new UnityEvent();
 
         _playerHealth.OnDeath.AddListener(Respawn);
+
+        _movementSystem = _movementSystem ?? GetComponent<MovementSystem>();
     }
 
     private void Update()
@@ -49,7 +54,9 @@ public class RespawnManager : NetworkBehaviour
 
     private void Respawn()
     {
-        transform.SetPositionAndRotation(new Vector3(0, 100f, 0), Quaternion.Euler(new Vector3(0f, 0f, 0f)));
+        transform.SetPositionAndRotation(new Vector3(0, 78.5f, 0), Quaternion.identity);
+
+        _movementSystem.SetIsRespawning(true);
 
         // Delay respawn
         StartCoroutine(RespawnCoroutine());
@@ -65,6 +72,8 @@ public class RespawnManager : NetworkBehaviour
         Vector3 spawnPosition = PlayerManager.Instance.GetSpawnPosition();
 
         PlayerManager.Instance.RespawnPlayer(gameObject.GetInstanceID());
+
+        _movementSystem.SetIsRespawning(false);
 
         transform.position = spawnPosition;
         transform.rotation = Quaternion.identity;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Prediction;
 using UnityEngine;
@@ -24,6 +25,7 @@ public class MovementSystem : NetworkBehaviour
         public bool Jump;
         public bool ChangeToCombat; // Fire key
         public bool ChangeToParkour; // Sprint key
+        public bool IsRespawning; // Set by the RespawnManager
     }
 
     /// <summary>
@@ -73,6 +75,9 @@ public class MovementSystem : NetworkBehaviour
 
     [SerializeField]
     private PlayerHealth _playerHealth;
+
+    [SerializeField]
+    private RespawnManager _respawnManager;
 
     [SerializeField]
     private PlayerMovementProperties MovementProperties;
@@ -160,10 +165,10 @@ public class MovementSystem : NetworkBehaviour
     private bool _inCombatMode = false;
 
     /// <summary>
-    /// Amount to change the players height when grounded
+    /// Set to true when the player is respawning.
     /// </summary>
     [SerializeField]
-    private float groundChangeSpeed = 0.5f;
+    private bool _isRespawning = false;
 
 
     #endregion
@@ -212,8 +217,7 @@ public class MovementSystem : NetworkBehaviour
     {
         InputSystem = InputSystem ?? GetComponent<InputSystem>();
         _playerHealth = _playerHealth ?? GetComponent<PlayerHealth>();
-
-        _playerHealth.OnDeath.AddListener(() => {  });
+        _respawnManager = _respawnManager ?? GetComponent<RespawnManager>();
     }
 
     private void Start()
@@ -272,6 +276,8 @@ public class MovementSystem : NetworkBehaviour
         moveData.ChangeToCombat = _input.IsFirePressed;
         if (!moveData.ChangeToCombat)
             moveData.ChangeToParkour = _input.IsSprintKeyPressed;
+
+        moveData.IsRespawning = _isRespawning;
     }
 
     /// <summary>
@@ -292,7 +298,7 @@ public class MovementSystem : NetworkBehaviour
 
         UpdateVelocity(moveData, asServer);
 
-        UpdatePosition();
+        UpdatePosition(moveData);
     }
 
     /// <summary>
@@ -311,6 +317,31 @@ public class MovementSystem : NetworkBehaviour
         _inParkourMode = data.InParkourMode;
         _inCombatMode = data.InCombatMode;
         _timeOnGround = data.TimeOnGround;
+
+        if (_isRespawning)
+        {
+            transform.rotation = Quaternion.identity;
+            _currentVelocity = Vector3.zero;
+        }
+    }
+
+    // TODO: this is a fucking hacky way to do this
+    public void SetIsRespawning(bool isRespawning)
+    {
+        if (!isRespawning)
+        {
+            StartCoroutine(DelayRespawnCoroutine());
+        }
+        else
+        {
+            _isRespawning = true;
+        }
+    }
+
+    private IEnumerator DelayRespawnCoroutine()
+    {
+        yield return new WaitForSeconds(0.25f);
+        _isRespawning = false;
     }
 
     private void UpdateMode(MoveData moveData = new MoveData())
@@ -472,7 +503,7 @@ public class MovementSystem : NetworkBehaviour
 
     }
 
-    private void UpdatePosition()
+    private void UpdatePosition(MoveData moveData)
     {
         Vector3 changeGround = Vector3.zero;
 
@@ -524,6 +555,11 @@ public class MovementSystem : NetworkBehaviour
             Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, MovementProperties.MaxRotationDegrees);
 
             transform.SetPositionAndRotation(finalPosition, finalRotation);
+        }
+
+        if (moveData.IsRespawning)
+        {
+            transform.SetPositionAndRotation(finalPosition, Quaternion.identity);
         }
     }
 
