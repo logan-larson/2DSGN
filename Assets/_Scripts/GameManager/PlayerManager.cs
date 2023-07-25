@@ -64,6 +64,9 @@ public class PlayerManager : NetworkBehaviour
 
         var attackerUsername = attackerID == -1 ? "Suicide" : Players[attackerID].Username;
 
+        GameStateManager.Instance.PlayerKilled(playerID, attackerID);
+
+        GameStateManager.Instance.OnPlayerKilled.Invoke();
         OnPlayerKilled.Invoke(Players[playerID].Username, attackerUsername, weaponName);
 
         Players[playerID].PlayerHealth.OnDeath.Invoke();
@@ -123,11 +126,11 @@ public class PlayerManager : NetworkBehaviour
 
     public class Player
     {
-        public string Username { get; set; }
-        public int Health { get; set; }
-        public bool IsDead { get; set; }
         public PlayerHealth PlayerHealth { get; set; }
         public GameObject GameObject { get; set; }
         public NetworkConnection Connection { get; set; }
+        public string Username { get; set; } = "user123";
+        public int Health { get; set; } = 100;
+        public bool IsDead { get; set; } = false;
     }
 }

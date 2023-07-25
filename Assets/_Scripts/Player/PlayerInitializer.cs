@@ -34,7 +34,8 @@ public class PlayerInitializer : NetworkBehaviour
     [ServerRpc]
     private void InitializeServerRpc()
     {
-        PlayerManager.Instance.Players.Add(gameObject.GetInstanceID(), new PlayerManager.Player() { Health = 100, Username = "user123", PlayerHealth = _playerHealth, GameObject = gameObject, Connection = base.Owner });
+        PlayerManager.Instance.Players.Add(gameObject.GetInstanceID(), new PlayerManager.Player() { PlayerHealth = _playerHealth, GameObject = gameObject, Connection = base.Owner });
+        GameStateManager.Instance.Players.Add(gameObject.GetInstanceID(), new GameStateManager.Player() { Connection = base.Owner });
     }
 
 }
