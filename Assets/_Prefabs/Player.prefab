@@ -417,6 +417,7 @@ GameObject:
   - component: {fileID: 1072261995597177620}
   - component: {fileID: 1690121214485609034}
   - component: {fileID: 3251875225647411122}
+  - component: {fileID: 731787555991388258}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -564,14 +565,15 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 5020579654786682326}
   InputSystem: {fileID: 0}
   _input: {fileID: 0}
-  _animator: {fileID: 0}
+  _playerHealth: {fileID: 0}
+  _respawnManager: {fileID: 0}
   MovementProperties: {fileID: 11400000, guid: 70099ab69eee19c4cad9e629a3eb4742, type: 2}
   _currentVelocity: {x: 0, y: 0, z: 0}
   _timeSinceGrounded: 0
   _timeOnGround: 0
   _inParkourMode: 1
   _inCombatMode: 0
-  groundChangeSpeed: 2
+  _isRespawning: 0
 --- !u!114 &4268827610097334077
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -801,6 +803,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   _playerHealth: {fileID: 1707328605495123278}
+  _movementSystem: {fileID: 0}
   _spawnPositions:
   - {x: -30, y: -13, z: 0}
   - {x: -30, y: -25, z: 0}
@@ -878,6 +881,22 @@ MonoBehaviour:
   _networkObjectCache: {fileID: 5020579654786682326}
   Camera: {fileID: 0}
   CameraController: {fileID: 0}
+--- !u!114 &731787555991388258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4268827610097334048}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc7aa745d90d3ac4888bb93f08f9cc57, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 5020579654786682326}
+  _networkObjectCache: {fileID: 0}
+  ReadyButton: {fileID: 0}
 --- !u!1 &6111030698262587285
 GameObject:
   m_ObjectHideFlags: 0

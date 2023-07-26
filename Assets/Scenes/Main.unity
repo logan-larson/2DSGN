@@ -4601,6 +4601,9 @@ MonoBehaviour:
   OnPlayerKilled:
     m_PersistentCalls:
       m_Calls: []
+  OnLeaderboardActive:
+    m_PersistentCalls:
+      m_Calls: []
   _lobbyLeaderboard: {fileID: 1124107124}
   _playersList: {fileID: 1747319949}
   _playersListItem: {fileID: 5450942563857098396, guid: d8ae74284f0ec784d818cf25916b5440, type: 3}
@@ -6008,8 +6011,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 2100000, guid: 2e7517d1496ae784f94a2307a88e2bb5, type: 2}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.392}
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.78431374}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

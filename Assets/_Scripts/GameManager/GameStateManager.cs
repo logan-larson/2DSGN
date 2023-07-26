@@ -35,6 +35,8 @@ public class GameStateManager : NetworkBehaviour
 
     public UnityEvent OnPlayerKilled = new UnityEvent();
 
+    public UnityEvent OnLeaderboardActive = new UnityEvent();
+
     [SerializeField]
     private GameObject _lobbyLeaderboard;
 
@@ -77,9 +79,8 @@ public class GameStateManager : NetworkBehaviour
     {
         base.OnStartClient();
 
-        if (!base.IsOwner) return;
-
-        ReadyButton.onClick.AddListener(OnPlayerReady);
+        OnLeaderboardActive.Invoke();
+        _lobbyLeaderboard.SetActive(true);
     }
 
 
@@ -125,6 +126,11 @@ public class GameStateManager : NetworkBehaviour
     private void ToggleLeaderboardObserversRpc(bool isActive)
     {
         _lobbyLeaderboard.SetActive(isActive);
+
+        if (isActive)
+        {
+            OnLeaderboardActive.Invoke();
+        }
     }
 
     public void SetUsername(int playerID, string username)
@@ -136,19 +142,14 @@ public class GameStateManager : NetworkBehaviour
         SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
     }
 
-    public void OnPlayerReady()
-    {
-        Debug.Log("Ready button clicked");
-        _isReady = !_isReady;
-        SetPlayerReadyServerRpc(base.LocalConnection, _isReady);
-    }
-
     [ServerRpc]
-    private void SetPlayerReadyServerRpc(NetworkConnection conn, bool isReady)
+    public void SetPlayerReadyServerRpc(NetworkConnection conn, bool isReady)
     {
         Players.Values.First(x => x.Connection == conn).IsReady = isReady;
 
         SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
+
+        return;
 
         if (Players.Values.All(x => x.IsReady))
         {

@@ -21,6 +21,7 @@ public class InputSystem : MonoBehaviour
     private ModeManager _modeManager;
     private PlayerHealth _playerHealth;
     private RespawnManager _respawnManager;
+    private LobbyManager _lobbyManager;
 
     private bool _isEnabled = true;
 
@@ -33,6 +34,7 @@ public class InputSystem : MonoBehaviour
         _weaponEquipManager = _weaponEquipManager ?? GetComponent<WeaponEquipManager>();
         _playerInput = _playerInput ?? GetComponent<PlayerInput>();
         _modeManager = _modeManager ?? GetComponent<ModeManager>();
+        _lobbyManager = _lobbyManager ?? GetComponent<LobbyManager>();
 
         _playerHealth = _playerHealth ?? GetComponent<PlayerHealth>();
         _playerHealth.OnDeath.AddListener(() => _isEnabled = false);
@@ -120,11 +122,16 @@ public class InputSystem : MonoBehaviour
         _weaponEquipManager.TryEquipWeapon();
     }
 
-    public void OnMode(InputValue value)
+    public void OnSwitchMode(InputValue value)
     {
         if (!_isEnabled) return;
 
         _modeManager.ChangeMode();
+    }
+
+    public void OnToggleLeaderboard(InputValue _)
+    {
+        _lobbyManager.ToggleLeaderboard();
     }
 
     public void OnControlsChanged()
