@@ -16,9 +16,8 @@ public class PlayerListItem : MonoBehaviour
     [SerializeField]
     private TMP_Text _ready;
 
-    public void SetPlayer(GameStateManager.Player player)
+    public void SetPlayer(GameStateManager.Player player, int place)
     {
-        var place = transform.GetSiblingIndex();
         _place.text = place.ToString();
         _username.text = player.Username;
         _kills.text = player.Kills.ToString();

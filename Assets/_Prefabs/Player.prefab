@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ada55423a3fc24f4a89b5b97832169dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 11
+  _componentIndexCache: 13
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   Username: 
@@ -457,7 +457,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c400c7aab88b84d4282490905761dda5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 5020579654786682326}
+  _networkObjectCache: {fileID: 5020579654786682326}
   InputValues: {fileID: 0}
+  _isEnabled: 0
 --- !u!114 &3162633828202351065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -560,7 +564,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f06d7b9ad8a0d4d4fb9d1285272fea24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 0
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   InputSystem: {fileID: 0}
@@ -586,7 +590,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46558cb76fb386f488ee5ae79352b8b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 1
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   lerpValue: 0.12
@@ -606,7 +610,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03bb686b7482ced49b9a8d8e2e8ef352, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 2
+  _componentIndexCache: 3
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   _inputSystem: {fileID: 4268827610097334073}
@@ -630,6 +634,7 @@ MonoBehaviour:
   <IsNested>k__BackingField: 0
   <ComponentIndex>k__BackingField: 0
   _networkBehaviours:
+  - {fileID: 4268827610097334073}
   - {fileID: 4268827610097334074}
   - {fileID: 4268827610097334077}
   - {fileID: 4268827610097334069}
@@ -641,6 +646,7 @@ MonoBehaviour:
   - {fileID: 6537912511236322679}
   - {fileID: 1690121214485609034}
   - {fileID: 3251875225647411122}
+  - {fileID: 731787555991388258}
   - {fileID: 6413919363218253851}
   - {fileID: 223301570187018686}
   - {fileID: 7084400194756443070}
@@ -670,7 +676,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 3
+  _componentIndexCache: 4
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   _synchronizeParent: 0
@@ -712,7 +718,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9df73227be45ca545ae299872efb3604, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 4
+  _componentIndexCache: 5
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
 --- !u!61 &6558510044089372251
@@ -753,7 +759,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 178d4b97b5b8ca84f90111ffa674dc08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 5
+  _componentIndexCache: 6
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   Health: 100
@@ -773,7 +779,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b19a34780e366374d88b20cc80cd04d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 6
+  _componentIndexCache: 7
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   _weaponHolder: {fileID: 8253093595726430991}
@@ -796,7 +802,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 549024164fff9124591cdc5e05d42f4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 7
+  _componentIndexCache: 8
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   OnRespawn:
@@ -824,7 +830,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9609862d7cb93fc4dbc9d76b09fcd509, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 8
+  _componentIndexCache: 9
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   OnChangeToParkour:
@@ -858,10 +864,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93aef17e833e54240a3e052777843362, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 9
+  _componentIndexCache: 10
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   _playerHealth: {fileID: 1707328605495123278}
+  _modeManager: {fileID: 6537912511236322679}
+  _networkDirection: {fileID: 7084400194756443070}
   _crosshair: {fileID: 8990207482072156506}
   _lineRenderer: {fileID: 5339978170091014856}
 --- !u!114 &3251875225647411122
@@ -876,7 +884,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4babd69a2f66490489fe85cce0fc91e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 10
+  _componentIndexCache: 11
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   Camera: {fileID: 0}
@@ -893,10 +901,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc7aa745d90d3ac4888bb93f08f9cc57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 255
+  _componentIndexCache: 12
   _addedNetworkObject: {fileID: 5020579654786682326}
-  _networkObjectCache: {fileID: 0}
-  ReadyButton: {fileID: 0}
+  _networkObjectCache: {fileID: 5020579654786682326}
+  LobbyLeaderboard: {fileID: 0}
 --- !u!1 &6111030698262587285
 GameObject:
   m_ObjectHideFlags: 0
@@ -945,7 +953,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21751bfdbf288504a91caf95ebb77c9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 13
+  _componentIndexCache: 15
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   InputSystem: {fileID: 4268827610097334073}
@@ -1108,7 +1116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 347d0fb66e3b4b1489dabcc2b5b6aa3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _componentIndexCache: 12
+  _componentIndexCache: 14
   _addedNetworkObject: {fileID: 5020579654786682326}
   _networkObjectCache: {fileID: 5020579654786682326}
   _movementProperties: {fileID: 11400000, guid: 70099ab69eee19c4cad9e629a3eb4742, type: 2}

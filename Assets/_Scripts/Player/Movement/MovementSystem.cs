@@ -484,7 +484,6 @@ public class MovementSystem : NetworkBehaviour
             yield return new WaitForSeconds(0.1f);
 
             Vector2? normal = RecalculateNextLandingNormal();
-            Debug.Log("Recalculated normal");
 
             if (normal != null)
             {

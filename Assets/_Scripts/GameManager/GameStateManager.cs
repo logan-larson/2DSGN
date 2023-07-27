@@ -52,8 +52,6 @@ public class GameStateManager : NetworkBehaviour
     [SerializeField]
     private int _killsToWin = 3;
 
-    private bool _isReady = false;
-
     public GameState CurrentGameState { get; private set; } = GameState.Lobby;
 
     public Button ReadyButton;
@@ -99,6 +97,8 @@ public class GameStateManager : NetworkBehaviour
 
         Players[attackerID].Kills++;
         Players[playerID].Deaths++;
+            
+        SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
 
         CheckGameEnd(attackerID);
     }
@@ -107,30 +107,24 @@ public class GameStateManager : NetworkBehaviour
     {
         if (Players[playerID].Kills >= _killsToWin)
         {
-            _lobbyLeaderboard.SetActive(true);
+            Players.Select(x => x.Value).ToList().ForEach(x =>
+            {
+                x.IsReady = false;
+                SetPlayerReadyTargetRpc(x.Connection, x, false);
+            });
+
+            SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
 
             OnGameEnd.Invoke();
-            ToggleLeaderboard();
+            EnableLeaderboardObserversRpc();
             CurrentGameState = GameState.Lobby;
         }   
     }
 
-    private void ToggleLeaderboard()
-    {
-        _lobbyLeaderboard.SetActive(!_lobbyLeaderboard.activeSelf);
-
-        ToggleLeaderboardObserversRpc(!_lobbyLeaderboard.activeSelf);
-    }
-
     [ObserversRpc]
-    private void ToggleLeaderboardObserversRpc(bool isActive)
+    private void EnableLeaderboardObserversRpc()
     {
-        _lobbyLeaderboard.SetActive(isActive);
-
-        if (isActive)
-        {
-            OnLeaderboardActive.Invoke();
-        }
+        _lobbyLeaderboard.SetActive(true);
     }
 
     public void SetUsername(int playerID, string username)
@@ -142,36 +136,65 @@ public class GameStateManager : NetworkBehaviour
         SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
     }
 
-    [ServerRpc]
-    public void SetPlayerReadyServerRpc(NetworkConnection conn, bool isReady)
+    public void SetPlayerReady(NetworkConnection conn, bool isReady)
     {
-        Players.Values.First(x => x.Connection == conn).IsReady = isReady;
+
+        if (CurrentGameState != GameState.Lobby) return;
+
+        var player = Players.Values.First(x => x.Connection == conn);
+
+        player.IsReady = isReady;
+
+        SetPlayerReadyTargetRpc(conn, player, isReady);
 
         SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
 
-        return;
-
         if (Players.Values.All(x => x.IsReady))
         {
+            StartGame();
+        }
+    }
+
+    private void StartGame()
+    {
+            CurrentGameState = GameState.Game;
+
+            OnGameStart.Invoke();
+
+            Players.Values.ToList().ForEach(x =>
+            {
+                x.Kills = 0;
+                x.Deaths = 0;
+            });
+
+            SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
+            // TODO: Start countdown
+            // For now just start game
+            /*
             CurrentGameState = GameState.Countdown;
             OnInitiateCountdown.Invoke();
-            ToggleLeaderboard();
             StartCoroutine(CountdownCoroutine());
-        }
+            */
+    }
+
+    [TargetRpc]
+    private void SetPlayerReadyTargetRpc(NetworkConnection conn, Player player, bool isReady)
+    {
+        player.GameObject.GetComponent<LobbyManager>().SetReady(isReady);
     }
 
     [ObserversRpc]
     private void SetLeaderboardStateObserversRpc(Player[] playersList)
     {
-        for (var i = _playersList.transform.childCount - 1; i >= 1; i--)
+        for (var i = 1; i < _playersList.transform.childCount; i++)
         {
             Object.Destroy(_playersList.transform.GetChild(i).gameObject);
         }
 
-        foreach (var player in playersList)
+        for (var i = 0; i < playersList.Length; i++)
         {
             var playerListItem = Instantiate(_playersListItem, _playersList.transform);
-            playerListItem.GetComponent<PlayerListItem>().SetPlayer(player);
+            playerListItem.GetComponent<PlayerListItem>().SetPlayer(playersList[i], i + 1);
         }
     }
 
@@ -193,6 +216,7 @@ public class GameStateManager : NetworkBehaviour
     public class Player
     {
         public NetworkConnection Connection { get; set; }
+        public GameObject GameObject { get; set; }
         public string Username { get; set; } = "user123";
         public int Kills { get; set; } = 0;
         public int Deaths { get; set; } = 0;

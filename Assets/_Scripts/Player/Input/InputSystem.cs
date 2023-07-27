@@ -1,10 +1,12 @@
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(PlayerInputValues))]
 [RequireComponent(typeof(MovementSystem))]
-public class InputSystem : MonoBehaviour
+public class InputSystem : NetworkBehaviour
 {
 
 
@@ -23,7 +25,18 @@ public class InputSystem : MonoBehaviour
     private RespawnManager _respawnManager;
     private LobbyManager _lobbyManager;
 
-    private bool _isEnabled = true;
+    [SerializeField]
+    [SyncVar]
+    private bool _isEnabled = false;
+
+    [SyncVar (OnChange = nameof(ChangeIsCursorVisible))]
+    private bool _isCursorVisible = false;
+
+    private void ChangeIsCursorVisible(bool oldValue, bool newValue, bool asServer)
+    {
+        if (!asServer)
+            Cursor.visible = newValue;
+    }
 
     private PlayerInput _playerInput;
 
@@ -40,14 +53,20 @@ public class InputSystem : MonoBehaviour
         _playerHealth.OnDeath.AddListener(() => _isEnabled = false);
 
         _respawnManager = _respawnManager ?? GetComponent<RespawnManager>();
-        _respawnManager.OnRespawn.AddListener(() => _isEnabled = true);
+        _respawnManager.OnRespawn.AddListener(() =>
+        {
+            if (GameStateManager.Instance.CurrentGameState == GameStateManager.GameState.Game)
+                _isEnabled = true;
+        });
 
         InputValues = (PlayerInputValues)ScriptableObject.CreateInstance(typeof(PlayerInputValues));
 
     }
 
-    private void Start()
+    public override void OnStartServer()
     {
+        base.OnStartServer();
+
         GameStateManager.Instance.OnGameEnd.AddListener(() =>
         {
             _isEnabled = false;
@@ -55,6 +74,7 @@ public class InputSystem : MonoBehaviour
         });
         GameStateManager.Instance.OnGameStart.AddListener(() =>
         {
+            Debug.Log("Gamestareted");
             _isEnabled = true;
             Cursor.visible = false;
         });
@@ -63,8 +83,11 @@ public class InputSystem : MonoBehaviour
             _isEnabled = false;
             Cursor.visible = true;
         });
+    }
 
-
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
     }
 
     private void Update()
@@ -132,6 +155,11 @@ public class InputSystem : MonoBehaviour
     public void OnToggleLeaderboard(InputValue _)
     {
         _lobbyManager.ToggleLeaderboard();
+    }
+
+    public void OnToggleReady(InputValue _)
+    {
+        _lobbyManager.ToggleReady();
     }
 
     public void OnControlsChanged()
