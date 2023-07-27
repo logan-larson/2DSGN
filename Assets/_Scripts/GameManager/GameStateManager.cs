@@ -6,6 +6,7 @@ using FishNet.Object;
 using UnityEngine.Events;
 using System.Linq;
 using UnityEngine.UI;
+using FishNet.Transporting;
 
 public class GameStateManager : NetworkBehaviour
 {
@@ -71,6 +72,8 @@ public class GameStateManager : NetworkBehaviour
         base.OnStartServer();
 
         _lobbyLeaderboard.SetActive(false);
+
+        ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
     }
 
     public override void OnStartClient()
@@ -81,6 +84,25 @@ public class GameStateManager : NetworkBehaviour
         _lobbyLeaderboard.SetActive(true);
     }
 
+    private void OnRemoteConnectionState(NetworkConnection conn, RemoteConnectionStateArgs args)
+    {
+        if (args.ConnectionState == RemoteConnectionState.Stopped)
+        {
+            var player = Players.Select(x => (x.Key, x.Value)).First(x => x.Value.Connection == conn);
+
+            Players.Remove(player.Key);
+
+            if (Players.Count() == 0)
+            {
+                CurrentGameState = GameState.Lobby;
+                OnLobbyStart.Invoke();
+            }
+            else
+            {
+                SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
+            }
+        }
+    }
 
     public void PlayerJoined(int playerID, Player player)
     {
@@ -95,7 +117,9 @@ public class GameStateManager : NetworkBehaviour
     {
         if (!base.IsServer) return;
 
-        Players[attackerID].Kills++;
+        if (playerID != attackerID)
+            Players[attackerID].Kills++;
+
         Players[playerID].Deaths++;
             
         SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());

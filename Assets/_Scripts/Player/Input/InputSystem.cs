@@ -74,7 +74,6 @@ public class InputSystem : NetworkBehaviour
         });
         GameStateManager.Instance.OnGameStart.AddListener(() =>
         {
-            Debug.Log("Gamestareted");
             _isEnabled = true;
             Cursor.visible = false;
         });
@@ -83,6 +82,11 @@ public class InputSystem : NetworkBehaviour
             _isEnabled = false;
             Cursor.visible = true;
         });
+
+        if (GameStateManager.Instance.CurrentGameState == GameStateManager.GameState.Game)
+            _isEnabled = true;
+        else
+            _isEnabled = false;
     }
 
     public override void OnStartClient()
@@ -160,6 +164,11 @@ public class InputSystem : NetworkBehaviour
     public void OnToggleReady(InputValue _)
     {
         _lobbyManager.ToggleReady();
+    }
+
+    public void OnForceRespawn(InputValue _)
+    {
+        _respawnManager.ForceRespawn();
     }
 
     public void OnControlsChanged()

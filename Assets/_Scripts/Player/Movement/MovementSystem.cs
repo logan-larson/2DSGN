@@ -144,11 +144,6 @@ public class MovementSystem : NetworkBehaviour
     /// </summary>
     private bool _recalculateLanding = false;
 
-    /// <summary>
-    /// True if the landing position and normal should be recalculated in the next second.
-    /// </summary>
-    private bool _recalculateNextLanding = false;
-
     private IEnumerator _recalculateLandingCoroutine;
     private bool _recalculateLandingCoroutineIsRunning;
 
@@ -436,8 +431,6 @@ public class MovementSystem : NetworkBehaviour
 
                 RecalculateLandingPosition();
 
-                _recalculateNextLanding = true;
-
                 _recalculateLandingCoroutine = RecalculateNextLandingCoroutine();
 
                 _recalculateLandingCoroutineIsRunning = true;
@@ -447,8 +440,6 @@ public class MovementSystem : NetworkBehaviour
             // Set height relative to ground
             else
             {
-                _recalculateNextLanding = false;
-
                 if (_recalculateLandingCoroutineIsRunning)
                 {
                     StopCoroutine(_recalculateLandingCoroutine);

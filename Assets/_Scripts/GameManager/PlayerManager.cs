@@ -62,7 +62,7 @@ public class PlayerManager : NetworkBehaviour
     private void PlayerKilled(int playerID, int attackerID, string weaponName)
     {
 
-        var attackerUsername = attackerID == -1 ? "Suicide" : Players[attackerID].Username;
+        var attackerUsername = attackerID == playerID ? "Suicide" : Players[attackerID].Username;
 
         GameStateManager.Instance.PlayerKilled(playerID, attackerID);
 
