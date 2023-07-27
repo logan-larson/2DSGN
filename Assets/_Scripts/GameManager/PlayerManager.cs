@@ -5,6 +5,7 @@ using UnityEngine.Events;
 using FishNet.Object;
 using FishNet.Connection;
 using System.Linq;
+using FishNet.Transporting;
 
 public class PlayerManager : NetworkBehaviour
 {
@@ -20,6 +21,23 @@ public class PlayerManager : NetworkBehaviour
         Instance = this;
 
         OnPlayerKilled = OnPlayerKilled ?? new UnityEvent<string, string, string>();
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
+    }
+
+    private void OnRemoteConnectionState(NetworkConnection conn, RemoteConnectionStateArgs args)
+    {
+        if (args.ConnectionState == RemoteConnectionState.Stopped)
+        {
+            var player = Players.Select(x => (x.Key, x.Value)).First(x => x.Value.Connection == conn);
+
+            Players.Remove(player.Key);
+        }
     }
 
     private void OnDrawGizmos()
