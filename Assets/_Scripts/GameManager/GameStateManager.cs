@@ -175,8 +175,31 @@ public class GameStateManager : NetworkBehaviour
 
         if (Players.Values.All(x => x.IsReady))
         {
-            StartGame();
+            InitiateCountdown();
         }
+    }
+
+    private void InitiateCountdown()
+    {
+        CurrentGameState = GameState.Countdown;
+
+        OnInitiateCountdown.Invoke();
+
+        StartCoroutine(CountdownCoroutine());
+    }
+
+    private IEnumerator CountdownCoroutine()
+    {
+        var countdownTime = _countdownTime;
+
+        while (countdownTime > 0)
+        {
+            yield return new WaitForSeconds(1);
+
+            countdownTime--;
+        }
+
+        StartGame();
     }
 
     private void StartGame()
@@ -192,13 +215,6 @@ public class GameStateManager : NetworkBehaviour
             });
 
             SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
-            // TODO: Start countdown
-            // For now just start game
-            /*
-            CurrentGameState = GameState.Countdown;
-            OnInitiateCountdown.Invoke();
-            StartCoroutine(CountdownCoroutine());
-            */
     }
 
     [TargetRpc]
@@ -220,21 +236,6 @@ public class GameStateManager : NetworkBehaviour
             var playerListItem = Instantiate(_playersListItem, _playersList.transform);
             playerListItem.GetComponent<PlayerListItem>().SetPlayer(playersList[i], i + 1);
         }
-    }
-
-    private IEnumerator CountdownCoroutine()
-    {
-        if (_countdownTime > 0)
-        {
-            _countdownTime--;
-
-            yield return new WaitForSeconds(1f);
-        }
-
-        OnGameStart.Invoke();
-        CurrentGameState = GameState.Game;
-        _countdownTime = 3;
-        yield return null;
     }
 
     public class Player
