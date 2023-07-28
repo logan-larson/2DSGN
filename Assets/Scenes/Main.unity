@@ -183,8 +183,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: GO NUTS
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4744,7 +4744,8 @@ MonoBehaviour:
   _playersListItem: {fileID: 5450942563857098396, guid: d8ae74284f0ec784d818cf25916b5440, type: 3}
   _countdownTime: 5
   _killsToWin: 5
-  ReadyButton: {fileID: 0}
+  MainCamera: {fileID: 1919249581}
+  PlayerUI: {fileID: 1475965006}
 --- !u!1 &881088363
 GameObject:
   m_ObjectHideFlags: 0
@@ -6590,6 +6591,7 @@ MonoBehaviour:
   _networkBehaviours:
   - {fileID: 584717825}
   - {fileID: 403253776}
+  - {fileID: 1679524609}
   <ParentNetworkObject>k__BackingField: {fileID: 0}
   <ChildNetworkObjects>k__BackingField: []
   _isNetworked: 1
@@ -12479,7 +12481,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _componentIndexCache: 2
   _addedNetworkObject: {fileID: 1475965011}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 1475965011}
   _text: {fileID: 1378282}
   _image: {fileID: 1679524610}
 --- !u!114 &1679524610
@@ -15051,9 +15053,9 @@ MonoBehaviour:
   _unreliableMTU: 1023
   _ipv4BindAddress: 
   _ipv6BindAddress: 
-  _port: 14104
-  _maximumClients: 4095
-  _clientAddress: localhost
+  _port: 32399
+  _maximumClients: 2496
+  _clientAddress: 144-202-12-187.global.servers.playflow.cloud
   _timeout: 15
 --- !u!114 &5313784219897215940
 MonoBehaviour:
@@ -15499,7 +15501,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &8451476576649307864
 MonoBehaviour:
   m_ObjectHideFlags: 0

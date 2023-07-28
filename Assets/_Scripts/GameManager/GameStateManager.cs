@@ -55,7 +55,8 @@ public class GameStateManager : NetworkBehaviour
 
     public GameState CurrentGameState { get; private set; } = GameState.Lobby;
 
-    public Button ReadyButton;
+    public GameObject MainCamera;
+    public GameObject PlayerUI;
 
     private void Awake()
     {
@@ -79,6 +80,10 @@ public class GameStateManager : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+
+        // Enable GameObjects that are disabled for some reason
+        MainCamera.SetActive(true);
+        PlayerUI.SetActive(true);
 
         OnLeaderboardActive.Invoke();
         _lobbyLeaderboard.SetActive(true);
