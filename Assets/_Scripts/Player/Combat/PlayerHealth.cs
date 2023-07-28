@@ -16,7 +16,7 @@ public class PlayerHealth : NetworkBehaviour
     [SyncVar]
     public int Health = 100;
 
-    public UnityEvent OnDeath;
+    public UnityEvent<bool> OnDeath;
 
     [SerializeField]
     private GameObject _damageIndicatorPrefab;
@@ -32,7 +32,7 @@ public class PlayerHealth : NetworkBehaviour
     {
         base.OnStartServer();
 
-        OnDeath = OnDeath ?? new UnityEvent();
+        OnDeath = OnDeath ?? new UnityEvent<bool>();
     }
 
     [Server]

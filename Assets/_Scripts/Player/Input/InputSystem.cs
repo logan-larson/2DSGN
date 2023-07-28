@@ -50,7 +50,7 @@ public class InputSystem : NetworkBehaviour
         _lobbyManager = _lobbyManager ?? GetComponent<LobbyManager>();
 
         _playerHealth = _playerHealth ?? GetComponent<PlayerHealth>();
-        _playerHealth.OnDeath.AddListener(() => _isEnabled = false);
+        _playerHealth.OnDeath.AddListener((bool _) => _isEnabled = false);
 
         _respawnManager = _respawnManager ?? GetComponent<RespawnManager>();
         _respawnManager.OnRespawn.AddListener(() =>

@@ -23,6 +23,8 @@ public class RespawnManager : NetworkBehaviour
         base.OnStartClient();
 
         if (!base.IsOwner) return;
+
+        ForceRespawnServerRpc();
     }
 
     public override void OnStartServer()
@@ -34,35 +36,47 @@ public class RespawnManager : NetworkBehaviour
         _playerHealth.OnDeath.AddListener(Respawn);
 
         _movementSystem = _movementSystem ?? GetComponent<MovementSystem>();
+
+        GameStateManager.Instance.OnInitiateCountdown.AddListener(() =>
+        {
+            PlayerManager.Instance.DamagePlayer(gameObject.GetInstanceID(), 100, -1, "Revolver");
+        });
     }
 
     public void ForceRespawn()
     {
         if (!base.IsOwner) return;
 
-        ForceRespawnServerRpc();
+        ForceSuicideServerRpc();
     }
 
     [ServerRpc]
     private void ForceRespawnServerRpc()
     {
+        Respawn(true);
+    }
+
+    [ServerRpc]
+    private void ForceSuicideServerRpc()
+    {
         PlayerManager.Instance.DamagePlayer(gameObject.GetInstanceID(), 100, gameObject.GetInstanceID(), "Revolver");
     }
 
-    private void Respawn()
+    private void Respawn(bool isGameStart)
     {
         transform.SetPositionAndRotation(new Vector3(0, 78.5f, 0), Quaternion.identity);
 
         _movementSystem.SetIsRespawning(true);
 
         // Delay respawn
-        StartCoroutine(RespawnCoroutine());
+        StartCoroutine(RespawnCoroutine(isGameStart));
     }
 
-    private IEnumerator RespawnCoroutine()
+    private IEnumerator RespawnCoroutine(bool isGameStart)
     {
-        // No delay for now, until I can make the player invulnerable
-        yield return new WaitForSeconds(3f);
+        var delay = isGameStart ? 0f : 3f;
+
+        yield return new WaitForSeconds(delay);
 
         OnRespawn.Invoke();
 

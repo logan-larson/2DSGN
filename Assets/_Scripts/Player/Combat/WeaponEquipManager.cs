@@ -93,7 +93,7 @@ public class WeaponEquipManager : NetworkBehaviour
         HighlightWeapon();
     }
 
-    private void OnDeath()
+    private void OnDeath(bool _)
     {
         // Drop the current weapon, if it isn't the default weapon
         if (_currentWeaponIndex != _defaultWeaponIndex)

@@ -54,6 +54,12 @@ public class PlayerManager : NetworkBehaviour
     {
         if (!base.IsServer) return;
 
+        if (attackerID == -1)
+        {
+            Players[playerID].PlayerHealth.OnDeath.Invoke(true);
+            return;
+        }
+
         var player = Players[playerID];
         var attacker = Players[attackerID];
 
@@ -79,7 +85,6 @@ public class PlayerManager : NetworkBehaviour
 
     private void PlayerKilled(int playerID, int attackerID, string weaponName)
     {
-
         var attackerUsername = attackerID == playerID ? "Suicide" : Players[attackerID].Username;
 
         GameStateManager.Instance.PlayerKilled(playerID, attackerID);
@@ -87,7 +92,7 @@ public class PlayerManager : NetworkBehaviour
         GameStateManager.Instance.OnPlayerKilled.Invoke();
         OnPlayerKilled.Invoke(Players[playerID].Username, attackerUsername, weaponName);
 
-        Players[playerID].PlayerHealth.OnDeath.Invoke();
+        Players[playerID].PlayerHealth.OnDeath.Invoke(false);
     }
 
     public void RespawnPlayer(int playerID)
