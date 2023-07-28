@@ -12,9 +12,17 @@ public class LobbyManager : NetworkBehaviour
 
     private bool _isReady = false;
 
+    private NetworkConnection _connection;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
+
+        if (!base.IsOwner) return;
+
+        _connection = base.LocalConnection;
+
+        SetConnectionServerRpc(_connection);
 
         GameStateManager.Instance.OnLeaderboardActive.AddListener(() =>
         {
@@ -23,6 +31,33 @@ public class LobbyManager : NetworkBehaviour
 
             LobbyLeaderboard = leaderboard;
         });
+    }
+
+    [ServerRpc]
+    private void SetConnectionServerRpc(NetworkConnection conn)
+    {
+        _connection = conn;
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        GameStateManager.Instance.OnInitiateCountdown.AddListener(() =>
+        {
+            SetLeaderboard(_connection, false);
+        });
+
+        GameStateManager.Instance.OnGameEnd.AddListener(() =>
+        {
+            SetLeaderboard(_connection, true);
+        });
+    }
+
+    [TargetRpc]
+    private void SetLeaderboard(NetworkConnection conn, bool isActive)
+    {
+        LobbyLeaderboard.SetActive(isActive);
     }
 
     public void ToggleLeaderboard()
