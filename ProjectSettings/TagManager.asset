@@ -8,6 +8,7 @@ TagManager:
   - Weapon
   - WeaponPickup
   - WeaponPickups
+  - ReadyButton
   layers:
   - Default
   - TransparentFX

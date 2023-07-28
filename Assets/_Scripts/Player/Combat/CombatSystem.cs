@@ -231,7 +231,6 @@ public class CombatSystem : NetworkBehaviour
             hits = new RaycastHit2D[1][];
 
             var currentBloom = _weaponEquipManager.CurrentWeapon.CurrentBloom;
-            Debug.Log(currentBloom);
             Vector3 bloomDir= Quaternion.Euler(0f, 0f, Random.Range(-currentBloom, currentBloom)) * direction;
 
             hits[0] = Physics2D.RaycastAll(position, bloomDir, weapon.Range, ~nonHittable);
@@ -321,8 +320,6 @@ public class CombatSystem : NetworkBehaviour
         if (weapon.BulletsPerShot != 1) return;
 
         _weaponEquipManager.CurrentWeapon.CurrentBloom += weapon.BloomAngleIncreasePerShot;
-
-        Debug.Log("Adding Bloom");
 
         if (_weaponEquipManager.CurrentWeapon.CurrentBloom > weapon.MaxBloomAngle)
             _weaponEquipManager.CurrentWeapon.CurrentBloom = weapon.MaxBloomAngle;

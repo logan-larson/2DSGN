@@ -5,6 +5,7 @@ using UnityEngine.Events;
 using FishNet.Object;
 using FishNet.Connection;
 using System.Linq;
+using FishNet.Transporting;
 
 public class PlayerManager : NetworkBehaviour
 {
@@ -20,6 +21,23 @@ public class PlayerManager : NetworkBehaviour
         Instance = this;
 
         OnPlayerKilled = OnPlayerKilled ?? new UnityEvent<string, string, string>();
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
+    }
+
+    private void OnRemoteConnectionState(NetworkConnection conn, RemoteConnectionStateArgs args)
+    {
+        if (args.ConnectionState == RemoteConnectionState.Stopped)
+        {
+            var player = Players.Select(x => (x.Key, x.Value)).First(x => x.Value.Connection == conn);
+
+            Players.Remove(player.Key);
+        }
     }
 
     private void OnDrawGizmos()
@@ -62,8 +80,11 @@ public class PlayerManager : NetworkBehaviour
     private void PlayerKilled(int playerID, int attackerID, string weaponName)
     {
 
-        var attackerUsername = attackerID == -1 ? "Suicide" : Players[attackerID].Username;
+        var attackerUsername = attackerID == playerID ? "Suicide" : Players[attackerID].Username;
 
+        GameStateManager.Instance.PlayerKilled(playerID, attackerID);
+
+        GameStateManager.Instance.OnPlayerKilled.Invoke();
         OnPlayerKilled.Invoke(Players[playerID].Username, attackerUsername, weaponName);
 
         Players[playerID].PlayerHealth.OnDeath.Invoke();
@@ -123,11 +144,11 @@ public class PlayerManager : NetworkBehaviour
 
     public class Player
     {
-        public string Username { get; set; }
-        public int Health { get; set; }
-        public bool IsDead { get; set; }
         public PlayerHealth PlayerHealth { get; set; }
         public GameObject GameObject { get; set; }
         public NetworkConnection Connection { get; set; }
+        public string Username { get; set; } = "user123";
+        public int Health { get; set; } = 100;
+        public bool IsDead { get; set; } = false;
     }
 }

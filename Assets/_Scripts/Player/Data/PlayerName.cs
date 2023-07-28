@@ -89,5 +89,6 @@ public class PlayerName : NetworkBehaviour
         Username = username;
 
         PlayerManager.Instance.SetUsername(transform.parent.gameObject.GetInstanceID(), username);
+        GameStateManager.Instance.SetUsername(transform.parent.gameObject.GetInstanceID(), username);
     }
 }

@@ -36,20 +36,17 @@ public class RespawnManager : NetworkBehaviour
         _movementSystem = _movementSystem ?? GetComponent<MovementSystem>();
     }
 
-    private void Update()
+    public void ForceRespawn()
     {
         if (!base.IsOwner) return;
 
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            ForceRespawnServerRpc(gameObject.GetInstanceID());
-        }
+        ForceRespawnServerRpc();
     }
 
     [ServerRpc]
-    private void ForceRespawnServerRpc(int id)
+    private void ForceRespawnServerRpc()
     {
-        PlayerManager.Instance.DamagePlayer(id, 100, id, "Revolver");
+        PlayerManager.Instance.DamagePlayer(gameObject.GetInstanceID(), 100, gameObject.GetInstanceID(), "Revolver");
     }
 
     private void Respawn()
