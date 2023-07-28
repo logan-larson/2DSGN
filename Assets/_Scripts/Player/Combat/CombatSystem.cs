@@ -137,6 +137,9 @@ public class CombatSystem : NetworkBehaviour
     {
         Vector3 screenMousePosition = Mouse.current.position.ReadValue();
         screenMousePosition.z = 10f;
+
+        if (Camera.main == null) return;
+
         Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
 
         _worldMousePosition = new Vector3(worldMousePosition.x, worldMousePosition.y, 0f);
