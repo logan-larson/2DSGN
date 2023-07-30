@@ -3145,7 +3145,7 @@ MonoBehaviour:
   _playersList: {fileID: 1747319949}
   _playersListItem: {fileID: 5450942563857098396, guid: d8ae74284f0ec784d818cf25916b5440, type: 3}
   _countdownTime: 5
-  _killsToWin: 5
+  _killsToWin: 25
   ReadyButton: {fileID: 0}
 --- !u!114 &875225100
 MonoBehaviour:
@@ -15274,9 +15274,9 @@ MonoBehaviour:
   _unreliableMTU: 1023
   _ipv4BindAddress: 
   _ipv6BindAddress: 
-  _port: 14104
+  _port: 31768
   _maximumClients: 4095
-  _clientAddress: localhost
+  _clientAddress: 209-222-18-222.global.servers.playflow.cloud
   _timeout: 15
 --- !u!114 &5313784219897215940
 MonoBehaviour:
@@ -15734,7 +15734,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &8451476576649307864
 MonoBehaviour:
   m_ObjectHideFlags: 0

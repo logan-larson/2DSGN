@@ -51,7 +51,7 @@ public class GameStateManager : NetworkBehaviour
     private int _countdownTime = 5;
 
     [SerializeField]
-    private int _killsToWin = 5;
+    private int _killsToWin = 25;
 
     public GameState CurrentGameState { get; private set; } = GameState.Lobby;
 
