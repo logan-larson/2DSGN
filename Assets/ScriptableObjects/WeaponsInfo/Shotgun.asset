@@ -15,7 +15,7 @@ MonoBehaviour:
   Name: Shotgun
   Damage: 40
   FireRate: 0.5
-  Range: 8
+  Range: 12
   IsAutomatic: 1
   BulletsPerShot: 4
   SpreadAngle: 18.77

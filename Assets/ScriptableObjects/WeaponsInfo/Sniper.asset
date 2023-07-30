@@ -15,7 +15,7 @@ MonoBehaviour:
   Name: Sniper
   Damage: 110
   FireRate: 1.5
-  Range: 20
+  Range: 30
   IsAutomatic: 1
   BulletsPerShot: 1
   SpreadAngle: 0

@@ -15,7 +15,7 @@ MonoBehaviour:
   Name: Revolver
   Damage: 20
   FireRate: 0.5
-  Range: 10
+  Range: 15
   IsAutomatic: 1
   BulletsPerShot: 1
   SpreadAngle: 0
