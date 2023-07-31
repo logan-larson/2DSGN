@@ -34,6 +34,8 @@ public class PlayerManager : NetworkBehaviour
     {
         if (args.ConnectionState == RemoteConnectionState.Stopped)
         {
+            if (Players.Count() == 0) return;
+
             var player = Players.Select(x => (x.Key, x.Value)).First(x => x.Value.Connection == conn);
 
             Players.Remove(player.Key);

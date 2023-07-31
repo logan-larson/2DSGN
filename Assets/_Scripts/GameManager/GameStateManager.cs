@@ -55,7 +55,8 @@ public class GameStateManager : NetworkBehaviour
 
     public GameState CurrentGameState { get; private set; } = GameState.Lobby;
 
-    public Button ReadyButton;
+    public GameObject Cam;
+    public GameObject PlayerUI;
 
     private void Awake()
     {
@@ -80,6 +81,9 @@ public class GameStateManager : NetworkBehaviour
     {
         base.OnStartClient();
 
+        Cam.SetActive(true);
+        PlayerUI.SetActive(true);
+
         OnLeaderboardActive.Invoke();
         _lobbyLeaderboard.SetActive(true);
     }
@@ -88,6 +92,8 @@ public class GameStateManager : NetworkBehaviour
     {
         if (args.ConnectionState == RemoteConnectionState.Stopped)
         {
+            if (Players.Count() == 0) return;
+
             var player = Players.Select(x => (x.Key, x.Value)).First(x => x.Value.Connection == conn);
 
             Players.Remove(player.Key);
