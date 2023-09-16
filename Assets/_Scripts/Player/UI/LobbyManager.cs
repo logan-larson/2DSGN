@@ -24,6 +24,13 @@ public class LobbyManager : NetworkBehaviour
 
         SetConnectionServerRpc(_connection);
 
+        /*
+        var PlayerUI = GameObject.Find("PlayerUI");
+        var leaderboard = PlayerUI.transform.GetChild(2).gameObject;
+
+        LobbyLeaderboard = leaderboard;
+        */
+
         GameStateManager.Instance.OnLeaderboardActive.AddListener(() =>
         {
             var PlayerUI = GameObject.Find("PlayerUI");

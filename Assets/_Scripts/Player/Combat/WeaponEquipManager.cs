@@ -7,6 +7,8 @@ using FishNet.Object.Synchronizing;
 using System.Linq;
 using static ModeManager;
 using UnityEngine.Events;
+using FishNet.Connection;
+using FishNet.Transporting;
 
 public class WeaponEquipManager : NetworkBehaviour
 {
@@ -84,6 +86,8 @@ public class WeaponEquipManager : NetworkBehaviour
         }
 
         Weapons[_currentWeaponIndex].IsShown = _modeManager.CurrentMode == Mode.Combat;
+
+        ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
     }
 
     private void Update()
@@ -91,6 +95,15 @@ public class WeaponEquipManager : NetworkBehaviour
         if (!base.IsOwner) return;
         
         HighlightWeapon();
+    }
+
+    // On disconnect, call the OnDeath method to drop the weapon
+    private void OnRemoteConnectionState(NetworkConnection conn, RemoteConnectionStateArgs args)
+    {
+        if (args.ConnectionState == RemoteConnectionState.Stopped)
+        {
+            OnDeath(false);
+        }
     }
 
     private void OnDeath(bool _)
