@@ -17,6 +17,8 @@ public class CameraManager : NetworkBehaviour
         _respawnManager.OnRespawn.AddListener(OnRespawn);
     }
 
+    private void Start() { }
+
     private void OnRespawn()
     {
         SetPlayerFollowTargetRpc(base.Owner, gameObject);

@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Currently this is the Ready Up manager
+/// </summary>
 public class LobbyManager : NetworkBehaviour
 {
 
@@ -12,66 +15,7 @@ public class LobbyManager : NetworkBehaviour
 
     private bool _isReady = false;
 
-    private NetworkConnection _connection;
-
-    public override void OnStartClient()
-    {
-        base.OnStartClient();
-
-        if (!base.IsOwner) return;
-
-        _connection = base.LocalConnection;
-
-        SetConnectionServerRpc(_connection);
-
-        /*
-        var PlayerUI = GameObject.Find("PlayerUI");
-        var leaderboard = PlayerUI.transform.GetChild(2).gameObject;
-
-        LobbyLeaderboard = leaderboard;
-        */
-
-        GameStateManager.Instance.OnLeaderboardActive.AddListener(() =>
-        {
-            var PlayerUI = GameObject.Find("PlayerUI");
-            var leaderboard = PlayerUI.transform.GetChild(2).gameObject;
-
-            LobbyLeaderboard = leaderboard;
-        });
-    }
-
-    [ServerRpc]
-    private void SetConnectionServerRpc(NetworkConnection conn)
-    {
-        _connection = conn;
-    }
-
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-
-        GameStateManager.Instance.OnInitiateCountdown.AddListener(() =>
-        {
-            SetLeaderboard(_connection, false);
-        });
-
-        GameStateManager.Instance.OnGameEnd.AddListener(() =>
-        {
-            SetLeaderboard(_connection, true);
-        });
-    }
-
-    [TargetRpc]
-    private void SetLeaderboard(NetworkConnection conn, bool isActive)
-    {
-        LobbyLeaderboard.SetActive(isActive);
-    }
-
-    public void ToggleLeaderboard()
-    {
-        if (LobbyLeaderboard != null)
-            LobbyLeaderboard.SetActive(!LobbyLeaderboard.activeSelf);
-    }
+    private void Start() { }
 
     public void ToggleReady()
     {

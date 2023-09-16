@@ -19,6 +19,7 @@ public class PlayerInitializer : NetworkBehaviour
     [SerializeField]
     private LineRenderer _lineRenderer;
 
+    private void Start() { }
 
     public override void OnStartClient()
     {

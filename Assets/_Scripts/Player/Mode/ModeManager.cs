@@ -44,6 +44,8 @@ public class ModeManager : NetworkBehaviour
         */
     }
 
+    private void Start() { }
+
     public override void OnStartClient()
     {
         base.OnStartClient();

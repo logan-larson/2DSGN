@@ -24,11 +24,14 @@ public class InputSystem : NetworkBehaviour
     private PlayerHealth _playerHealth;
     private RespawnManager _respawnManager;
     private LobbyManager _lobbyManager;
+    private ScoreboardManager _scoreboardManager;
+
 
     [SerializeField]
     [SyncVar]
     private bool _isEnabled = false;
 
+    /*
     [SyncVar (OnChange = nameof(ChangeIsCursorVisible))]
     private bool _isCursorVisible = false;
 
@@ -37,6 +40,7 @@ public class InputSystem : NetworkBehaviour
         if (!asServer)
             Cursor.visible = newValue;
     }
+    */
 
     private PlayerInput _playerInput;
 
@@ -48,6 +52,8 @@ public class InputSystem : NetworkBehaviour
         _playerInput = _playerInput ?? GetComponent<PlayerInput>();
         _modeManager = _modeManager ?? GetComponent<ModeManager>();
         _lobbyManager = _lobbyManager ?? GetComponent<LobbyManager>();
+
+        _scoreboardManager = _scoreboardManager ?? GetComponentInChildren<ScoreboardManager>();
 
         _playerHealth = _playerHealth ?? GetComponent<PlayerHealth>();
         _playerHealth.OnDeath.AddListener((bool _) => _isEnabled = false);
@@ -158,7 +164,7 @@ public class InputSystem : NetworkBehaviour
 
     public void OnToggleLeaderboard(InputValue _)
     {
-        _lobbyManager.ToggleLeaderboard();
+        _scoreboardManager.ToggleScoreboard();
     }
 
     public void OnToggleReady(InputValue _)

@@ -18,6 +18,8 @@ public class RespawnManager : NetworkBehaviour
     [SerializeField]
     private List<Vector3> _spawnPositions = new List<Vector3>();
 
+    private void Start() { }
+
     public override void OnStartClient()
     {
         base.OnStartClient();

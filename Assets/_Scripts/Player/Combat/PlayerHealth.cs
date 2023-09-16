@@ -21,6 +21,8 @@ public class PlayerHealth : NetworkBehaviour
     [SerializeField]
     private GameObject _damageIndicatorPrefab;
 
+    private void Start() { }
+
     public override void OnStartClient()
     {
         base.OnStartClient();

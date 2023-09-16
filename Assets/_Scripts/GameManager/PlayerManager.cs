@@ -23,6 +23,8 @@ public class PlayerManager : NetworkBehaviour
         OnPlayerKilled = OnPlayerKilled ?? new UnityEvent<string, string, string>();
     }
 
+    private void Start() { }
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -120,8 +122,6 @@ public class PlayerManager : NetworkBehaviour
     public Vector3 GetSpawnPosition()
     {
         Transform[] playerPositions = Players.Values.Where(p => !p.IsDead).Select(p => p.GameObject.transform).ToArray();
-
-        Debug.Log(playerPositions.Length);
 
         // Find spawn point furthest away from all players
         Vector3 furthestSpawnPoint = _spawnPositions[0];
