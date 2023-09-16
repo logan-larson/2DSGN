@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Rifle
   m_EditorClassIdentifier: 
   Name: Rifle
-  Damage: 25
+  Damage: 23
   FireRate: 0.23
-  Range: 23
+  Range: 15
   IsAutomatic: 1
   BulletsPerShot: 1
   SpreadAngle: 0

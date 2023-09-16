@@ -22,7 +22,7 @@ public class JoinGame : MonoBehaviour
         if (IsServerBuild)
         {
             NetworkInfo.IsServerBuild = IsServerBuild;
-            SceneManager.LoadScene("BigMap");
+            SceneManager.LoadScene("Main");
         }
     }
 
@@ -30,6 +30,6 @@ public class JoinGame : MonoBehaviour
     {
         UserInfo.Username = _usernameInput.text;
         NetworkInfo.IsServerBuild = false;
-        SceneManager.LoadScene("BigMap");
+        SceneManager.LoadScene("Main");
     }
 }

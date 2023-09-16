@@ -767,7 +767,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   _damageIndicatorPrefab: {fileID: 3693752882580872442, guid: dc8c980b93d120147ad8cbb5e2d5233d, type: 3}
-  _deathIndicatorPrefab: {fileID: 3914275941705013947, guid: 4b7d9860f35174548874236542f50721, type: 3}
 --- !u!114 &6483848118584978808
 MonoBehaviour:
   m_ObjectHideFlags: 0

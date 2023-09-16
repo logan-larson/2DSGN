@@ -20,8 +20,6 @@ public class PlayerHealth : NetworkBehaviour
 
     [SerializeField]
     private GameObject _damageIndicatorPrefab;
-    [SerializeField]
-    private GameObject _deathIndicatorPrefab;
 
     public override void OnStartClient()
     {
@@ -35,25 +33,6 @@ public class PlayerHealth : NetworkBehaviour
         base.OnStartServer();
 
         OnDeath = OnDeath ?? new UnityEvent<bool>();
-
-        OnDeath.AddListener(SpawnDeathIndicator);
-    }
-
-    private void SpawnDeathIndicator(bool isSuicide)
-    {
-        // Spawn death indicator
-        Instantiate(_deathIndicatorPrefab, transform.position, Quaternion.identity);
-
-        if (base.IsHost) return;
-
-        // Spawn death indicator on clients
-        SpawnDeathIndicatorObserversRpc(transform.position);
-    }
-
-    [ObserversRpc]
-    private void SpawnDeathIndicatorObserversRpc(Vector3 position)
-    {
-        Instantiate(_deathIndicatorPrefab, position, Quaternion.identity);
     }
 
     [Server]

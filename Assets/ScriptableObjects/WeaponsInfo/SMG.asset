@@ -15,7 +15,7 @@ MonoBehaviour:
   Name: SMG
   Damage: 15
   FireRate: 0.15
-  Range: 17
+  Range: 12
   IsAutomatic: 1
   BulletsPerShot: 1
   SpreadAngle: 0
