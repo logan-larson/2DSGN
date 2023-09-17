@@ -29,7 +29,7 @@ public class InputSystem : NetworkBehaviour
 
     [SerializeField]
     [SyncVar]
-    private bool _isEnabled = false;
+    private bool _isEnabled = true;
 
     /*
     [SyncVar (OnChange = nameof(ChangeIsCursorVisible))]
@@ -47,9 +47,10 @@ public class InputSystem : NetworkBehaviour
     private void Awake()
     {
         _movement = _movement ?? GetComponent<MovementSystem>();
+        _playerInput = _playerInput ?? GetComponent<PlayerInput>();
+        /*
         _combatSystem = _combatSystem ?? GetComponent<CombatSystem>();
         _weaponEquipManager = _weaponEquipManager ?? GetComponent<WeaponEquipManager>();
-        _playerInput = _playerInput ?? GetComponent<PlayerInput>();
         _modeManager = _modeManager ?? GetComponent<ModeManager>();
         _lobbyManager = _lobbyManager ?? GetComponent<LobbyManager>();
 
@@ -64,6 +65,7 @@ public class InputSystem : NetworkBehaviour
             if (GameStateManager.Instance.CurrentGameState == GameStateManager.GameState.Game)
                 _isEnabled = true;
         });
+        */
 
         InputValues = (PlayerInputValues)ScriptableObject.CreateInstance(typeof(PlayerInputValues));
 
@@ -73,6 +75,9 @@ public class InputSystem : NetworkBehaviour
     {
         base.OnStartServer();
 
+        _isEnabled = true;
+
+        /*
         GameStateManager.Instance.OnGameEnd.AddListener(() =>
         {
             _isEnabled = false;
@@ -93,6 +98,7 @@ public class InputSystem : NetworkBehaviour
             _isEnabled = true;
         else
             _isEnabled = false;
+        */
     }
 
     public override void OnStartClient()
@@ -120,10 +126,12 @@ public class InputSystem : NetworkBehaviour
 
         InputValues.IsSprintKeyPressed = value.Get<float>() == 1f;
 
+        /*
         if (InputValues.IsSprintKeyPressed && !InputValues.IsFirePressed)
             _modeManager.ChangeToParkourMode();
         else if (InputValues.IsFirePressed)
             _modeManager.ChangeToCombatMode();
+        */
     }
 
     // TODO: Move these events to triggers
@@ -142,10 +150,12 @@ public class InputSystem : NetworkBehaviour
 
         _combatSystem.SetIsShootingServerRpc(value.Get<float>() == 1f);
 
+        /*
         if (InputValues.IsFirePressed)
             _modeManager.ChangeToCombatMode();
         else if (InputValues.IsSprintKeyPressed)
             _modeManager.ChangeToParkourMode();
+        */
     }
 
     public void OnInteract(InputValue value)
@@ -159,7 +169,7 @@ public class InputSystem : NetworkBehaviour
     {
         if (!_isEnabled) return;
 
-        _modeManager.ChangeMode();
+        //_modeManager.ChangeMode();
     }
 
     public void OnToggleLeaderboard(InputValue _)

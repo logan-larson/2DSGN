@@ -37,6 +37,8 @@ public class ScoreboardManager : NetworkBehaviour
     {
         base.OnStartServer();
 
+        if (GameStateManager.Instance == null) return;
+
         // Add listeners for the scoreboard.
         GameStateManager.Instance.OnPlayersChanged.AddListener(UpdateScoreboardObserversRpc);
 
@@ -73,6 +75,8 @@ public class ScoreboardManager : NetworkBehaviour
 
     private void UpdateScoreboard()
     {
+        if (GameStateManager.Instance == null) return;
+
         // Sort the players by kills.
         Dictionary<int, GameStateManager.Player> orderedPlayers = GameStateManager.Instance.Players.OrderByDescending(x => x.Value.Kills).ToDictionary(x => x.Key, x => x.Value);
 

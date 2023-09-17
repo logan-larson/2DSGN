@@ -19,8 +19,6 @@ public class PlayerInitializer : NetworkBehaviour
     [SerializeField]
     private LineRenderer _lineRenderer;
 
-    private void Start() { }
-
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -42,8 +40,11 @@ public class PlayerInitializer : NetworkBehaviour
     [ServerRpc]
     private void InitializeServerRpc()
     {
+        if (PlayerManager.Instance is null) return;
+
         PlayerManager.Instance.Players.Add(gameObject.GetInstanceID(), new PlayerManager.Player() { PlayerHealth = _playerHealth, GameObject = gameObject, Connection = base.Owner });
-        //GameStateManager.Instance.Players.Add(gameObject.GetInstanceID(), new GameStateManager.Player() { Connection = base.Owner });
+
+        if (GameStateManager.Instance is null) return;
 
         GameStateManager.Instance.PlayerJoined(gameObject.GetInstanceID(), new GameStateManager.Player() { Connection = base.Owner, GameObject = gameObject });
     }

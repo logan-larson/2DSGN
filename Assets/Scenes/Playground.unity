@@ -5869,7 +5869,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1521907826}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -30.02, y: -25.35, z: 6.9991865}
+  m_LocalPosition: {x: -30.02, y: -25.35, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12055,7 +12055,6 @@ MonoBehaviour:
   <AssetPathHash>k__BackingField: 0
   _sceneNetworkObjects:
   - {fileID: 1919249585}
-  - {fileID: 5467418486952887424}
 --- !u!114 &73101529796357879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12572,7 +12571,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5467418486952887439}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
   m_Name: 
@@ -12594,7 +12593,6 @@ MonoBehaviour:
   <AssetPathHash>k__BackingField: 14034910126332314592
   _sceneNetworkObjects:
   - {fileID: 1919249585}
-  - {fileID: 5467418486952887424}
 --- !u!114 &5467418486952887425
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12646,7 +12644,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5467418486952887439}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ef1db52e9b9a6194b9d3c21d29f06b81, type: 3}
   m_Name: 
@@ -12669,7 +12667,22 @@ MonoBehaviour:
   OnPlayerKilled:
     m_PersistentCalls:
       m_Calls: []
+  OnPlayerJoined:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPlayerLeft:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPlayerReady:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPlayerSetUsername:
+    m_PersistentCalls:
+      m_Calls: []
   OnScoreboardUpdate:
+    m_PersistentCalls:
+      m_Calls: []
+  OnPlayersChanged:
     m_PersistentCalls:
       m_Calls: []
   _countdownTime: 5
@@ -12692,7 +12705,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!222 &6673669104503240096
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -12790,7 +12803,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 211a9f6ec51ddc14f908f5acc0cd0423, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerPrefab: {fileID: 5020579654786682326, guid: 7ca1af4284ae87641a47f8ba61416b85, type: 3}
+  _playerPrefab: {fileID: 5020579654786682326, guid: 520d34e4d42a0a24bae69e3811fc930f, type: 3}
   _addToDefaultScene: 1
   Spawns:
   - {fileID: 1521907827}
@@ -12844,7 +12857,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72904caff6746bd43866baf51fac4a43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NetworkInfo: {fileID: 11400000, guid: 493434df7f0dddc4caf35666a53dc9f4, type: 2}
+  IsServerBuild: 0
   _networkManager: {fileID: 7372385470554394577}
 --- !u!224 &9211264179772845736
 RectTransform:

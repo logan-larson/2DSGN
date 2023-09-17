@@ -49,6 +49,8 @@ public class CountdownManager : NetworkBehaviour
     {
         base.OnStartServer();
 
+        if (GameStateManager.Instance == null) return;
+
         GameStateManager.Instance.OnInitiateCountdown.AddListener(StartCountdownObserversRpc);
         GameStateManager.Instance.OnGameStart.AddListener(GameStartObserversRpc);
     }

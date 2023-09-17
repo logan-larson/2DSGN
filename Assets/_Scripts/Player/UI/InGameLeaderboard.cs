@@ -18,10 +18,12 @@ public class InGameLeaderboard : NetworkBehaviour
 
     public int PlayerID;
 
-    //private void Start()
     public override void OnStartServer()
     {
         base.OnStartServer();
+
+        if (GameStateManager.Instance == null) return;
+
         GameStateManager.Instance.OnPlayerKilled.AddListener(OnPlayerKilled);
     }
 

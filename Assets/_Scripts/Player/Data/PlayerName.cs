@@ -53,10 +53,12 @@ public class PlayerName : NetworkBehaviour
             return;
         }
 
+        /*
         _modeManager = GetComponentInParent<ModeManager>();
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
+        */
 
         SetMode(0);
         
@@ -88,7 +90,12 @@ public class PlayerName : NetworkBehaviour
     {
         Username = username;
 
+        if (PlayerManager.Instance is null) return;
+
         PlayerManager.Instance.SetUsername(transform.parent.gameObject.GetInstanceID(), username);
+
+        if (GameStateManager.Instance is null) return;
+
         GameStateManager.Instance.SetUsername(transform.parent.gameObject.GetInstanceID(), username);
     }
 }

@@ -53,10 +53,6 @@ public class AnimationSystem : NetworkBehaviour
     private bool _jumpParkour;
     private bool _jumpCombat;
 
-    private void Start()
-    {
-    }
-
     public override void OnStartClient()
     {
         base.OnStartClient();

@@ -26,7 +26,7 @@ public class RespawnManager : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
-        ForceRespawnServerRpc();
+        //ForceRespawnServerRpc();
     }
 
     public override void OnStartServer()
@@ -39,10 +39,12 @@ public class RespawnManager : NetworkBehaviour
 
         _movementSystem = _movementSystem ?? GetComponent<MovementSystem>();
 
+        /*
         GameStateManager.Instance.OnInitiateCountdown.AddListener(() =>
         {
             PlayerManager.Instance.DamagePlayer(gameObject.GetInstanceID(), 100, -1, "Revolver");
         });
+        */
     }
 
     public void ForceRespawn()
