@@ -5,10 +5,27 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Countdown : NetworkBehaviour
+public class CountdownManager : NetworkBehaviour
 {
+    /// <summary>
+    /// The UI canvas's game object.
+    /// </summary>
+    public GameObject CountdownCanvas;
+
+    /// <summary>
+    /// The countdown text's game object.
+    /// </summary>
+    public GameObject CountdownText;
+
+    /// <summary>
+    /// The text component for the countdown. e.g. 5, 4, 3, 2, 1, Go Nuts!
+    /// </summary>
     [SerializeField]
     TMP_Text _text;
+
+    /// <summary>
+    /// The image component for the countdown. This is just a black background that fades out as the countdown ticks.
+    /// </summary>
     [SerializeField]
     Image _image;
 
@@ -16,16 +33,16 @@ public class Countdown : NetworkBehaviour
 
     private void Awake()
     {
-        _text = GetComponentInChildren<TMP_Text>();
-        _image = GetComponent<Image>();
+        _text ??= GetComponentInChildren<TMP_Text>();
+        _image ??= GetComponentInChildren<Image>();
     }
 
     public override void OnStartClient()
     {
         base.OnStartClient();
 
-        _image.enabled = false;
-        _text.enabled = false;
+        CountdownCanvas.SetActive(false);
+        CountdownText.SetActive(false);
     }
 
     public override void OnStartServer()
@@ -50,8 +67,6 @@ public class Countdown : NetworkBehaviour
 
     private void GameStart()
     {
-        _image.enabled = false;
-
         StartCoroutine(GoNuts());
     }
 
@@ -72,14 +87,17 @@ public class Countdown : NetworkBehaviour
             yield return null; // Wait for the next frame.
         }
 
-        // Countdown has finished.
-        _text.enabled = false;
+        // Countdown has finished - disable the canvas and text.
+        CountdownCanvas.SetActive(false);
+        CountdownText.SetActive(false);
     }
 
     private void StartCountdown()
     {
-        _image.enabled = true;
-        _text.enabled = true;
+        // Enable the canvas and text.
+        CountdownCanvas.SetActive(true);
+        CountdownText.SetActive(true);
+
         _text.fontSize = 100;
 
         StartCoroutine(CountdownRoutine());
@@ -115,8 +133,6 @@ public class Countdown : NetworkBehaviour
         // Countdown has finished.
         _text.text = "GO NUTS";
         _text.fontSize = 120;
-
-        _image.enabled = false;
     }
 }
 

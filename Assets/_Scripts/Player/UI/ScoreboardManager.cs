@@ -38,14 +38,6 @@ public class ScoreboardManager : NetworkBehaviour
         base.OnStartServer();
 
         // Add listeners for the scoreboard.
-        /*
-        GameStateManager.Instance.OnPlayerJoined.AddListener(UpdateScoreboardObserversRpc);
-        GameStateManager.Instance.OnPlayerLeft.AddListener(UpdateScoreboardObserversRpc);
-        GameStateManager.Instance.OnPlayerKilled.AddListener(UpdateScoreboardObserversRpc);
-        GameStateManager.Instance.OnPlayerReady.AddListener(UpdateScoreboardObserversRpc);
-        GameStateManager.Instance.OnPlayerSetUsername.AddListener(UpdateScoreboardObserversRpc);
-        */
-
         GameStateManager.Instance.OnPlayersChanged.AddListener(UpdateScoreboardObserversRpc);
 
         GameStateManager.Instance.OnInitiateCountdown.AddListener(DisableScoreboardObserversRpc);
