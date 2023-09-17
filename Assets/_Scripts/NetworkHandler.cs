@@ -8,14 +8,14 @@ NetworkHandler is responsible for starting the server or client connection.
 */
 public class NetworkHandler : MonoBehaviour
 {
-    public UserInfo UserInfo;
-    public NetworkInfo NetworkInfo;
+    public bool IsServerBuild;
 
+    [SerializeField]
     private NetworkManager _networkManager;
 
     private void Start()
     {
-        _networkManager = FindObjectOfType<NetworkManager>();
+        _networkManager ??= FindObjectOfType<NetworkManager>();
 
         if (_networkManager == null)
         {
@@ -23,7 +23,7 @@ public class NetworkHandler : MonoBehaviour
             return;
         }
 
-        if (NetworkInfo.IsServerBuild)
+        if (IsServerBuild)
         {
             _networkManager.ServerManager.StartConnection();
         }

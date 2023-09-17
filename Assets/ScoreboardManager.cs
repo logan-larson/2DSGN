@@ -1,4 +1,5 @@
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,35 +24,34 @@ public class ScoreboardManager : NetworkBehaviour
     [SerializeField]
     private GameObject _playersListItem;
 
-    public Dictionary<int, GameStateManager.Player> Players = new Dictionary<int, GameStateManager.Player>();
-
     public override void OnStartClient()
     {
         base.OnStartClient();
 
-        GameStateManager.Instance.OnScoreboardUpdate.AddListener(UpdateScoreboard);
-
-        GameStateManager.Instance.OnInitiateCountdown.AddListener(() =>
-        {
-            ScoreboardUI.SetActive(false);
-        });
-
-        GameStateManager.Instance.OnGameStart.AddListener(() =>
-        {
-            ScoreboardUI.SetActive(false);
-        });
-
-        GameStateManager.Instance.OnGameEnd.AddListener(() =>
-        {
-            ScoreboardUI.SetActive(true);
-        });
-
         ScoreboardUI.SetActive(false);
+
+        UpdateScoreboard();
     }
 
     public override void OnStartServer()
     {
         base.OnStartServer();
+
+        // Add listeners for the scoreboard.
+        /*
+        GameStateManager.Instance.OnPlayerJoined.AddListener(UpdateScoreboardObserversRpc);
+        GameStateManager.Instance.OnPlayerLeft.AddListener(UpdateScoreboardObserversRpc);
+        GameStateManager.Instance.OnPlayerKilled.AddListener(UpdateScoreboardObserversRpc);
+        GameStateManager.Instance.OnPlayerReady.AddListener(UpdateScoreboardObserversRpc);
+        GameStateManager.Instance.OnPlayerSetUsername.AddListener(UpdateScoreboardObserversRpc);
+        */
+
+        GameStateManager.Instance.OnPlayersChanged.AddListener(UpdateScoreboardObserversRpc);
+
+        GameStateManager.Instance.OnInitiateCountdown.AddListener(DisableScoreboardObserversRpc);
+        GameStateManager.Instance.OnGameStart.AddListener(DisableScoreboardObserversRpc);
+
+        GameStateManager.Instance.OnGameEnd.AddListener(EnableScoreboardObserversRpc);
     }
 
     public void ToggleScoreboard()
@@ -59,13 +59,30 @@ public class ScoreboardManager : NetworkBehaviour
         ScoreboardUI.SetActive(ScoreboardUI.activeSelf ? false : true);
     }
 
+    [ObserversRpc]
+    private void EnableScoreboardObserversRpc()
+    {
+        ScoreboardUI.SetActive(true);
+        UpdateScoreboard();
+    }
+
+    [ObserversRpc]
+    private void DisableScoreboardObserversRpc()
+    {
+        ScoreboardUI.SetActive(false);
+        UpdateScoreboard();
+    }
+
+    [ObserversRpc]
+    private void UpdateScoreboardObserversRpc()
+    {
+        UpdateScoreboard();
+    }
+
     private void UpdateScoreboard()
     {
-        // Update the players dictionary.
-        Players = GameStateManager.Instance.Players;
-
         // Sort the players by kills.
-        Players = Players.OrderByDescending(x => x.Value.Kills).ToDictionary(x => x.Key, x => x.Value);
+        Dictionary<int, GameStateManager.Player> orderedPlayers = GameStateManager.Instance.Players.OrderByDescending(x => x.Value.Kills).ToDictionary(x => x.Key, x => x.Value);
 
         // Clear the scoreboard besides the header row.
         for (var i = 1; i < _playersList.transform.childCount; i++)
@@ -74,7 +91,7 @@ public class ScoreboardManager : NetworkBehaviour
         }
 
         // Create a new row for each player.
-        foreach (var (player, index) in Players.Values.Select((p, i) => (p, i)))
+        foreach (var (player, index) in orderedPlayers.Values.Select((p, i) => (p, i)))
         {
             var playerListItem = Instantiate(_playersListItem, _playersList.transform);
             playerListItem.GetComponent<PlayerListItem>().SetPlayer(player, index + 1);

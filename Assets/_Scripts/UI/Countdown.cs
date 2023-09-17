@@ -34,10 +34,6 @@ public class Countdown : NetworkBehaviour
 
         GameStateManager.Instance.OnInitiateCountdown.AddListener(StartCountdownObserversRpc);
         GameStateManager.Instance.OnGameStart.AddListener(GameStartObserversRpc);
-
-
-        _image.enabled = false;
-        _text.enabled = false;
     }
 
     [ObserversRpc]
@@ -75,6 +71,9 @@ public class Countdown : NetworkBehaviour
 
             yield return null; // Wait for the next frame.
         }
+
+        // Countdown has finished.
+        _text.enabled = false;
     }
 
     private void StartCountdown()
@@ -116,6 +115,8 @@ public class Countdown : NetworkBehaviour
         // Countdown has finished.
         _text.text = "GO NUTS";
         _text.fontSize = 120;
+
+        _image.enabled = false;
     }
 }
 

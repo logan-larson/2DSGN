@@ -12669,6 +12669,9 @@ MonoBehaviour:
   OnPlayerKilled:
     m_PersistentCalls:
       m_Calls: []
+  OnScoreboardUpdate:
+    m_PersistentCalls:
+      m_Calls: []
   _countdownTime: 5
   _killsToWin: 5
 --- !u!1 &5467418486952887439
@@ -12732,6 +12735,7 @@ GameObject:
   - component: {fileID: 7372385470554394591}
   - component: {fileID: 7372385470554394593}
   - component: {fileID: 7372385470554394592}
+  - component: {fileID: 7372385470554394594}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -12828,6 +12832,20 @@ MonoBehaviour:
   _maximumClients: 4095
   _clientAddress: localhost
   _timeout: 15
+--- !u!114 &7372385470554394594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7372385470554394576}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72904caff6746bd43866baf51fac4a43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  NetworkInfo: {fileID: 11400000, guid: 493434df7f0dddc4caf35666a53dc9f4, type: 2}
+  _networkManager: {fileID: 7372385470554394577}
 --- !u!224 &9211264179772845736
 RectTransform:
   m_ObjectHideFlags: 0

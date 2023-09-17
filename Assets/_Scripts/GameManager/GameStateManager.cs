@@ -7,12 +7,16 @@ using UnityEngine.Events;
 using System.Linq;
 using UnityEngine.UI;
 using FishNet.Transporting;
+using FishNet.Object.Synchronizing;
+using System.Threading.Tasks;
 
 public class GameStateManager : NetworkBehaviour
 {
     public static GameStateManager Instance { get; private set; }
 
-    public Dictionary<int, Player> Players = new Dictionary<int, Player>();
+    [SyncObject]
+    public readonly SyncDictionary<int, Player> Players = new SyncDictionary<int, Player>();
+
 
 
     /// <summary>
@@ -39,9 +43,35 @@ public class GameStateManager : NetworkBehaviour
     public UnityEvent OnPlayerKilled = new UnityEvent();
 
     /// <summary>
+    /// Invoked whenever a player joins the game.
+    /// </summary>
+    public UnityEvent OnPlayerJoined = new UnityEvent();
+
+    /// <summary>
+    /// Invoked whenever a player leaves the game.
+    /// </summary>
+    public UnityEvent OnPlayerLeft = new UnityEvent();
+
+    /// <summary>
+    /// Invoked whenever a player changes their ready state.
+    /// </summary>
+    public UnityEvent OnPlayerReady = new UnityEvent();
+
+    /// <summary>
+    /// Invoked whenever a player changes their username.
+    /// </summary>
+    public UnityEvent OnPlayerSetUsername = new UnityEvent();
+
+    /// <summary>
     /// Invoked whenever the scoreboard is updated.
     /// </summary>
     public UnityEvent OnScoreboardUpdate = new UnityEvent();
+
+    /// <summary>
+    /// Invoked whenever the players dictionary changes.
+    /// </summary>
+    public UnityEvent OnPlayersChanged = new UnityEvent();
+
 
     [SerializeField]
     private int _countdownTime = 5;
@@ -54,6 +84,13 @@ public class GameStateManager : NetworkBehaviour
     private void Awake()
     {
         Instance = this;
+
+        Players.OnChange += Players_OnChange;
+    }
+
+    private void Players_OnChange(SyncDictionaryOperation op, int key, Player value, bool asServer)
+    {
+        OnPlayersChanged.Invoke();
     }
 
     private void Start()
@@ -77,8 +114,6 @@ public class GameStateManager : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
-
-        OnScoreboardUpdate.Invoke();
     }
 
     private void OnRemoteConnectionState(NetworkConnection conn, RemoteConnectionStateArgs args)
@@ -100,7 +135,7 @@ public class GameStateManager : NetworkBehaviour
             }
             else
             {
-                OnScoreboardUpdate.Invoke();
+                OnPlayerLeft.Invoke();
             }
         }
     }
@@ -111,19 +146,25 @@ public class GameStateManager : NetworkBehaviour
 
         Players.Add(playerID, player);
 
-        OnScoreboardUpdate.Invoke();
+        OnPlayerJoined.Invoke();
     }
 
     public void PlayerKilled(int playerID, int attackerID)
     {
         if (!base.IsServer) return;
 
-        if (playerID != attackerID)
-            Players[attackerID].Kills++;
+        var attacker = Players[attackerID];
+        var player = Players[playerID];
 
-        Players[playerID].Deaths++;
+        if (playerID != attackerID)
+            attacker.Kills++;
+
+        player.Deaths++;
+
+        Players[attackerID] = attacker;
+        Players[playerID] = player;
             
-        OnScoreboardUpdate.Invoke();
+        OnPlayerKilled.Invoke();
 
         CheckGameEnd(attackerID);
     }
@@ -135,10 +176,7 @@ public class GameStateManager : NetworkBehaviour
             Players.Select(x => x.Value).ToList().ForEach(x =>
             {
                 x.IsReady = false;
-                SetPlayerReadyTargetRpc(x.Connection, x, false);
             });
-
-            OnScoreboardUpdate.Invoke();
 
             OnGameEnd.Invoke();
 
@@ -150,27 +188,33 @@ public class GameStateManager : NetworkBehaviour
     {
         if (!base.IsServer) return;
 
-        Players[playerID].Username = username;
+        var player = Players[playerID];
 
-        OnScoreboardUpdate.Invoke();
+        player.Username = username;
+
+        Players[playerID] = player;
+
+        OnPlayerSetUsername.Invoke();
     }
 
-    public void SetPlayerReady(NetworkConnection conn, bool isReady)
+    public void TogglePlayerReady(NetworkConnection conn)
     {
-
         if (CurrentGameState != GameState.Lobby) return;
 
-        var player = Players.Values.First(x => x.Connection == conn);
+        var (key, player) = Players.First(x => x.Value.Connection == conn);
 
-        player.IsReady = isReady;
-
-        SetPlayerReadyTargetRpc(conn, player, isReady);
-
-        OnScoreboardUpdate.Invoke();
-
-        if (Players.Values.All(x => x.IsReady))
+        if (player != null)
         {
-            InitiateCountdown();
+            player.IsReady = !player.IsReady;
+
+            Players[key] = player;
+
+            OnPlayerReady.Invoke();
+
+            if (Players.Values.All(x => x.IsReady))
+            {
+                InitiateCountdown();
+            }
         }
     }
 
@@ -201,21 +245,13 @@ public class GameStateManager : NetworkBehaviour
     {
         CurrentGameState = GameState.Game;
 
-        OnGameStart.Invoke();
-
         Players.Values.ToList().ForEach(x =>
         {
             x.Kills = 0;
             x.Deaths = 0;
         });
 
-        OnScoreboardUpdate.Invoke();
-    }
-
-    [TargetRpc]
-    private void SetPlayerReadyTargetRpc(NetworkConnection conn, Player player, bool isReady)
-    {
-        player.GameObject.GetComponent<LobbyManager>().SetReady(isReady);
+        OnGameStart.Invoke();
     }
 
     public class Player
