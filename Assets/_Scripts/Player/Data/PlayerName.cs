@@ -53,12 +53,10 @@ public class PlayerName : NetworkBehaviour
             return;
         }
 
-        /*
-        _modeManager = GetComponentInParent<ModeManager>();
+        _modeManager ??= GetComponentInParent<ModeManager>();
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
-        */
 
         SetMode(0);
         

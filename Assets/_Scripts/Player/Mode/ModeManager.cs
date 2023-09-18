@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
-
+using FishNet.Connection;
+using FishNet.Transporting;
 
 public class ModeManager : NetworkBehaviour
 {
@@ -52,6 +53,28 @@ public class ModeManager : NetworkBehaviour
 
         if (!base.IsOwner) return;
     }
+
+    /* This was my attempt at syncing the mode between clients. It didn't work for now...
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        // Listen for new connections.
+        ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
+    }
+
+    private void OnRemoteConnectionState(NetworkConnection conn, RemoteConnectionStateArgs args)
+    {
+        // When a new connection is made, send the current mode to the new connection so they can sync.
+        TargetSetMode(conn, CurrentMode);
+    }
+
+    [TargetRpc]
+    private void TargetSetMode(NetworkConnection conn, Mode mode)
+    {
+        CurrentMode = mode;
+    }
+    */
 
     // This is called by the dedicated change mode button which refers to changing between parkour and combat.
     public void ChangeMode()

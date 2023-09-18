@@ -48,16 +48,17 @@ public class InputSystem : NetworkBehaviour
     {
         _movement = _movement ?? GetComponent<MovementSystem>();
         _playerInput = _playerInput ?? GetComponent<PlayerInput>();
+
+        _modeManager = _modeManager ?? GetComponent<ModeManager>();
+        _playerHealth = _playerHealth ?? GetComponent<PlayerHealth>();
+        _playerHealth.OnDeath.AddListener((bool _) => _isEnabled = false);
+
         /*
         _combatSystem = _combatSystem ?? GetComponent<CombatSystem>();
         _weaponEquipManager = _weaponEquipManager ?? GetComponent<WeaponEquipManager>();
-        _modeManager = _modeManager ?? GetComponent<ModeManager>();
         _lobbyManager = _lobbyManager ?? GetComponent<LobbyManager>();
 
         _scoreboardManager = _scoreboardManager ?? GetComponentInChildren<ScoreboardManager>();
-
-        _playerHealth = _playerHealth ?? GetComponent<PlayerHealth>();
-        _playerHealth.OnDeath.AddListener((bool _) => _isEnabled = false);
 
         _respawnManager = _respawnManager ?? GetComponent<RespawnManager>();
         _respawnManager.OnRespawn.AddListener(() =>
@@ -126,12 +127,10 @@ public class InputSystem : NetworkBehaviour
 
         InputValues.IsSprintKeyPressed = value.Get<float>() == 1f;
 
-        /*
         if (InputValues.IsSprintKeyPressed && !InputValues.IsFirePressed)
             _modeManager.ChangeToParkourMode();
         else if (InputValues.IsFirePressed)
             _modeManager.ChangeToCombatMode();
-        */
     }
 
     // TODO: Move these events to triggers
@@ -148,14 +147,14 @@ public class InputSystem : NetworkBehaviour
 
         InputValues.IsFirePressed = value.Get<float>() == 1f;
 
-        _combatSystem.SetIsShootingServerRpc(value.Get<float>() == 1f);
-
         /*
+        _combatSystem.SetIsShootingServerRpc(value.Get<float>() == 1f);
+        */
+
         if (InputValues.IsFirePressed)
             _modeManager.ChangeToCombatMode();
         else if (InputValues.IsSprintKeyPressed)
             _modeManager.ChangeToParkourMode();
-        */
     }
 
     public void OnInteract(InputValue value)
@@ -169,7 +168,7 @@ public class InputSystem : NetworkBehaviour
     {
         if (!_isEnabled) return;
 
-        //_modeManager.ChangeMode();
+        _modeManager.ChangeMode();
     }
 
     public void OnToggleLeaderboard(InputValue _)

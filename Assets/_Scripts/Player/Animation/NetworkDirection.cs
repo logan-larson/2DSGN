@@ -1,6 +1,8 @@
 using UnityEngine;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
+using FishNet.Connection;
+using FishNet.Transporting;
 
 /**
 <summary>
@@ -43,6 +45,28 @@ public class NetworkDirection : NetworkBehaviour
         }
     }
 
+    /* This was my attempt at syncing the direction of the player when they join the game.
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        // Listen for new connections.
+        ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
+    }
+
+    private void OnRemoteConnectionState(NetworkConnection conn, RemoteConnectionStateArgs args)
+    {
+        // When a new connection is made, send the current mode to the new connection so they can sync.
+        TargetSetMode(conn, IsFacingRight);
+    }
+
+    [TargetRpc]
+    private void TargetSetMode(NetworkConnection conn, bool isFacingRight)
+    {
+        IsFacingRight = isFacingRight;
+    }
+    */
+
     private void Update()
     {
         if (base.IsOwner)
@@ -56,6 +80,12 @@ public class NetworkDirection : NetworkBehaviour
 
     [ServerRpc]
     public void ServerSetDirection(bool isFacingRight)
+    {
+        IsFacingRight = isFacingRight;
+    }
+
+    [ObserversRpc]
+    private void ChangeDirectionObservers(bool isFacingRight)
     {
         IsFacingRight = isFacingRight;
     }
