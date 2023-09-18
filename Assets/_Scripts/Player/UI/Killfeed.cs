@@ -28,6 +28,7 @@ public class Killfeed : NetworkBehaviour
     [ObserversRpc]
     private void OnPlayerKilledObserversRpc(string playerKilledUsername, string killerUsername, string weaponName)
     {
+        if (base.IsHost) return;
 
         GameObject go = Instantiate(_killfeedItemPrefab, transform);
         go.GetComponent<KillfeedItem>().Setup(playerKilledUsername, killerUsername, weaponName);

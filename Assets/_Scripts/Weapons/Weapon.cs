@@ -83,8 +83,6 @@ public class Weapon : NetworkBehaviour
         WeaponSprite.enabled = false;
         MuzzleFlashSprite.enabled = false;
 
-        if (!base.IsServer) return;
-
         IsShown = false;
     }
 

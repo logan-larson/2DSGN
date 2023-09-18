@@ -46,10 +46,14 @@ public class WeaponEquipManager : NetworkBehaviour
     {
         base.OnStartClient();
 
-        _weaponHolder = _weaponHolder ?? GetComponentInChildren<GameObject>();
+        _weaponHolder ??= GetComponentInChildren<GameObject>();
 
-        Weapons = _weaponHolder
-            .GetComponentsInChildren<Weapon>(true);
+        Weapons = _weaponHolder.GetComponentsInChildren<Weapon>(true);
+
+        foreach (Weapon weapon in Weapons)
+        {
+            weapon.Initialize();
+        }
 
         if (!base.IsOwner) return;
 
@@ -59,11 +63,6 @@ public class WeaponEquipManager : NetworkBehaviour
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
-
-        foreach (Weapon weapon in Weapons)
-        {
-            weapon.Initialize();
-        }
 
         Weapons[_currentWeaponIndex].IsShown = _modeManager.CurrentMode == Mode.Combat;
     }
