@@ -69,8 +69,8 @@ public class Weapon : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
-        _combatSystem = _combatSystem ?? transform.parent.GetComponentInParent<CombatSystem>();
-        _weaponEquipManager = _weaponEquipManager ?? transform.parent.GetComponentInParent<WeaponEquipManager>();
+        _combatSystem ??= transform.parent.GetComponentInParent<CombatSystem>();
+        _weaponEquipManager ??= transform.parent.GetComponentInParent<WeaponEquipManager>();
     }
 
     public override void OnStartServer()
@@ -82,8 +82,6 @@ public class Weapon : NetworkBehaviour
     {
         WeaponSprite.enabled = false;
         MuzzleFlashSprite.enabled = false;
-
-        if (!base.IsServer) return;
 
         IsShown = false;
     }

@@ -14,7 +14,10 @@ public class DamageMask : MonoBehaviour
 
     private float _currentScaleY = 0f;
 
+    [SerializeField]
     private ModeManager _modeManager;
+
+    [SerializeField]
     private PlayerHealth _playerHealth;
 
     [SerializeField]
@@ -22,8 +25,8 @@ public class DamageMask : MonoBehaviour
 
     private void Awake()
     {
-        _modeManager = GetComponentInParent<ModeManager>();
-        _playerHealth = GetComponentInParent<PlayerHealth>();
+        _modeManager ??= GetComponentInParent<ModeManager>();
+        _playerHealth ??= GetComponentInParent<PlayerHealth>();
 
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombat);
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkour);

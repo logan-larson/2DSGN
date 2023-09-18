@@ -7,12 +7,16 @@ using UnityEngine.Events;
 using System.Linq;
 using UnityEngine.UI;
 using FishNet.Transporting;
+using FishNet.Object.Synchronizing;
+using System.Threading.Tasks;
 
 public class GameStateManager : NetworkBehaviour
 {
     public static GameStateManager Instance { get; private set; }
 
-    public Dictionary<int, Player> Players = new Dictionary<int, Player>();
+    [SyncObject]
+    public readonly SyncDictionary<int, Player> Players = new SyncDictionary<int, Player>();
+
 
 
     /// <summary>
@@ -33,19 +37,41 @@ public class GameStateManager : NetworkBehaviour
     /// </summary>
     public UnityEvent OnLobbyStart = new UnityEvent();
 
-
+    /// <summary>
+    /// Invoked whenever a player is killed.
+    /// </summary>
     public UnityEvent OnPlayerKilled = new UnityEvent();
 
-    public UnityEvent OnLeaderboardActive = new UnityEvent();
+    /// <summary>
+    /// Invoked whenever a player joins the game.
+    /// </summary>
+    public UnityEvent OnPlayerJoined = new UnityEvent();
 
-    [SerializeField]
-    private GameObject _lobbyLeaderboard;
+    /// <summary>
+    /// Invoked whenever a player leaves the game.
+    /// </summary>
+    public UnityEvent OnPlayerLeft = new UnityEvent();
 
-    [SerializeField]
-    private GameObject _playersList;
+    /// <summary>
+    /// Invoked whenever a player changes their ready state.
+    /// </summary>
+    public UnityEvent OnPlayerReady = new UnityEvent();
 
-    [SerializeField]
-    private GameObject _playersListItem;
+    /// <summary>
+    /// Invoked whenever a player changes their username.
+    /// </summary>
+    public UnityEvent OnPlayerSetUsername = new UnityEvent();
+
+    /// <summary>
+    /// Invoked whenever the scoreboard is updated.
+    /// </summary>
+    public UnityEvent OnScoreboardUpdate = new UnityEvent();
+
+    /// <summary>
+    /// Invoked whenever the players dictionary changes.
+    /// </summary>
+    public UnityEvent OnPlayersChanged = new UnityEvent();
+
 
     [SerializeField]
     private int _countdownTime = 5;
@@ -55,12 +81,16 @@ public class GameStateManager : NetworkBehaviour
 
     public GameState CurrentGameState { get; private set; } = GameState.Lobby;
 
-    public GameObject MainCamera;
-    public GameObject PlayerUI;
-
     private void Awake()
     {
         Instance = this;
+
+        Players.OnChange += Players_OnChange;
+    }
+
+    private void Players_OnChange(SyncDictionaryOperation op, int key, Player value, bool asServer)
+    {
+        OnPlayersChanged.Invoke();
     }
 
     private void Start()
@@ -72,21 +102,18 @@ public class GameStateManager : NetworkBehaviour
     {
         base.OnStartServer();
 
-        _lobbyLeaderboard.SetActive(false);
-
         ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
+
+        // Check if this is the Playground scene, if so, start the game
+        /*
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Playground")
+            StartGame(); 
+        */
     }
 
     public override void OnStartClient()
     {
         base.OnStartClient();
-
-        // Enable GameObjects that are disabled for some reason
-        MainCamera.SetActive(true);
-        PlayerUI.SetActive(true);
-
-        OnLeaderboardActive.Invoke();
-        _lobbyLeaderboard.SetActive(true);
     }
 
     private void OnRemoteConnectionState(NetworkConnection conn, RemoteConnectionStateArgs args)
@@ -99,6 +126,8 @@ public class GameStateManager : NetworkBehaviour
 
             Players.Remove(player.Key);
 
+            // If the player was the last one, end the game and go back to the lobby
+            // Otherwise, update the scoreboard
             if (Players.Count() == 0)
             {
                 CurrentGameState = GameState.Lobby;
@@ -106,7 +135,7 @@ public class GameStateManager : NetworkBehaviour
             }
             else
             {
-                SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
+                OnPlayerLeft.Invoke();
             }
         }
     }
@@ -117,19 +146,25 @@ public class GameStateManager : NetworkBehaviour
 
         Players.Add(playerID, player);
 
-        SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
+        OnPlayerJoined.Invoke();
     }
 
     public void PlayerKilled(int playerID, int attackerID)
     {
         if (!base.IsServer) return;
 
-        if (playerID != attackerID)
-            Players[attackerID].Kills++;
+        var attacker = Players[attackerID];
+        var player = Players[playerID];
 
-        Players[playerID].Deaths++;
+        if (playerID != attackerID)
+            attacker.Kills++;
+
+        player.Deaths++;
+
+        Players[attackerID] = attacker;
+        Players[playerID] = player;
             
-        SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
+        OnPlayerKilled.Invoke();
 
         CheckGameEnd(attackerID);
     }
@@ -141,48 +176,45 @@ public class GameStateManager : NetworkBehaviour
             Players.Select(x => x.Value).ToList().ForEach(x =>
             {
                 x.IsReady = false;
-                SetPlayerReadyTargetRpc(x.Connection, x, false);
             });
 
-            SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
-
             OnGameEnd.Invoke();
-            EnableLeaderboardObserversRpc();
+
             CurrentGameState = GameState.Lobby;
         }   
-    }
-
-    [ObserversRpc]
-    private void EnableLeaderboardObserversRpc()
-    {
-        _lobbyLeaderboard.SetActive(true);
     }
 
     public void SetUsername(int playerID, string username)
     {
         if (!base.IsServer) return;
 
-        Players[playerID].Username = username;
+        var player = Players[playerID];
 
-        SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
+        player.Username = username;
+
+        Players[playerID] = player;
+
+        OnPlayerSetUsername.Invoke();
     }
 
-    public void SetPlayerReady(NetworkConnection conn, bool isReady)
+    public void TogglePlayerReady(NetworkConnection conn)
     {
-
         if (CurrentGameState != GameState.Lobby) return;
 
-        var player = Players.Values.First(x => x.Connection == conn);
+        var (key, player) = Players.First(x => x.Value.Connection == conn);
 
-        player.IsReady = isReady;
-
-        SetPlayerReadyTargetRpc(conn, player, isReady);
-
-        SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
-
-        if (Players.Values.All(x => x.IsReady))
+        if (player != null)
         {
-            InitiateCountdown();
+            player.IsReady = !player.IsReady;
+
+            Players[key] = player;
+
+            OnPlayerReady.Invoke();
+
+            if (Players.Values.All(x => x.IsReady))
+            {
+                InitiateCountdown();
+            }
         }
     }
 
@@ -211,48 +243,31 @@ public class GameStateManager : NetworkBehaviour
 
     private void StartGame()
     {
-            CurrentGameState = GameState.Game;
+        CurrentGameState = GameState.Game;
 
-            OnGameStart.Invoke();
-
-            Players.Values.ToList().ForEach(x =>
-            {
-                x.Kills = 0;
-                x.Deaths = 0;
-            });
-
-            SetLeaderboardStateObserversRpc(Players.Values.OrderByDescending(x => x.Kills).ToArray());
-    }
-
-    [TargetRpc]
-    private void SetPlayerReadyTargetRpc(NetworkConnection conn, Player player, bool isReady)
-    {
-        player.GameObject.GetComponent<LobbyManager>().SetReady(isReady);
-    }
-
-    [ObserversRpc]
-    private void SetLeaderboardStateObserversRpc(Player[] playersList)
-    {
-        for (var i = 1; i < _playersList.transform.childCount; i++)
+        Players.Values.ToList().ForEach(x =>
         {
-            Object.Destroy(_playersList.transform.GetChild(i).gameObject);
-        }
+            x.Kills = 0;
+            x.Deaths = 0;
+        });
 
-        for (var i = 0; i < playersList.Length; i++)
-        {
-            var playerListItem = Instantiate(_playersListItem, _playersList.transform);
-            playerListItem.GetComponent<PlayerListItem>().SetPlayer(playersList[i], i + 1);
-        }
+        OnGameStart.Invoke();
     }
 
     public class Player
     {
         public NetworkConnection Connection { get; set; }
         public GameObject GameObject { get; set; }
-        public string Username { get; set; } = "user123";
+        public string Username { get; set; }
         public int Kills { get; set; } = 0;
         public int Deaths { get; set; } = 0;
         public bool IsReady { get; set; } = false;
+
+        public Player()
+        {
+            System.Random random = new System.Random();
+            Username = "user" + random.Next(100, 1000);
+        }
     }
 
     public enum GameState

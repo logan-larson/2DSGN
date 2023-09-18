@@ -11,7 +11,6 @@ TODO: This should be refactored into two separate scripts. One for passing the u
 public class JoinGame : MonoBehaviour
 {
     public UserInfo UserInfo;
-    public NetworkInfo NetworkInfo;
     public bool IsServerBuild;
 
     [SerializeField]
@@ -21,15 +20,13 @@ public class JoinGame : MonoBehaviour
     {
         if (IsServerBuild)
         {
-            NetworkInfo.IsServerBuild = IsServerBuild;
-            SceneManager.LoadScene("BigMap");
+            SceneManager.LoadScene("Playground");
         }
     }
 
     public void OnJoinGame()
     {
         UserInfo.Username = _usernameInput.text;
-        NetworkInfo.IsServerBuild = false;
-        SceneManager.LoadScene("BigMap");
+        SceneManager.LoadScene("Playground");
     }
 }

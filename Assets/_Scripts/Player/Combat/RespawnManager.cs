@@ -15,9 +15,6 @@ public class RespawnManager : NetworkBehaviour
     [SerializeField]
     private MovementSystem _movementSystem;
 
-    [SerializeField]
-    private List<Vector3> _spawnPositions = new List<Vector3>();
-
     public override void OnStartClient()
     {
         base.OnStartClient();

@@ -24,11 +24,14 @@ public class InputSystem : NetworkBehaviour
     private PlayerHealth _playerHealth;
     private RespawnManager _respawnManager;
     private LobbyManager _lobbyManager;
+    private ScoreboardManager _scoreboardManager;
+
 
     [SerializeField]
     [SyncVar]
-    private bool _isEnabled = false;
+    private bool _isEnabled = true;
 
+    /*
     [SyncVar (OnChange = nameof(ChangeIsCursorVisible))]
     private bool _isCursorVisible = false;
 
@@ -37,50 +40,62 @@ public class InputSystem : NetworkBehaviour
         if (!asServer)
             Cursor.visible = newValue;
     }
+    */
 
     private PlayerInput _playerInput;
 
     private void Awake()
     {
-        _movement = _movement ?? GetComponent<MovementSystem>();
-        _combatSystem = _combatSystem ?? GetComponent<CombatSystem>();
-        _weaponEquipManager = _weaponEquipManager ?? GetComponent<WeaponEquipManager>();
-        _playerInput = _playerInput ?? GetComponent<PlayerInput>();
-        _modeManager = _modeManager ?? GetComponent<ModeManager>();
-        _lobbyManager = _lobbyManager ?? GetComponent<LobbyManager>();
+        _movement ??= GetComponent<MovementSystem>();
+        _playerInput ??= GetComponent<PlayerInput>();
 
-        _playerHealth = _playerHealth ?? GetComponent<PlayerHealth>();
+        _modeManager ??= GetComponent<ModeManager>();
+        _playerHealth ??= GetComponent<PlayerHealth>();
+        _combatSystem ??= GetComponent<CombatSystem>();
+
         _playerHealth.OnDeath.AddListener((bool _) => _isEnabled = false);
 
-        _respawnManager = _respawnManager ?? GetComponent<RespawnManager>();
+
+
+        // Just uncommented these
+        _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
+        _lobbyManager ??= GetComponent<LobbyManager>();
+        _scoreboardManager ??= GetComponentInChildren<ScoreboardManager>();
+        _respawnManager ??= GetComponent<RespawnManager>();
+
         _respawnManager.OnRespawn.AddListener(() =>
         {
             if (GameStateManager.Instance.CurrentGameState == GameStateManager.GameState.Game)
                 _isEnabled = true;
         });
 
-        InputValues = (PlayerInputValues)ScriptableObject.CreateInstance(typeof(PlayerInputValues));
 
+
+
+        InputValues = (PlayerInputValues)ScriptableObject.CreateInstance(typeof(PlayerInputValues));
+        Cursor.visible = true;
     }
 
     public override void OnStartServer()
     {
         base.OnStartServer();
 
+        _isEnabled = true;
+
         GameStateManager.Instance.OnGameEnd.AddListener(() =>
         {
             _isEnabled = false;
-            Cursor.visible = true;
+            //Cursor.visible = true;
         });
         GameStateManager.Instance.OnGameStart.AddListener(() =>
         {
             _isEnabled = true;
-            Cursor.visible = false;
+            //Cursor.visible = false;
         });
         GameStateManager.Instance.OnLobbyStart.AddListener(() =>
         {
             _isEnabled = false;
-            Cursor.visible = true;
+            //Cursor.visible = true;
         });
 
         if (GameStateManager.Instance.CurrentGameState == GameStateManager.GameState.Game)
@@ -158,7 +173,7 @@ public class InputSystem : NetworkBehaviour
 
     public void OnToggleLeaderboard(InputValue _)
     {
-        _lobbyManager.ToggleLeaderboard();
+        _scoreboardManager.ToggleScoreboard();
     }
 
     public void OnToggleReady(InputValue _)

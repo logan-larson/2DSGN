@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Data;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Prediction;
@@ -312,12 +313,6 @@ public class MovementSystem : NetworkBehaviour
         _inParkourMode = data.InParkourMode;
         _inCombatMode = data.InCombatMode;
         _timeOnGround = data.TimeOnGround;
-
-        if (_isRespawning)
-        {
-            transform.rotation = Quaternion.identity;
-            _currentVelocity = Vector3.zero;
-        }
     }
 
     // TODO: this is a fucking hacky way to do this
@@ -393,7 +388,11 @@ public class MovementSystem : NetworkBehaviour
 
     private void UpdateVelocity(MoveData moveData, bool asServer)
     {
-
+        if (moveData.IsRespawning)
+        {
+            _currentVelocity = Vector3.zero;
+            return;
+        }
 
         // Increase top speed when sprint key is pressed
         float sprintMultiplier = moveData.Sprint && !_inCombatMode ? MovementProperties.SprintMultiplier : 1f;
@@ -504,6 +503,11 @@ public class MovementSystem : NetworkBehaviour
 
         Vector3 finalPosition = (transform.position + changeGround) + _currentVelocity * (float)TimeManager.TickDelta;
 
+        if (moveData.IsRespawning)
+        {
+            transform.SetPositionAndRotation(finalPosition, Quaternion.identity);
+            return;
+        }
 
         if (_isGrounded)
         {
@@ -545,11 +549,6 @@ public class MovementSystem : NetworkBehaviour
             Quaternion finalRotation = Quaternion.RotateTowards(transform.rotation, targetRotation, MovementProperties.MaxRotationDegrees);
 
             transform.SetPositionAndRotation(finalPosition, finalRotation);
-        }
-
-        if (moveData.IsRespawning)
-        {
-            transform.SetPositionAndRotation(finalPosition, Quaternion.identity);
         }
     }
 

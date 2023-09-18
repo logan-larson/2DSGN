@@ -36,6 +36,9 @@ public class CombatSystem : NetworkBehaviour
     private WeaponEquipManager _weaponEquipManager;
 
     [SerializeField]
+    private PlayerName _playerName;
+
+    [SerializeField]
     private LineRenderer _bullet;
 
     private float _shootTimer = 0f;
@@ -47,13 +50,11 @@ public class CombatSystem : NetworkBehaviour
     private Vector3 _aimDirection = Vector3.zero;
     private Vector3 _worldMousePosition = Vector3.zero;
 
-    public UserInfo UserInfo;
-
     public Vector3 AimDirection => _aimDirection;
 
 
-    void Start()
-    { // public void OnStart
+    private void Start()
+    {
         _bullet.enabled = false;
     }
 
@@ -63,8 +64,9 @@ public class CombatSystem : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
-        _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
-        _weaponEquipManager = _weaponEquipManager ?? GetComponent<WeaponEquipManager>();
+        _inputSystem ??= GetComponent<InputSystem>();
+        _playerName ??= GetComponentInChildren<PlayerName>();
+        _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
 
         _weaponEquipManager.ChangeWeapon.AddListener(OnWeaponChanged);
 
@@ -75,8 +77,9 @@ public class CombatSystem : NetworkBehaviour
     {
         base.OnStartServer();
 
-        _inputSystem = _inputSystem ?? GetComponent<InputSystem>();
-        _weaponEquipManager = _weaponEquipManager ?? GetComponent<WeaponEquipManager>();
+        _inputSystem ??= GetComponent<InputSystem>();
+        _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
+        _playerName ??= GetComponentInChildren<PlayerName>();
 
         _input = _inputSystem.InputValues;
     }
@@ -179,7 +182,7 @@ public class CombatSystem : NetworkBehaviour
         _shootTimer = 0f;
 
         // TODO: Change bullet spawn location to be related to WeaponInfo.MuzzlePosition
-        ShootServer(_weaponEquipManager.CurrentWeapon.WeaponInfo, _weaponHolder.transform.position, _aimDirection, UserInfo.Username);
+        ShootServer(_weaponEquipManager.CurrentWeapon.WeaponInfo, _weaponHolder.transform.position, _aimDirection, _playerName.Username);
     }
 
     [ServerRpc]

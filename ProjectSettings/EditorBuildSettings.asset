@@ -11,8 +11,11 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Main.unity
     guid: 7ae0fcd02dcfc9b498c764bf9620200c
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/BigMap.unity
     guid: 88708495161f482419d240ca654c5cbb
+  - enabled: 1
+    path: Assets/Scenes/Playground.unity
+    guid: 30df0d7054ae84642abd618e65cd2631
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 778b13f2bf9b8b9438ee04ec454c2ccc, type: 2}

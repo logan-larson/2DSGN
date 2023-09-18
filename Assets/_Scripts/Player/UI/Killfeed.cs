@@ -10,12 +10,13 @@ public class Killfeed : NetworkBehaviour
 
     private void Start()
     {
+        if (PlayerManager.Instance is null) return;
+
         PlayerManager.Instance.OnPlayerKilled.AddListener(OnPlayerKilled);
     }
 
     private void OnPlayerKilled(string playerKilledUsername, string killerUsername, string weaponName)
     {
-
         GameObject go = Instantiate(_killfeedItemPrefab, transform);
         go.GetComponent<KillfeedItem>().Setup(playerKilledUsername, killerUsername, weaponName);
 
@@ -27,6 +28,7 @@ public class Killfeed : NetworkBehaviour
     [ObserversRpc]
     private void OnPlayerKilledObserversRpc(string playerKilledUsername, string killerUsername, string weaponName)
     {
+        if (base.IsHost) return;
 
         GameObject go = Instantiate(_killfeedItemPrefab, transform);
         go.GetComponent<KillfeedItem>().Setup(playerKilledUsername, killerUsername, weaponName);

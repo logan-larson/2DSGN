@@ -33,6 +33,14 @@ public class Crosshair : NetworkBehaviour
     {
         base.OnStartClient();
 
+        _crosshair = GetComponent<RectTransform>();
+
+        if (!base.IsOwner)
+        {
+            transform.parent.gameObject.SetActive(false);
+            return;
+        }
+
         _weaponEquipManager = _weaponEquipManager ?? GetComponentInParent<WeaponEquipManager>();
 
         _weaponEquipManager.ChangeWeapon.AddListener(ChangeWeapon);
