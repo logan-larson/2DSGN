@@ -53,9 +53,9 @@ public class WeaponEquipManager : NetworkBehaviour
 
         if (!base.IsOwner) return;
 
-        _modeManager = _modeManager ?? GetComponentInParent<ModeManager>();
-        //_respawnManager = _respawnManager ?? GetComponentInParent<RespawnManager>();
-        _playerHealth = _playerHealth ?? GetComponentInParent<PlayerHealth>();
+        _modeManager ??= GetComponentInParent<ModeManager>();
+        _respawnManager ??= GetComponentInParent<RespawnManager>();
+        _playerHealth ??= GetComponentInParent<PlayerHealth>();
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
@@ -72,13 +72,13 @@ public class WeaponEquipManager : NetworkBehaviour
     {
         base.OnStartServer();
 
-        _weaponHolder = _weaponHolder ?? GetComponentInChildren<GameObject>();
+        _weaponHolder ??= GetComponentInChildren<GameObject>();
+        _respawnManager ??= GetComponentInParent<RespawnManager>();
 
-        Weapons = _weaponHolder
-            .GetComponentsInChildren<Weapon>(true);
+        Weapons = _weaponHolder.GetComponentsInChildren<Weapon>(true);
 
         _playerHealth.OnDeath.AddListener(OnDeath);
-        //_respawnManager.OnRespawn.AddListener(OnRespawn);
+        _respawnManager.OnRespawn.AddListener(OnRespawn);
 
         foreach (Weapon weapon in Weapons)
         {
@@ -155,11 +155,9 @@ public class WeaponEquipManager : NetworkBehaviour
         ChangeWeaponActivationServer(_currentWeaponIndex, false, -1);
     }
 
-    /**
-    <summary>
-    Highlight the closest weapon that isn't equipped and within a certain threshold distance.
-    </summary>
-    */
+    /// <summary>
+    /// Highlight the closest weapon that isn't equipped and within a certain threshold distance.
+    /// </summary>
     private void HighlightWeapon()
     {
         GameObject[] weapons = GameObject.FindGameObjectsWithTag("WeaponPickup");
@@ -193,11 +191,9 @@ public class WeaponEquipManager : NetworkBehaviour
         }
     }
 
-    /**
-    <summary>
-    Try to equip the highlighted weapon. This is called by the player's input system.
-    </summary>
-    */
+    /// <summary>
+    /// Try to equip the highlighted weapon. This is called by the player's input system.
+    /// </summary>
     public void TryEquipWeapon()
     {
         if (!base.IsOwner) return;

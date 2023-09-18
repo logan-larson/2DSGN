@@ -10,9 +10,6 @@ using UnityEngine.UI;
 /// </summary>
 public class LobbyManager : NetworkBehaviour
 {
-
-    public GameObject LobbyLeaderboard;
-
     public void ToggleReady()
     {
         if (!base.IsOwner) return;

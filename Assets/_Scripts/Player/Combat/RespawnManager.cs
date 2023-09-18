@@ -15,18 +15,13 @@ public class RespawnManager : NetworkBehaviour
     [SerializeField]
     private MovementSystem _movementSystem;
 
-    [SerializeField]
-    private List<Vector3> _spawnPositions = new List<Vector3>();
-
-    private void Start() { }
-
     public override void OnStartClient()
     {
         base.OnStartClient();
 
         if (!base.IsOwner) return;
 
-        //ForceRespawnServerRpc();
+        ForceRespawnServerRpc();
     }
 
     public override void OnStartServer()
@@ -39,12 +34,10 @@ public class RespawnManager : NetworkBehaviour
 
         _movementSystem = _movementSystem ?? GetComponent<MovementSystem>();
 
-        /*
         GameStateManager.Instance.OnInitiateCountdown.AddListener(() =>
         {
             PlayerManager.Instance.DamagePlayer(gameObject.GetInstanceID(), 100, -1, "Revolver");
         });
-        */
     }
 
     public void ForceRespawn()

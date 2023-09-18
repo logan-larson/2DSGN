@@ -13,10 +13,8 @@ public class CameraManager : NetworkBehaviour
 
     private void Awake()
     {
-        /*
         _respawnManager = gameObject.GetComponent<RespawnManager>();
         _respawnManager.OnRespawn.AddListener(OnRespawn);
-        */
     }
 
     private void OnRespawn()

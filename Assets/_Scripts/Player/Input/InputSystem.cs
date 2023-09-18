@@ -54,22 +54,26 @@ public class InputSystem : NetworkBehaviour
         _combatSystem ??= GetComponent<CombatSystem>();
 
         _playerHealth.OnDeath.AddListener((bool _) => _isEnabled = false);
-        /*
-        _weaponEquipManager = _weaponEquipManager ?? GetComponent<WeaponEquipManager>();
-        _lobbyManager = _lobbyManager ?? GetComponent<LobbyManager>();
 
-        _scoreboardManager = _scoreboardManager ?? GetComponentInChildren<ScoreboardManager>();
 
-        _respawnManager = _respawnManager ?? GetComponent<RespawnManager>();
+
+        // Just uncommented these
+        _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
+        _lobbyManager ??= GetComponent<LobbyManager>();
+        _scoreboardManager ??= GetComponentInChildren<ScoreboardManager>();
+        _respawnManager ??= GetComponent<RespawnManager>();
+
         _respawnManager.OnRespawn.AddListener(() =>
         {
             if (GameStateManager.Instance.CurrentGameState == GameStateManager.GameState.Game)
                 _isEnabled = true;
         });
-        */
+
+
+
 
         InputValues = (PlayerInputValues)ScriptableObject.CreateInstance(typeof(PlayerInputValues));
-
+        Cursor.visible = true;
     }
 
     public override void OnStartServer()
@@ -78,28 +82,26 @@ public class InputSystem : NetworkBehaviour
 
         _isEnabled = true;
 
-        /*
         GameStateManager.Instance.OnGameEnd.AddListener(() =>
         {
             _isEnabled = false;
-            Cursor.visible = true;
+            //Cursor.visible = true;
         });
         GameStateManager.Instance.OnGameStart.AddListener(() =>
         {
             _isEnabled = true;
-            Cursor.visible = false;
+            //Cursor.visible = false;
         });
         GameStateManager.Instance.OnLobbyStart.AddListener(() =>
         {
             _isEnabled = false;
-            Cursor.visible = true;
+            //Cursor.visible = true;
         });
 
         if (GameStateManager.Instance.CurrentGameState == GameStateManager.GameState.Game)
             _isEnabled = true;
         else
             _isEnabled = false;
-        */
     }
 
     public override void OnStartClient()
