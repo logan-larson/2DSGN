@@ -46,15 +46,15 @@ public class InputSystem : NetworkBehaviour
 
     private void Awake()
     {
-        _movement = _movement ?? GetComponent<MovementSystem>();
-        _playerInput = _playerInput ?? GetComponent<PlayerInput>();
+        _movement ??= GetComponent<MovementSystem>();
+        _playerInput ??= GetComponent<PlayerInput>();
 
-        _modeManager = _modeManager ?? GetComponent<ModeManager>();
-        _playerHealth = _playerHealth ?? GetComponent<PlayerHealth>();
+        _modeManager ??= GetComponent<ModeManager>();
+        _playerHealth ??= GetComponent<PlayerHealth>();
+        _combatSystem ??= GetComponent<CombatSystem>();
+
         _playerHealth.OnDeath.AddListener((bool _) => _isEnabled = false);
-
         /*
-        _combatSystem = _combatSystem ?? GetComponent<CombatSystem>();
         _weaponEquipManager = _weaponEquipManager ?? GetComponent<WeaponEquipManager>();
         _lobbyManager = _lobbyManager ?? GetComponent<LobbyManager>();
 
@@ -147,9 +147,7 @@ public class InputSystem : NetworkBehaviour
 
         InputValues.IsFirePressed = value.Get<float>() == 1f;
 
-        /*
         _combatSystem.SetIsShootingServerRpc(value.Get<float>() == 1f);
-        */
 
         if (InputValues.IsFirePressed)
             _modeManager.ChangeToCombatMode();

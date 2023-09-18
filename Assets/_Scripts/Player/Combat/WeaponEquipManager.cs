@@ -54,7 +54,7 @@ public class WeaponEquipManager : NetworkBehaviour
         if (!base.IsOwner) return;
 
         _modeManager = _modeManager ?? GetComponentInParent<ModeManager>();
-        _respawnManager = _respawnManager ?? GetComponentInParent<RespawnManager>();
+        //_respawnManager = _respawnManager ?? GetComponentInParent<RespawnManager>();
         _playerHealth = _playerHealth ?? GetComponentInParent<PlayerHealth>();
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
@@ -78,7 +78,7 @@ public class WeaponEquipManager : NetworkBehaviour
             .GetComponentsInChildren<Weapon>(true);
 
         _playerHealth.OnDeath.AddListener(OnDeath);
-        _respawnManager.OnRespawn.AddListener(OnRespawn);
+        //_respawnManager.OnRespawn.AddListener(OnRespawn);
 
         foreach (Weapon weapon in Weapons)
         {
