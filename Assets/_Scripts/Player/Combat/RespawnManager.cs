@@ -61,9 +61,9 @@ public class RespawnManager : NetworkBehaviour
 
     private void Respawn(bool isGameStart)
     {
-        transform.SetPositionAndRotation(new Vector3(0, 78.5f, 0), Quaternion.identity);
+        //transform.SetPositionAndRotation(new Vector3(0, 78.5f, 0), Quaternion.identity);
 
-        _movementSystem.SetIsRespawning(true);
+        //_movementSystem.SetIsRespawning(true);
 
         // Delay respawn
         StartCoroutine(RespawnCoroutine(isGameStart));
@@ -77,13 +77,13 @@ public class RespawnManager : NetworkBehaviour
 
         OnRespawn.Invoke();
 
-        Vector3 spawnPosition = PlayerManager.Instance.GetSpawnPosition();
+        //Vector3 spawnPosition = PlayerManager.Instance.GetSpawnPosition();
 
         PlayerManager.Instance.RespawnPlayer(gameObject.GetInstanceID());
 
-        _movementSystem.SetIsRespawning(false);
+        //_movementSystem.SetIsRespawning(false);
 
-        transform.position = spawnPosition;
-        transform.rotation = Quaternion.identity;
+        //transform.position = spawnPosition;
+        //transform.rotation = Quaternion.identity;
     }
 }

@@ -91,6 +91,7 @@ public class MovementSystem : NetworkBehaviour
     /// <summary>
     /// The current airborne velocity of the player.
     /// </summary>
+    [SerializeField]
     public Vector3 _currentVelocity = new Vector3();
 
     /// <summary>
@@ -106,6 +107,7 @@ public class MovementSystem : NetworkBehaviour
     /// <summary>
     /// True if the player is currently grounded.
     /// </summary>
+    [SerializeField]
     private bool _isGrounded = false;
 
     /// <summary>
@@ -133,11 +135,13 @@ public class MovementSystem : NetworkBehaviour
     /// <summary>
     /// The predicted landing position for airborne player.
     /// </summary>
+    [SerializeField]
     private Vector3 _predictedPosition = new Vector3();
 
     /// <summary>
     /// The predicted normal of surface of landing position for airborne player.
     /// </summary>
+    [SerializeField]
     private Vector3 _predictedNormal = new Vector3();
 
     /// <summary>
@@ -211,9 +215,12 @@ public class MovementSystem : NetworkBehaviour
 
     private void Awake()
     {
-        InputSystem = InputSystem ?? GetComponent<InputSystem>();
-        _playerHealth = _playerHealth ?? GetComponent<PlayerHealth>();
-        _respawnManager = _respawnManager ?? GetComponent<RespawnManager>();
+        InputSystem ??= GetComponent<InputSystem>();
+        _playerHealth ??= GetComponent<PlayerHealth>();
+        _respawnManager ??= GetComponent<RespawnManager>();
+
+        _playerHealth.OnDeath.AddListener(OnDeath);
+        _respawnManager.OnRespawn.AddListener(OnRespawn);
     }
 
     private void Start()
@@ -222,6 +229,25 @@ public class MovementSystem : NetworkBehaviour
 
         if (_input == null)
             Debug.LogError("InputValues not found on InputSystem.");
+    }
+
+    private void OnDeath(bool _)
+    {
+        // Disable movement
+        _isRespawning = true;
+
+        // Set position to heaven
+        transform.SetPositionAndRotation(new Vector3(0, 78.5f, 0), Quaternion.identity);
+    }
+
+    private void OnRespawn()
+    {
+        // Set position to spawn
+        Vector3 spawnPosition = PlayerManager.Instance.GetSpawnPosition();
+        transform.SetPositionAndRotation(spawnPosition, Quaternion.identity);
+
+        // Enable movement
+        _isRespawning = false;
     }
 
     private void OnTick()
@@ -248,7 +274,7 @@ public class MovementSystem : NetworkBehaviour
                 IsGrounded = _isGrounded,
                 InParkourMode = _inParkourMode,
                 InCombatMode = _inCombatMode,
-                TimeOnGround = _timeOnGround
+                TimeOnGround = _timeOnGround,
             };
 
             Reconciliation(reconcileData, true);
@@ -286,6 +312,14 @@ public class MovementSystem : NetworkBehaviour
     [Replicate]
     private void Move(MoveData moveData, bool asServer, bool replaying = false)
     {
+        if (moveData.IsRespawning)
+        {
+            _currentVelocity = Vector3.zero;
+            _predictedNormal = Vector3.zero;
+            _predictedPosition = transform.position;
+            return;
+        }
+
         UpdateMode(moveData);
 
         UpdateRaycastOrigins();
@@ -313,25 +347,6 @@ public class MovementSystem : NetworkBehaviour
         _inParkourMode = data.InParkourMode;
         _inCombatMode = data.InCombatMode;
         _timeOnGround = data.TimeOnGround;
-    }
-
-    // TODO: this is a fucking hacky way to do this
-    public void SetIsRespawning(bool isRespawning)
-    {
-        if (!isRespawning)
-        {
-            StartCoroutine(DelayRespawnCoroutine());
-        }
-        else
-        {
-            _isRespawning = true;
-        }
-    }
-
-    private IEnumerator DelayRespawnCoroutine()
-    {
-        yield return new WaitForSeconds(0.25f);
-        _isRespawning = false;
     }
 
     private void UpdateMode(MoveData moveData = new MoveData())
@@ -388,12 +403,6 @@ public class MovementSystem : NetworkBehaviour
 
     private void UpdateVelocity(MoveData moveData, bool asServer)
     {
-        if (moveData.IsRespawning)
-        {
-            _currentVelocity = Vector3.zero;
-            return;
-        }
-
         // Increase top speed when sprint key is pressed
         float sprintMultiplier = moveData.Sprint && !_inCombatMode ? MovementProperties.SprintMultiplier : 1f;
         // Set top speed based on mode
@@ -502,12 +511,6 @@ public class MovementSystem : NetworkBehaviour
         }
 
         Vector3 finalPosition = (transform.position + changeGround) + _currentVelocity * (float)TimeManager.TickDelta;
-
-        if (moveData.IsRespawning)
-        {
-            transform.SetPositionAndRotation(finalPosition, Quaternion.identity);
-            return;
-        }
 
         if (_isGrounded)
         {
