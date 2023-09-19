@@ -166,10 +166,12 @@ public class WeaponEquipManager : NetworkBehaviour
 
         foreach (GameObject weapon in weapons)
         {
-            weapon.GetComponent<WeaponPickup>().HideHighlight();
+            var weaponPickup = weapon.GetComponent<WeaponPickup>();
+            weaponPickup.HideHighlight();
 
             float distance = Vector3.Distance(weapon.transform.position, referencePosition);
-            if (distance < closestDistance)
+            // If the distance is the closest and it is available to be picked up.
+            if (!weaponPickup.IsPickedUp && distance < closestDistance)
             {
                 closestWeaponPickup = weapon;
                 closestDistance = distance;
