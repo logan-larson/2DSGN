@@ -41,6 +41,9 @@ public class CombatSystem : NetworkBehaviour
     [SerializeField]
     private LineRenderer _bullet;
 
+    [SerializeField]
+    private bool _combatDisabled = false;
+
     private float _shootTimer = 0f;
     private float _bloomTimer = 0f;
 
@@ -82,6 +85,22 @@ public class CombatSystem : NetworkBehaviour
         _playerName ??= GetComponentInChildren<PlayerName>();
 
         _input = _inputSystem.InputValues;
+
+        GameStateManager.Instance.OnGameStart.AddListener(OnGameStart);
+        GameStateManager.Instance.OnGameEnd.AddListener(OnGameEnd);
+    }
+
+    private void OnGameStart()
+    {
+        // Enable movement
+        _combatDisabled = false;
+    }
+
+    private void OnGameEnd()
+    {
+        // Disable movement things
+        _combatDisabled = true;
+        _isShooting = false;
     }
 
     private void OnWeaponChanged()
@@ -92,6 +111,8 @@ public class CombatSystem : NetworkBehaviour
 
     private void Update()
     {
+        if (_combatDisabled) return;
+
         if (base.IsOwner)
         {
             if (_weaponEquipManager.CurrentWeapon == null)

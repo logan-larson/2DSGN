@@ -105,8 +105,8 @@ public class GameStateManager : NetworkBehaviour
         ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
 
         // Check if this is the Playground scene, if so, start the game
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Playground")
-            StartGame(); 
+        //if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Playground")
+            //StartGame(); 
     }
 
     private void OnRemoteConnectionState(NetworkConnection conn, RemoteConnectionStateArgs args)

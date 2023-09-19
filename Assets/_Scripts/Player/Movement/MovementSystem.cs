@@ -26,7 +26,6 @@ public class MovementSystem : NetworkBehaviour
         public bool Jump;
         public bool ChangeToCombat; // Fire key
         public bool ChangeToParkour; // Sprint key
-        public bool IsRespawning; // Set by the RespawnManager
     }
 
     /// <summary>
@@ -55,7 +54,6 @@ public class MovementSystem : NetworkBehaviour
     {
         public Vector3 Position;
         public Vector3 Velocity;
-        //public Quaternion Rotation;
         public bool IsGrounded;
         public bool InParkourMode;
         public bool InCombatMode;
@@ -165,10 +163,11 @@ public class MovementSystem : NetworkBehaviour
     private bool _inCombatMode = false;
 
     /// <summary>
-    /// Set to true when the player is respawning.
+    /// Set to true when the player's movement should be disabled.
     /// </summary>
     [SerializeField]
-    private bool _isRespawning = false;
+    private bool _movementDisabled = false;
+
 
 
     #endregion
@@ -219,8 +218,12 @@ public class MovementSystem : NetworkBehaviour
         _playerHealth ??= GetComponent<PlayerHealth>();
         _respawnManager ??= GetComponent<RespawnManager>();
 
+        // Should this be in the OnStartClient method?? OnStartServer?? Or Both??
         _playerHealth.OnDeath.AddListener(OnDeath);
         _respawnManager.OnRespawn.AddListener(OnRespawn);
+
+        GameStateManager.Instance.OnGameStart.AddListener(OnGameStart);
+        GameStateManager.Instance.OnGameEnd.AddListener(OnGameEnd);
     }
 
     private void Start()
@@ -231,10 +234,16 @@ public class MovementSystem : NetworkBehaviour
             Debug.LogError("InputValues not found on InputSystem.");
     }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+    }
+
     private void OnDeath(bool _)
     {
         // Disable movement
-        _isRespawning = true;
+        //_isRespawning = true;
+        _movementDisabled = true;
 
         // Set position to heaven
         transform.SetPositionAndRotation(new Vector3(0, 78.5f, 0), Quaternion.identity);
@@ -247,7 +256,20 @@ public class MovementSystem : NetworkBehaviour
         transform.SetPositionAndRotation(spawnPosition, Quaternion.identity);
 
         // Enable movement
-        _isRespawning = false;
+        //_isRespawning = false;
+        _movementDisabled = false;
+    }
+
+    private void OnGameStart()
+    {
+        // Enable movement
+        _movementDisabled = false;
+    }
+
+    private void OnGameEnd()
+    {
+        // Disable movement things
+        _movementDisabled = true;
     }
 
     private void OnTick()
@@ -298,8 +320,6 @@ public class MovementSystem : NetworkBehaviour
         moveData.ChangeToCombat = _input.IsFirePressed;
         if (!moveData.ChangeToCombat)
             moveData.ChangeToParkour = _input.IsSprintKeyPressed;
-
-        moveData.IsRespawning = _isRespawning;
     }
 
     /// <summary>
@@ -312,7 +332,7 @@ public class MovementSystem : NetworkBehaviour
     [Replicate]
     private void Move(MoveData moveData, bool asServer, bool replaying = false)
     {
-        if (moveData.IsRespawning)
+        if (_movementDisabled)
         {
             _currentVelocity = Vector3.zero;
             _predictedNormal = Vector3.zero;
