@@ -62,7 +62,28 @@ public class PlayerHealth : NetworkBehaviour
     [Server]
     public void ResetHealth()
     {
+        var healthDifference = 100 - Health;
+        
+        PlayerManager.Instance.Players[gameObject.GetInstanceID()].Health = 100;
         Health = 100;
+
+        GameObject healIndicator = Instantiate(_damageIndicatorPrefab, transform.position, Quaternion.identity);
+        var healIndicatorText = healIndicator.GetComponentInChildren<DamageIndicator>();
+        healIndicatorText.SetDamageValue(healthDifference);
+        healIndicatorText.SetColor(Color.green);
+
+        SpawnHealIndicatorObserversRpc(transform.position, healthDifference);
+    }
+
+    [ObserversRpc]
+    private void SpawnHealIndicatorObserversRpc(Vector3 position, int healthDifference)
+    {
+        if (base.IsHost) return;
+
+        GameObject healIndicator = Instantiate(_damageIndicatorPrefab, position, Quaternion.identity);
+        var healIndicatorText = healIndicator.GetComponentInChildren<DamageIndicator>();
+        healIndicatorText.SetDamageValue(healthDifference);
+        healIndicatorText.SetColor(Color.green);
     }
 
 }

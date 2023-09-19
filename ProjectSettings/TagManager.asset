@@ -9,6 +9,7 @@ TagManager:
   - WeaponPickup
   - WeaponPickups
   - ReadyButton
+  - HealthNut
   layers:
   - Default
   - TransparentFX

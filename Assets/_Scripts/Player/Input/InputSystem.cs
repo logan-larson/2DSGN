@@ -25,6 +25,7 @@ public class InputSystem : NetworkBehaviour
     private RespawnManager _respawnManager;
     private LobbyManager _lobbyManager;
     private ScoreboardManager _scoreboardManager;
+    private HealthNutManager _healthNutManager;
 
 
     [SerializeField]
@@ -59,6 +60,7 @@ public class InputSystem : NetworkBehaviour
 
         // Just uncommented these
         _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
+        _healthNutManager ??= GetComponent<HealthNutManager>();
         _lobbyManager ??= GetComponent<LobbyManager>();
         _scoreboardManager ??= GetComponentInChildren<ScoreboardManager>();
         _respawnManager ??= GetComponent<RespawnManager>();
@@ -162,6 +164,7 @@ public class InputSystem : NetworkBehaviour
         if (!_isEnabled) return;
 
         _weaponEquipManager.TryEquipWeapon();
+        _healthNutManager.TryPickupHealthNut();
     }
 
     public void OnSwitchMode(InputValue value)

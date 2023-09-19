@@ -36,4 +36,8 @@ public class DamageIndicator : MonoBehaviour
         _damageValue.text = damage.ToString();
     }
 
+    public void SetColor(Color color)
+    {
+        _damageValue.color = color;
+    }
 }
