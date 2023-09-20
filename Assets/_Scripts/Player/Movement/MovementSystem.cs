@@ -516,6 +516,13 @@ public class MovementSystem : NetworkBehaviour
                 _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, MovementProperties.Friction);
         }
 
+        // If grounded and sliding, adjust the velocity to match the slope
+        if (_isGrounded && _modeManager.CurrentMode == ModeManager.Mode.Sliding)
+        {
+            Vector3 newVelo = Vector3.ProjectOnPlane(_currentVelocity, transform.up);
+            _currentVelocity = newVelo;
+        }
+
         // Limit top speed
         //float maxSpeed = _isGrounded ? MovementProperties.MaxSpeed : MovementProperties.MaxAirborneSpeed;
         // Sliding tweaks lol
@@ -556,14 +563,11 @@ public class MovementSystem : NetworkBehaviour
 
                 if (_modeManager.CurrentMode == ModeManager.Mode.Sliding)
                 {
-                    // TODO
                     // Apply gravity in direction of slope
                     Vector3 gravity = new Vector3(0f, MovementProperties.Gravity, 0f);
-                    Vector3 gravityParallel = Vector3.Project(gravity, transform.up);
-                    //_currentVelocity += (Vector3.down * MovementProperties.Gravity * (float)TimeManager.TickDelta);
+                    Vector3 gravityParallel = Vector3.Project(gravity, transform.right);
 
-                    //_currentVelocity +=
-                    slope = gravityParallel * (float)TimeManager.TickDelta;
+                    _currentVelocity -= gravityParallel * (float)TimeManager.TickDelta;
                 }
             }
         }

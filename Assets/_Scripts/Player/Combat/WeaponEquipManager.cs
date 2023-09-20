@@ -63,6 +63,7 @@ public class WeaponEquipManager : NetworkBehaviour
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
+        _modeManager.OnChangeToSliding.AddListener(OnChangeToSlidingMode);
 
         Weapons[_currentWeaponIndex].IsShown = _modeManager.CurrentMode == Mode.Combat || _modeManager.CurrentMode == Mode.Sliding;
     }
@@ -152,6 +153,12 @@ public class WeaponEquipManager : NetworkBehaviour
     private void OnChangeToParkourMode()
     {
         ChangeWeaponActivationServer(_currentWeaponIndex, false, -1);
+    }
+
+    private void OnChangeToSlidingMode()
+    {
+
+        ChangeWeaponActivationServer(_currentWeaponIndex, true, -1);
     }
 
     /// <summary>
