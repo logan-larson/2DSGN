@@ -64,7 +64,7 @@ public class WeaponEquipManager : NetworkBehaviour
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
 
-        Weapons[_currentWeaponIndex].IsShown = _modeManager.CurrentMode == Mode.Combat;
+        Weapons[_currentWeaponIndex].IsShown = _modeManager.CurrentMode == Mode.Combat || _modeManager.CurrentMode == Mode.Sliding;
     }
 
     public override void OnStartServer()
@@ -84,7 +84,7 @@ public class WeaponEquipManager : NetworkBehaviour
             weapon.Initialize();
         }
 
-        Weapons[_currentWeaponIndex].IsShown = _modeManager.CurrentMode == Mode.Combat;
+        Weapons[_currentWeaponIndex].IsShown = _modeManager.CurrentMode == Mode.Combat || _modeManager.CurrentMode == Mode.Sliding;
 
         ServerManager.OnRemoteConnectionState += OnRemoteConnectionState;
     }
@@ -136,7 +136,7 @@ public class WeaponEquipManager : NetworkBehaviour
 
         if (weapon == null) return;
 
-        if (_modeManager.CurrentMode == Mode.Combat)
+        if (_modeManager.CurrentMode == Mode.Combat || _modeManager.CurrentMode == Mode.Sliding)
             weapon.IsShown = true;
         else
             weapon.IsShown = false;
@@ -238,7 +238,7 @@ public class WeaponEquipManager : NetworkBehaviour
 
         if (weapon == null) return;
 
-        if (_modeManager.CurrentMode == Mode.Combat)
+        if (_modeManager.CurrentMode == Mode.Combat || _modeManager.CurrentMode == Mode.Sliding)
             weapon.IsShown = isActive;
         else
             weapon.IsShown = false;
@@ -258,7 +258,7 @@ public class WeaponEquipManager : NetworkBehaviour
 
         if (weapon == null) return;
 
-        if (_modeManager.CurrentMode == Mode.Combat)
+        if (_modeManager.CurrentMode == Mode.Combat || _modeManager.CurrentMode == Mode.Sliding)
             weapon.IsShown = isActive;
         else
             weapon.IsShown = false;

@@ -20,6 +20,11 @@ public class PlayerInputValues : ScriptableObject
     public bool IsJumpKeyPressed = false;
 
     /// <summary>
+    /// Slide input (Left Control Key, Y button)
+    /// </summary>
+    public bool IsSlideKeyPressed = false;
+
+    /// <summary>
     /// Sprint input (Left shift, B button)
     /// </summary>
     public bool IsSprintKeyPressed = false;

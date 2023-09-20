@@ -26,6 +26,8 @@ public class AnimationSystem : NetworkBehaviour
     [SerializeField]
     private Sprite _biSprite;
     [SerializeField]
+    private Sprite _slideSprite;
+    [SerializeField]
     private SpriteRenderer _spriteRenderer;
     [SerializeField]
     private SpriteRenderer _damagedSpriteRenderer;
@@ -63,6 +65,7 @@ public class AnimationSystem : NetworkBehaviour
 
         _modeManager.OnChangeToParkour.AddListener(OnChangeToParkourMode);
         _modeManager.OnChangeToCombat.AddListener(OnChangeToCombatMode);
+        _modeManager.OnChangeToSliding.AddListener(OnChangeToSlidingMode);
 
         _spriteRenderer.sprite = _quadSprite;
         _damagedSpriteRenderer.sprite = _quadSprite;
@@ -110,5 +113,27 @@ public class AnimationSystem : NetworkBehaviour
     {
         _spriteRenderer.sprite = _quadSprite;
         _damagedSpriteRenderer.sprite = _quadSprite;
+    }
+
+    private void OnChangeToSlidingMode()
+    {
+        _spriteRenderer.sprite = _slideSprite;
+        _damagedSpriteRenderer.sprite = _slideSprite;
+        OnChangeToSlidingModeServer();
+    }
+
+    [ServerRpc]
+    private void OnChangeToSlidingModeServer()
+    {
+        _spriteRenderer.sprite = _slideSprite;
+        _damagedSpriteRenderer.sprite = _slideSprite;
+        OnChangeToSlidingModeObservers();
+    }
+
+    [ObserversRpc]
+    private void OnChangeToSlidingModeObservers()
+    {
+        _spriteRenderer.sprite = _slideSprite;
+        _damagedSpriteRenderer.sprite = _slideSprite;
     }
 }
