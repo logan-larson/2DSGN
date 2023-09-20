@@ -6,23 +6,20 @@ using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using FishNet.Connection;
 using FishNet.Transporting;
+using System.Security.Cryptography;
 
 public class ModeManager : NetworkBehaviour
 {
-    /*
-    Currently commenting out all references to sliding as it is not yet implemented.
-    */
-
     public enum Mode
     {
         Parkour,
         Combat,
-        // Sliding
+        Sliding
     }
 
     public UnityEvent OnChangeToParkour = new UnityEvent();
     public UnityEvent OnChangeToCombat = new UnityEvent();
-    // public UnityEvent ChangeToSliding = new UnityEvent();
+    public UnityEvent OnChangeToSliding = new UnityEvent();
 
     [SyncVar(OnChange = nameof(OnChangeMode))]
     public Mode CurrentMode = Mode.Parkour; 
@@ -37,12 +34,10 @@ public class ModeManager : NetworkBehaviour
         {
             OnChangeToCombat.Invoke();
         }
-        /*
         else if (newValue == Mode.Sliding)
         {
-            ChangeToSliding.Invoke();
+            OnChangeToSliding.Invoke();
         }
-        */
     }
 
     private void Start() { }
@@ -101,13 +96,11 @@ public class ModeManager : NetworkBehaviour
             ChangeModeServer(Mode.Combat);
     }
 
-    /*
     public void ChangeToSlidingMode()
     {
         if (CurrentMode != Mode.Sliding)
             CurrentMode = Mode.Sliding;
     }
-    */
 
     [ServerRpc]
     private void ChangeModeServer(Mode mode)

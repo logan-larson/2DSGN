@@ -14,6 +14,9 @@ MovementSystem is responsible for handling all movement related actions.
 public class MovementSystem : NetworkBehaviour
 {
 
+    [SerializeField]
+    private Vector3 slope;
+
     #region Types
 
     /// <summary>
@@ -26,6 +29,7 @@ public class MovementSystem : NetworkBehaviour
         public bool Jump;
         public bool ChangeToCombat; // Fire key
         public bool ChangeToParkour; // Sprint key
+        public bool ChangeToSliding; // Slide key
     }
 
     /// <summary>
@@ -39,6 +43,7 @@ public class MovementSystem : NetworkBehaviour
         public bool IsGrounded;
         public bool InParkourMode;
         public bool InCombatMode;
+        public bool InSlidingMode;
         public float TimeOnGround;
     }
 
@@ -80,6 +85,9 @@ public class MovementSystem : NetworkBehaviour
 
     [SerializeField]
     private PlayerMovementProperties MovementProperties;
+
+    [SerializeField]
+    private ModeManager _modeManager;
 
     #endregion
 
@@ -150,6 +158,7 @@ public class MovementSystem : NetworkBehaviour
     private IEnumerator _recalculateLandingCoroutine;
     private bool _recalculateLandingCoroutineIsRunning;
 
+    /*
     /// <summary>
     /// True if the player is in parkour mode.
     /// </summary>
@@ -161,6 +170,13 @@ public class MovementSystem : NetworkBehaviour
     /// </summary>
     [SerializeField]
     private bool _inCombatMode = false;
+
+    /// <summary>
+    /// True if the player is in sliding mode.
+    /// </summary>
+    [SerializeField]
+    private bool _inSlidingMode = false;
+    */
 
     /// <summary>
     /// Set to true when the player's movement should be disabled.
@@ -217,6 +233,7 @@ public class MovementSystem : NetworkBehaviour
         InputSystem ??= GetComponent<InputSystem>();
         _playerHealth ??= GetComponent<PlayerHealth>();
         _respawnManager ??= GetComponent<RespawnManager>();
+        _modeManager ??= GetComponent<ModeManager>();
 
         // Should this be in the OnStartClient method?? OnStartServer?? Or Both??
         _playerHealth.OnDeath.AddListener(OnDeath);
@@ -294,8 +311,17 @@ public class MovementSystem : NetworkBehaviour
                 Velocity = new Vector3(_currentVelocity.x, _currentVelocity.y, _currentVelocity.z),
                 Rotation = new Quaternion(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w),
                 IsGrounded = _isGrounded,
+
+                InParkourMode = _modeManager.CurrentMode == ModeManager.Mode.Parkour,
+                InCombatMode = _modeManager.CurrentMode == ModeManager.Mode.Combat,
+                InSlidingMode = _modeManager.CurrentMode == ModeManager.Mode.Sliding,
+
+                /*
                 InParkourMode = _inParkourMode,
                 InCombatMode = _inCombatMode,
+                InSlidingMode = _inSlidingMode,
+                */
+
                 TimeOnGround = _timeOnGround,
             };
 
@@ -317,7 +343,11 @@ public class MovementSystem : NetworkBehaviour
         moveData.Horizontal = _input.HorizontalMovementInput;
         moveData.Sprint = _input.IsSprintKeyPressed;
         moveData.Jump = _input.IsJumpKeyPressed;
-        moveData.ChangeToCombat = _input.IsFirePressed;
+
+        // Little move data state machine to determine what mode the player should be in
+        moveData.ChangeToSliding = _input.IsSlideKeyPressed;
+        if (!moveData.ChangeToSliding)
+            moveData.ChangeToCombat = _input.IsFirePressed;
         if (!moveData.ChangeToCombat)
             moveData.ChangeToParkour = _input.IsSprintKeyPressed;
     }
@@ -364,18 +394,29 @@ public class MovementSystem : NetworkBehaviour
         transform.rotation = new Quaternion(data.Rotation.x, data.Rotation.y, data.Rotation.z, data.Rotation.w);
         _currentVelocity = new Vector3(data.Velocity.x, data.Velocity.y, data.Velocity.z);
         _isGrounded = data.IsGrounded;
+        /*
         _inParkourMode = data.InParkourMode;
         _inCombatMode = data.InCombatMode;
+        */
         _timeOnGround = data.TimeOnGround;
     }
 
     private void UpdateMode(MoveData moveData = new MoveData())
     {
+        /*
         if (moveData.ChangeToParkour)
         {
             if (_inCombatMode)
             {
+                _inSlidingMode = false;
                 _inCombatMode = false;
+                _inParkourMode = true;
+            }
+
+            if (_inSlidingMode)
+            {
+                _inCombatMode = false;
+                _inSlidingMode = false;
                 _inParkourMode = true;
             }
         }
@@ -384,10 +425,36 @@ public class MovementSystem : NetworkBehaviour
         {
             if (_inParkourMode)
             {
+                _inSlidingMode = false;
+                _inParkourMode = false;
+                _inCombatMode = true;
+            }
+
+            if (_inSlidingMode)
+            {
+                _inSlidingMode = false;
                 _inParkourMode = false;
                 _inCombatMode = true;
             }
         }
+
+        if (moveData.ChangeToSliding)
+        {
+            if (_inParkourMode)
+            {
+                _inParkourMode = false;
+                _inCombatMode = false;
+                _inSlidingMode = true;
+            }
+
+            if (_inCombatMode)
+            {
+                _inCombatMode = false;
+                _inParkourMode = false;
+                _inSlidingMode = true;
+            }
+        }
+        */
     }
 
     private void UpdateRaycastOrigins()
@@ -424,12 +491,22 @@ public class MovementSystem : NetworkBehaviour
     private void UpdateVelocity(MoveData moveData, bool asServer)
     {
         // Increase top speed when sprint key is pressed
-        float sprintMultiplier = moveData.Sprint && !_inCombatMode ? MovementProperties.SprintMultiplier : 1f;
+        //float sprintMultiplier = moveData.Sprint && !_inCombatMode ? MovementProperties.SprintMultiplier : 1f;
+        float sprintMultiplier =
+            moveData.Sprint && _modeManager.CurrentMode != ModeManager.Mode.Combat
+            ? MovementProperties.SprintMultiplier
+            : 1f;
+
+        sprintMultiplier = _modeManager.CurrentMode == ModeManager.Mode.Sliding
+            ? 1f
+            : sprintMultiplier;
+
         // Set top speed based on mode
-        float modeMultiplier = _inParkourMode ? MovementProperties.ParkourMultiplier : MovementProperties.CombatMultiplier;
+        float modeMultiplier = _modeManager.CurrentMode == ModeManager.Mode.Parkour ? MovementProperties.ParkourMultiplier : MovementProperties.CombatMultiplier;
+        modeMultiplier = _modeManager.CurrentMode == ModeManager.Mode.Sliding ? 1f : modeMultiplier;
 
         // If grounded, change velocity
-        if (_isGrounded)
+        if (_isGrounded && _modeManager.CurrentMode != ModeManager.Mode.Sliding)
         {
             // If horizontal input is given, add velocity
             if (moveData.Horizontal != 0f)
@@ -439,8 +516,18 @@ public class MovementSystem : NetworkBehaviour
                 _currentVelocity = Vector3.MoveTowards(_currentVelocity, Vector3.zero, MovementProperties.Friction);
         }
 
+        // If grounded and sliding, adjust the velocity to match the slope
+        if (_isGrounded && _modeManager.CurrentMode == ModeManager.Mode.Sliding)
+        {
+            Vector3 newVelo = Vector3.ProjectOnPlane(_currentVelocity, transform.up);
+            _currentVelocity = newVelo;
+        }
+
         // Limit top speed
-        float maxSpeed = _isGrounded ? MovementProperties.MaxSpeed : MovementProperties.MaxAirborneSpeed;
+        //float maxSpeed = _isGrounded ? MovementProperties.MaxSpeed : MovementProperties.MaxAirborneSpeed;
+        // Sliding tweaks lol
+        float maxSpeed = _isGrounded && _modeManager.CurrentMode != ModeManager.Mode.Sliding ? MovementProperties.MaxSpeed : 100f;
+
         if (_isGrounded && _currentVelocity.magnitude > maxSpeed * sprintMultiplier * modeMultiplier)
         {
             _currentVelocity = _currentVelocity.normalized * maxSpeed * sprintMultiplier * modeMultiplier;
@@ -472,6 +559,15 @@ public class MovementSystem : NetworkBehaviour
                 {
                     StopCoroutine(_recalculateLandingCoroutine);
                     _recalculateLandingCoroutineIsRunning = false;
+                }
+
+                if (_modeManager.CurrentMode == ModeManager.Mode.Sliding)
+                {
+                    // Apply gravity in direction of slope
+                    Vector3 gravity = new Vector3(0f, MovementProperties.Gravity, 0f);
+                    Vector3 gravityParallel = Vector3.Project(gravity, transform.right);
+
+                    _currentVelocity -= gravityParallel * (float)TimeManager.TickDelta;
                 }
             }
         }
@@ -692,8 +788,8 @@ public class MovementSystem : NetworkBehaviour
         PublicData.Position = transform.position;
         PublicData.Velocity = _currentVelocity;
         PublicData.IsGrounded = _isGrounded;
-        PublicData.InParkourMode = _inParkourMode;
-        PublicData.InCombatMode = _inCombatMode;
+        //PublicData.InParkourMode = _inParkourMode;
+        //PublicData.InCombatMode = _inCombatMode;
     }
 
     #endregion

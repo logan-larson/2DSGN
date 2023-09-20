@@ -116,6 +116,15 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Slide"",
+                    ""type"": ""Button"",
+                    ""id"": ""aed5b879-272f-42d4-aa31-1e746b6e5a82"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -429,17 +438,6 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""79a3e29e-ba2f-4830-b09d-51ec1f414f07"",
-                    ""path"": ""<Gamepad>/buttonNorth"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""SwitchMode"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""09cef8b1-f952-46d3-8577-772073aacc32"",
                     ""path"": ""<Keyboard>/tab"",
                     ""interactions"": """",
@@ -490,6 +488,28 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ForceRespawn"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""46a51fa8-22da-4f40-8627-eed95216ffa9"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Slide"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d8537a34-8f99-4db6-902c-cc6518b3fe9d"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Slide"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1087,6 +1107,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         m_Player_ToggleLeaderboard = m_Player.FindAction("ToggleLeaderboard", throwIfNotFound: true);
         m_Player_ToggleReady = m_Player.FindAction("ToggleReady", throwIfNotFound: true);
         m_Player_ForceRespawn = m_Player.FindAction("ForceRespawn", throwIfNotFound: true);
+        m_Player_Slide = m_Player.FindAction("Slide", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1168,6 +1189,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_ToggleLeaderboard;
     private readonly InputAction m_Player_ToggleReady;
     private readonly InputAction m_Player_ForceRespawn;
+    private readonly InputAction m_Player_Slide;
     public struct PlayerActions
     {
         private @PlayerControls m_Wrapper;
@@ -1182,6 +1204,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         public InputAction @ToggleLeaderboard => m_Wrapper.m_Player_ToggleLeaderboard;
         public InputAction @ToggleReady => m_Wrapper.m_Player_ToggleReady;
         public InputAction @ForceRespawn => m_Wrapper.m_Player_ForceRespawn;
+        public InputAction @Slide => m_Wrapper.m_Player_Slide;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1221,6 +1244,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @ForceRespawn.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnForceRespawn;
                 @ForceRespawn.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnForceRespawn;
                 @ForceRespawn.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnForceRespawn;
+                @Slide.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSlide;
+                @Slide.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSlide;
+                @Slide.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSlide;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -1255,6 +1281,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @ForceRespawn.started += instance.OnForceRespawn;
                 @ForceRespawn.performed += instance.OnForceRespawn;
                 @ForceRespawn.canceled += instance.OnForceRespawn;
+                @Slide.started += instance.OnSlide;
+                @Slide.performed += instance.OnSlide;
+                @Slide.canceled += instance.OnSlide;
             }
         }
     }
@@ -1421,6 +1450,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         void OnToggleLeaderboard(InputAction.CallbackContext context);
         void OnToggleReady(InputAction.CallbackContext context);
         void OnForceRespawn(InputAction.CallbackContext context);
+        void OnSlide(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

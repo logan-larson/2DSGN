@@ -131,10 +131,12 @@ public class InputSystem : NetworkBehaviour
 
         InputValues.IsSprintKeyPressed = value.Get<float>() == 1f;
 
-        if (InputValues.IsSprintKeyPressed && !InputValues.IsFirePressed)
+        if (InputValues.IsSprintKeyPressed)
             _modeManager.ChangeToParkourMode();
+        /*
         else if (InputValues.IsFirePressed)
             _modeManager.ChangeToCombatMode();
+        */
     }
 
     // TODO: Move these events to triggers
@@ -145,6 +147,16 @@ public class InputSystem : NetworkBehaviour
         InputValues.IsJumpKeyPressed = value.Get<float>() == 1f;
     }
 
+    public void OnSlide(InputValue value)
+    {
+        if (!_isEnabled) return;
+
+        InputValues.IsSlideKeyPressed = value.Get<float>() == 1f;
+
+        if (InputValues.IsSlideKeyPressed)
+            _modeManager.ChangeToSlidingMode();
+    }
+
     public void OnFire(InputValue value)
     {
         if (!_isEnabled) return;
@@ -153,10 +165,12 @@ public class InputSystem : NetworkBehaviour
 
         _combatSystem.SetIsShootingServerRpc(value.Get<float>() == 1f);
 
-        if (InputValues.IsFirePressed)
+        if (InputValues.IsFirePressed && _modeManager.CurrentMode == ModeManager.Mode.Parkour)
             _modeManager.ChangeToCombatMode();
+        /*
         else if (InputValues.IsSprintKeyPressed)
             _modeManager.ChangeToParkourMode();
+        */
     }
 
     public void OnInteract(InputValue value)
