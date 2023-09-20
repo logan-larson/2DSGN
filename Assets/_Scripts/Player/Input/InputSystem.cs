@@ -131,12 +131,10 @@ public class InputSystem : NetworkBehaviour
 
         InputValues.IsSprintKeyPressed = value.Get<float>() == 1f;
 
-        if (InputValues.IsSprintKeyPressed)
+        if (InputValues.IsSprintKeyPressed && !InputValues.IsFirePressed)
             _modeManager.ChangeToParkourMode();
-        /*
         else if (InputValues.IsFirePressed)
             _modeManager.ChangeToCombatMode();
-        */
     }
 
     // TODO: Move these events to triggers
@@ -167,10 +165,8 @@ public class InputSystem : NetworkBehaviour
 
         if (InputValues.IsFirePressed && _modeManager.CurrentMode == ModeManager.Mode.Parkour)
             _modeManager.ChangeToCombatMode();
-        /*
         else if (InputValues.IsSprintKeyPressed)
             _modeManager.ChangeToParkourMode();
-        */
     }
 
     public void OnInteract(InputValue value)
