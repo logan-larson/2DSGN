@@ -535,17 +535,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9132779481292761573, guid: 9e9230d4ca2b5a846a3a627706f0cb5b, type: 3}
   m_PrefabInstance: {fileID: 482718564}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &669373084 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9132779481292761575, guid: 9e9230d4ca2b5a846a3a627706f0cb5b, type: 3}
-  m_PrefabInstance: {fileID: 9132779480808143739}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 70baa2a87ce8f2040b070926d6ffdd85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &669373086 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9132779481292761573, guid: 9e9230d4ca2b5a846a3a627706f0cb5b, type: 3}
@@ -13672,6 +13661,7 @@ MonoBehaviour:
   - {fileID: 1455902218}
   - {fileID: 1717472909}
   - {fileID: 1919249585}
+  - {fileID: 2062314941}
   - {fileID: 5467418486952887424}
 --- !u!1 &2062314940
 GameObject:
@@ -13704,10 +13694,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <IsNested>k__BackingField: 0
   <ComponentIndex>k__BackingField: 0
-  _networkBehaviours:
-  - {fileID: 669373084}
+  _networkBehaviours: []
   <ParentNetworkObject>k__BackingField: {fileID: 0}
-  <ChildNetworkObjects>k__BackingField: []
+  <ChildNetworkObjects>k__BackingField:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   _isNetworked: 1
   _isGlobal: 0
   _defaultDespawnType: 0
@@ -13717,7 +13710,6 @@ MonoBehaviour:
   <SceneId>k__BackingField: 551377951972660631
   <AssetPathHash>k__BackingField: 0
   _sceneNetworkObjects:
-  - {fileID: 2062314941}
   - {fileID: 675620447}
   - {fileID: 961565999}
   - {fileID: 1178962757}
@@ -13727,6 +13719,7 @@ MonoBehaviour:
   - {fileID: 1455902218}
   - {fileID: 1717472909}
   - {fileID: 1919249585}
+  - {fileID: 2062314941}
   - {fileID: 5467418486952887424}
 --- !u!4 &2062314942
 Transform:
@@ -14294,6 +14287,7 @@ MonoBehaviour:
   - {fileID: 1455902218}
   - {fileID: 1717472909}
   - {fileID: 1919249585}
+  - {fileID: 2062314941}
   - {fileID: 5467418486952887424}
 --- !u!114 &5467418486952887425
 MonoBehaviour:
@@ -14388,7 +14382,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   _countdownTime: 5
-  _killsToWin: 5
+  _killsToWin: 10
 --- !u!1 &5467418486952887439
 GameObject:
   m_ObjectHideFlags: 0

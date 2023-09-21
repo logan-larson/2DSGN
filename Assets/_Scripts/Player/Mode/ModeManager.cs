@@ -99,7 +99,7 @@ public class ModeManager : NetworkBehaviour
     public void ChangeToSlidingMode()
     {
         if (CurrentMode != Mode.Sliding)
-            CurrentMode = Mode.Sliding;
+            ChangeModeServer(Mode.Sliding);
     }
 
     [ServerRpc]
