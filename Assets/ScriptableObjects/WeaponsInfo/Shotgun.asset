@@ -21,3 +21,4 @@ MonoBehaviour:
   SpreadAngle: 18.77
   MaxBloomAngle: 30
   BloomAngleIncreasePerShot: 0
+  Knockback: 120
