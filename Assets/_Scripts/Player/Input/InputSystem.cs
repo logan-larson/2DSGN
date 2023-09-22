@@ -110,7 +110,7 @@ public class InputSystem : NetworkBehaviour
     {
         base.OnStartClient();
 
-        if (!base.IsOwner) enabled = false;
+        //if (!base.IsOwner) enabled = false;
     }
 
     private void Update()
