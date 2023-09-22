@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Revolver
   m_EditorClassIdentifier: 
   Name: Revolver
-  Damage: 20
-  FireRate: 0.5
-  Range: 10
+  Damage: 30
+  FireRate: 0.4
+  Range: 12
   IsAutomatic: 1
   BulletsPerShot: 1
   SpreadAngle: 0

@@ -88,7 +88,7 @@ public class CameraController : NetworkBehaviour
                     StopCoroutine(_delayRotationCoroutine);
                 }
             }
-            else if (_modeManager.CurrentMode != ModeManager.Mode.Sliding)
+            else if (_modeManager.CurrentMode != ModeManager.Mode.Sliding || !_movementSystem.PublicData.IsGrounded)
             {
                 _delayRotationCoroutine = DelayRotationCoroutine();
                 StartCoroutine(_delayRotationCoroutine);
@@ -98,8 +98,9 @@ public class CameraController : NetworkBehaviour
         // Set the rotation lerp value based on whether the player is grounded or not
         var rotLerpValue = _movementSystem.PublicData.IsGrounded ? _grounedRotLerpValue : _airborneRotLerpValue;
 
-        // If the player is shooting don't adjust the camera rotation, unless they are sliding
-        Quaternion lerpedRot = (_inputValues.IsFirePressed && _modeManager.CurrentMode != ModeManager.Mode.Sliding) || _delayRotationCoroutine != null
+        // If the player is shooting don't adjust the camera rotation, unless they are sliding and not airborne
+        bool shouldRotLerp = (_inputValues.IsFirePressed && (_modeManager.CurrentMode != ModeManager.Mode.Sliding || !_movementSystem.PublicData.IsGrounded));
+        Quaternion lerpedRot = shouldRotLerp || _delayRotationCoroutine != null
             ? this.transform.rotation
             : Quaternion.Lerp(this.transform.rotation, player.rotation, rotLerpValue);
 

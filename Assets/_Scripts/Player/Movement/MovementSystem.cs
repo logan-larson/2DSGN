@@ -225,7 +225,7 @@ public class MovementSystem : NetworkBehaviour
         GameStateManager.Instance.OnGameStart.AddListener(OnGameStart);
         GameStateManager.Instance.OnGameEnd.AddListener(OnGameEnd);
 
-        _combatSystem.OnFire.AddListener(OnFire);
+        //_combatSystem.OnFire.AddListener(OnFire);
     }
 
     private void Start()
@@ -239,6 +239,8 @@ public class MovementSystem : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+
+        _combatSystem.OnShoot.AddListener(OnShoot);
     }
 
     private void OnGameStart()
@@ -276,7 +278,7 @@ public class MovementSystem : NetworkBehaviour
         _movementDisabled = false;
     }
 
-    private void OnFire()
+    private void OnShoot()
     {
         _isShooting = true;
     }
@@ -497,6 +499,7 @@ public class MovementSystem : NetworkBehaviour
                         // If forces were applied then we need to recalculate the landing
                         //RecalculateLandingPosition();
                         //_recalculateLanding = true;
+                        //moveData.Shoot = false;
                     }
 
                     Vector3 gravityParallel = Vector3.Project(gravity, transform.right);
@@ -524,6 +527,8 @@ public class MovementSystem : NetworkBehaviour
 
                 // If forces were applied then we need to recalculate the landing
                 _recalculateLanding = true;
+
+                //moveData.Shoot = false;
             }
         }
 

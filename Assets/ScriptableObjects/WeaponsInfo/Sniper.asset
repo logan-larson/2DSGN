@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Sniper
   m_EditorClassIdentifier: 
   Name: Sniper
-  Damage: 110
-  FireRate: 1.5
+  Damage: 100
+  FireRate: 2
   Range: 20
   IsAutomatic: 1
   BulletsPerShot: 1
   SpreadAngle: 0
   MaxBloomAngle: 1
   BloomAngleIncreasePerShot: 0
-  Knockback: 12
+  Knockback: 15

@@ -56,7 +56,7 @@ public class CombatSystem : NetworkBehaviour
 
     public Vector3 AimDirection => _aimDirection;
 
-    public UnityEvent OnFire = new UnityEvent();
+    public UnityEvent OnShoot = new UnityEvent();
 
 
     private void Start()
@@ -205,7 +205,7 @@ public class CombatSystem : NetworkBehaviour
 
         _shootTimer = 0f;
 
-        OnFire.Invoke();
+        OnShoot.Invoke();
 
         // TODO: Change bullet spawn location to be related to WeaponInfo.MuzzlePosition
         ShootServer(_weaponEquipManager.CurrentWeapon.WeaponInfo, _weaponHolder.transform.position, _aimDirection, _playerName.Username);
@@ -215,8 +215,6 @@ public class CombatSystem : NetworkBehaviour
     public void ShootServer(WeaponInfo weapon, Vector3 position, Vector3 direction, string username)
     {
         if (weapon == null) return;
-
-        OnFire.Invoke();
 
         RaycastHit2D[][] allHits = GetHits(weapon, position, direction);
 
