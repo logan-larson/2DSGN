@@ -2241,7 +2241,6 @@ MonoBehaviour:
   - {fileID: 922995867}
   - {fileID: 1244146996}
   - {fileID: 1373432700}
-  - {fileID: 0}
   - {fileID: 1691890811}
   - {fileID: 1919249585}
   - {fileID: 2001524906}
@@ -2342,7 +2341,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   _countdownTime: 5
-  _killsToWin: 25
+  _killsToWin: 20
 --- !u!1001 &905765986
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13173,7 +13172,6 @@ MonoBehaviour:
   - {fileID: 922995867}
   - {fileID: 1244146996}
   - {fileID: 1373432700}
-  - {fileID: 0}
   - {fileID: 1691890811}
   - {fileID: 1919249585}
   - {fileID: 2001524906}

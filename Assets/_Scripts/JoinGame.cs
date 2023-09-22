@@ -20,13 +20,13 @@ public class JoinGame : MonoBehaviour
     {
         if (IsServerBuild)
         {
-            SceneManager.LoadScene("Playground");
+            SceneManager.LoadScene("BigMap");
         }
     }
 
     public void OnJoinGame()
     {
         UserInfo.Username = _usernameInput.text;
-        SceneManager.LoadScene("Playground");
+        SceneManager.LoadScene("BigMap");
     }
 }

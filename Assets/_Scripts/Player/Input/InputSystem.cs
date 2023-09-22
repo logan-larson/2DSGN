@@ -109,6 +109,8 @@ public class InputSystem : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+
+        if (!base.IsOwner) enabled = false;
     }
 
     private void Update()
