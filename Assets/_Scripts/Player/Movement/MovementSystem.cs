@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Data;
+using System.Runtime.CompilerServices;
 using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Prediction;
@@ -13,10 +14,6 @@ MovementSystem is responsible for handling all movement related actions.
 */
 public class MovementSystem : NetworkBehaviour
 {
-
-    [SerializeField]
-    private Vector3 slope;
-
     #region Types
 
     /// <summary>
@@ -27,9 +24,7 @@ public class MovementSystem : NetworkBehaviour
         public float Horizontal;
         public bool Sprint;
         public bool Jump;
-        public bool ChangeToCombat; // Fire key
-        public bool ChangeToParkour; // Sprint key
-        public bool ChangeToSliding; // Slide key
+        public bool Shoot;
     }
 
     /// <summary>
@@ -41,9 +36,6 @@ public class MovementSystem : NetworkBehaviour
         public Vector3 Velocity;
         public Quaternion Rotation;
         public bool IsGrounded;
-        public bool InParkourMode;
-        public bool InCombatMode;
-        public bool InSlidingMode;
         public float TimeOnGround;
     }
 
@@ -60,8 +52,6 @@ public class MovementSystem : NetworkBehaviour
         public Vector3 Position;
         public Vector3 Velocity;
         public bool IsGrounded;
-        public bool InParkourMode;
-        public bool InCombatMode;
     }
 
     public PublicMovementData PublicData;
@@ -88,6 +78,9 @@ public class MovementSystem : NetworkBehaviour
 
     [SerializeField]
     private ModeManager _modeManager;
+
+    [SerializeField]
+    private CombatSystem _combatSystem; 
 
     #endregion
 
@@ -158,26 +151,6 @@ public class MovementSystem : NetworkBehaviour
     private IEnumerator _recalculateLandingCoroutine;
     private bool _recalculateLandingCoroutineIsRunning;
 
-    /*
-    /// <summary>
-    /// True if the player is in parkour mode.
-    /// </summary>
-    [SerializeField]
-    private bool _inParkourMode = true;
-
-    /// <summary>
-    /// True if the player is in combat mode.
-    /// </summary>
-    [SerializeField]
-    private bool _inCombatMode = false;
-
-    /// <summary>
-    /// True if the player is in sliding mode.
-    /// </summary>
-    [SerializeField]
-    private bool _inSlidingMode = false;
-    */
-
     /// <summary>
     /// Set to true when the player's movement should be disabled.
     /// </summary>
@@ -228,12 +201,15 @@ public class MovementSystem : NetworkBehaviour
 
     #region Movement
 
+    #region Initialization
+
     private void Awake()
     {
         InputSystem ??= GetComponent<InputSystem>();
         _playerHealth ??= GetComponent<PlayerHealth>();
         _respawnManager ??= GetComponent<RespawnManager>();
         _modeManager ??= GetComponent<ModeManager>();
+        _combatSystem ??= GetComponent<CombatSystem>();
 
         // Should this be in the OnStartClient method?? OnStartServer?? Or Both??
         _playerHealth.OnDeath.AddListener(OnDeath);
@@ -256,6 +232,20 @@ public class MovementSystem : NetworkBehaviour
         base.OnStartClient();
     }
 
+    private void OnGameStart()
+    {
+        // Enable movement
+        _movementDisabled = false;
+    }
+
+    private void OnGameEnd()
+    {
+        // Disable movement things
+        _movementDisabled = true;
+    }
+
+    #endregion
+
     private void OnDeath(bool _)
     {
         // Disable movement
@@ -275,18 +265,6 @@ public class MovementSystem : NetworkBehaviour
         // Enable movement
         //_isRespawning = false;
         _movementDisabled = false;
-    }
-
-    private void OnGameStart()
-    {
-        // Enable movement
-        _movementDisabled = false;
-    }
-
-    private void OnGameEnd()
-    {
-        // Disable movement things
-        _movementDisabled = true;
     }
 
     private void OnTick()
@@ -312,16 +290,6 @@ public class MovementSystem : NetworkBehaviour
                 Rotation = new Quaternion(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w),
                 IsGrounded = _isGrounded,
 
-                InParkourMode = _modeManager.CurrentMode == ModeManager.Mode.Parkour,
-                InCombatMode = _modeManager.CurrentMode == ModeManager.Mode.Combat,
-                InSlidingMode = _modeManager.CurrentMode == ModeManager.Mode.Sliding,
-
-                /*
-                InParkourMode = _inParkourMode,
-                InCombatMode = _inCombatMode,
-                InSlidingMode = _inSlidingMode,
-                */
-
                 TimeOnGround = _timeOnGround,
             };
 
@@ -343,13 +311,7 @@ public class MovementSystem : NetworkBehaviour
         moveData.Horizontal = _input.HorizontalMovementInput;
         moveData.Sprint = _input.IsSprintKeyPressed;
         moveData.Jump = _input.IsJumpKeyPressed;
-
-        // Little move data state machine to determine what mode the player should be in
-        moveData.ChangeToSliding = _input.IsSlideKeyPressed;
-        if (!moveData.ChangeToSliding)
-            moveData.ChangeToCombat = _input.IsFirePressed;
-        if (!moveData.ChangeToCombat)
-            moveData.ChangeToParkour = _input.IsSprintKeyPressed;
+        moveData.Shoot = _input.IsFirePressed;
     }
 
     /// <summary>
@@ -369,8 +331,6 @@ public class MovementSystem : NetworkBehaviour
             _predictedPosition = transform.position;
             return;
         }
-
-        UpdateMode(moveData);
 
         UpdateRaycastOrigins();
 
@@ -394,67 +354,7 @@ public class MovementSystem : NetworkBehaviour
         transform.rotation = new Quaternion(data.Rotation.x, data.Rotation.y, data.Rotation.z, data.Rotation.w);
         _currentVelocity = new Vector3(data.Velocity.x, data.Velocity.y, data.Velocity.z);
         _isGrounded = data.IsGrounded;
-        /*
-        _inParkourMode = data.InParkourMode;
-        _inCombatMode = data.InCombatMode;
-        */
         _timeOnGround = data.TimeOnGround;
-    }
-
-    private void UpdateMode(MoveData moveData = new MoveData())
-    {
-        /*
-        if (moveData.ChangeToParkour)
-        {
-            if (_inCombatMode)
-            {
-                _inSlidingMode = false;
-                _inCombatMode = false;
-                _inParkourMode = true;
-            }
-
-            if (_inSlidingMode)
-            {
-                _inCombatMode = false;
-                _inSlidingMode = false;
-                _inParkourMode = true;
-            }
-        }
-
-        if (moveData.ChangeToCombat)
-        {
-            if (_inParkourMode)
-            {
-                _inSlidingMode = false;
-                _inParkourMode = false;
-                _inCombatMode = true;
-            }
-
-            if (_inSlidingMode)
-            {
-                _inSlidingMode = false;
-                _inParkourMode = false;
-                _inCombatMode = true;
-            }
-        }
-
-        if (moveData.ChangeToSliding)
-        {
-            if (_inParkourMode)
-            {
-                _inParkourMode = false;
-                _inCombatMode = false;
-                _inSlidingMode = true;
-            }
-
-            if (_inCombatMode)
-            {
-                _inCombatMode = false;
-                _inParkourMode = false;
-                _inSlidingMode = true;
-            }
-        }
-        */
     }
 
     private void UpdateRaycastOrigins()
@@ -788,8 +688,6 @@ public class MovementSystem : NetworkBehaviour
         PublicData.Position = transform.position;
         PublicData.Velocity = _currentVelocity;
         PublicData.IsGrounded = _isGrounded;
-        //PublicData.InParkourMode = _inParkourMode;
-        //PublicData.InCombatMode = _inCombatMode;
     }
 
     #endregion
