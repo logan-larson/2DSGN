@@ -80,7 +80,10 @@ public class MovementSystem : NetworkBehaviour
     private ModeManager _modeManager;
 
     [SerializeField]
-    private CombatSystem _combatSystem; 
+    private CombatSystem _combatSystem;
+
+    [SerializeField]
+    private WeaponEquipManager _weaponEquipManager;
 
     #endregion
 
@@ -210,6 +213,7 @@ public class MovementSystem : NetworkBehaviour
         _respawnManager ??= GetComponent<RespawnManager>();
         _modeManager ??= GetComponent<ModeManager>();
         _combatSystem ??= GetComponent<CombatSystem>();
+        _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
 
         // Should this be in the OnStartClient method?? OnStartServer?? Or Both??
         _playerHealth.OnDeath.AddListener(OnDeath);
@@ -477,9 +481,21 @@ public class MovementSystem : NetworkBehaviour
             _currentVelocity += (Vector3.down * MovementProperties.Gravity * (float)TimeManager.TickDelta);
 
             // This is where airborne movement forces can be applied
+            if (moveData.Shoot)
+            {
+                // Get the aim direction
+                var dir = _combatSystem.AimDirection;
 
-            // If forces were applied then we need to recalculate the landing
-            //recalculateLanding = false;
+                // Get the weapon's knockback force
+                var knockbackForce = _weaponEquipManager.CurrentWeapon.WeaponInfo.Knockback;
+
+                // Apply the force in the opposite direction of the aim direction
+                _currentVelocity += -dir * knockbackForce * Time.deltaTime;
+
+                // If forces were applied then we need to recalculate the landing
+                //RecalculateLandingPosition();
+                _recalculateLanding = true;
+            }
         }
 
         //CheckNeedRecalc();

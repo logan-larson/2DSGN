@@ -20,7 +20,9 @@ public class CameraController : NetworkBehaviour
     /// </summary>
     [SerializeField] private float zFactor = 0.4f;
 
-    private MovementSystem movementSystem;
+    private MovementSystem _movementSystem;
+    private InputSystem _inputSystem;
+    private PlayerInputValues _inputValues;
 
     public float CurrentZ => this.transform.position.z;
 
@@ -39,7 +41,9 @@ public class CameraController : NetworkBehaviour
     private void FirstObjectNotifier_OnFirstObjectSpawned(Transform obj, GameObject go)
     {
         player = obj;
-        movementSystem = go.GetComponent<MovementSystem>();
+        _movementSystem = go.GetComponent<MovementSystem>();
+        _inputSystem = go.GetComponent<InputSystem>();
+        _inputValues = _inputSystem.InputValues;
         go.GetComponent<CameraManager>().SetCamera(cam, this);
     }
 
@@ -55,7 +59,7 @@ public class CameraController : NetworkBehaviour
 
         // Calculate the camera z position based on the player's velocity
         // Zoom out when moving faster
-        Vector3 velocity = movementSystem.PublicData.Velocity;
+        Vector3 velocity = _movementSystem.PublicData.Velocity;
 
         Vector3 targetPos = player.position;
 
@@ -65,7 +69,11 @@ public class CameraController : NetworkBehaviour
 
         // Lerp to nearest position and rotation
         Vector3 lerpedPos = Vector3.Lerp(this.transform.position, targetPos, posLerpValue);
-        Quaternion lerpedRot = Quaternion.Lerp(this.transform.rotation, player.rotation, rotLerpValue);
+
+        // If the player is shooting don't adjust the camera rotation
+        Quaternion lerpedRot = _inputValues.IsFirePressed
+            ? this.transform.rotation
+            : Quaternion.Lerp(this.transform.rotation, player.rotation, rotLerpValue);
 
         this.transform.SetPositionAndRotation(new Vector3(lerpedPos.x, lerpedPos.y, lerpedPos.z), lerpedRot);
     }

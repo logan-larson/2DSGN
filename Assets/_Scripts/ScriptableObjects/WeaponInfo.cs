@@ -13,4 +13,6 @@ public class WeaponInfo : ScriptableObject
     public float SpreadAngle = 0f;
     public float MaxBloomAngle = 0f;
     public float BloomAngleIncreasePerShot = 0f;
+
+    public float Knockback = 0f;
 }
