@@ -26,6 +26,7 @@ public class CameraController : NetworkBehaviour
     private MovementSystem _movementSystem;
     private InputSystem _inputSystem;
     private PlayerInputValues _inputValues;
+    private ModeManager _modeManager;
 
     public float CurrentZ => this.transform.position.z;
 
@@ -49,6 +50,7 @@ public class CameraController : NetworkBehaviour
         _movementSystem = go.GetComponent<MovementSystem>();
         _inputSystem = go.GetComponent<InputSystem>();
         _inputValues = _inputSystem.InputValues;
+        _modeManager = go.GetComponent<ModeManager>();
         go.GetComponent<CameraManager>().SetCamera(cam, this);
     }
 
@@ -86,7 +88,7 @@ public class CameraController : NetworkBehaviour
                     StopCoroutine(_delayRotationCoroutine);
                 }
             }
-            else // maybe switch this back to else??
+            else if (_modeManager.CurrentMode != ModeManager.Mode.Sliding)
             {
                 _delayRotationCoroutine = DelayRotationCoroutine();
                 StartCoroutine(_delayRotationCoroutine);
@@ -96,8 +98,8 @@ public class CameraController : NetworkBehaviour
         // Set the rotation lerp value based on whether the player is grounded or not
         var rotLerpValue = _movementSystem.PublicData.IsGrounded ? _grounedRotLerpValue : _airborneRotLerpValue;
 
-        // If the player is shooting don't adjust the camera rotation
-        Quaternion lerpedRot = _inputValues.IsFirePressed || _delayRotationCoroutine != null
+        // If the player is shooting don't adjust the camera rotation, unless they are sliding
+        Quaternion lerpedRot = (_inputValues.IsFirePressed && _modeManager.CurrentMode != ModeManager.Mode.Sliding) || _delayRotationCoroutine != null
             ? this.transform.rotation
             : Quaternion.Lerp(this.transform.rotation, player.rotation, rotLerpValue);
 

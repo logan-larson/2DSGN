@@ -469,6 +469,25 @@ public class MovementSystem : NetworkBehaviour
                 {
                     // Apply gravity in direction of slope
                     Vector3 gravity = new Vector3(0f, MovementProperties.Gravity, 0f);
+
+                    // Allow players to shoot while sliding and have that affect their velocity
+                    if (moveData.Shoot)
+                    {
+                        // Get the aim direction
+                        var dir = _combatSystem.AimDirection;
+
+                        // Get the weapon's knockback force
+                        var knockbackForce = _weaponEquipManager.CurrentWeapon.WeaponInfo.Knockback * 5f;
+
+                        // Apply the force in the opposite direction of the aim direction
+                        gravity += dir * knockbackForce * Time.deltaTime;
+                        //_currentVelocity += -dir * knockbackForce * Time.deltaTime;
+
+                        // If forces were applied then we need to recalculate the landing
+                        //RecalculateLandingPosition();
+                        //_recalculateLanding = true;
+                    }
+
                     Vector3 gravityParallel = Vector3.Project(gravity, transform.right);
 
                     _currentVelocity -= gravityParallel * (float)TimeManager.TickDelta;
@@ -493,7 +512,6 @@ public class MovementSystem : NetworkBehaviour
                 _currentVelocity += -dir * knockbackForce * Time.deltaTime;
 
                 // If forces were applied then we need to recalculate the landing
-                //RecalculateLandingPosition();
                 _recalculateLanding = true;
             }
         }
