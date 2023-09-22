@@ -1,5 +1,6 @@
 using FishNet.Connection;
 using FishNet.Object;
+using System.Collections;
 using UnityEngine;
 
 /**
@@ -19,6 +20,7 @@ public class CameraController : NetworkBehaviour
     /// The factor by which the z position is effected by the player's velocity.
     /// </summary>
     [SerializeField] private float zFactor = 0.4f;
+    [SerializeField] private float _rotationDelay = 0.25f;
 
     private MovementSystem _movementSystem;
     private InputSystem _inputSystem;
@@ -26,6 +28,8 @@ public class CameraController : NetworkBehaviour
 
     public float CurrentZ => this.transform.position.z;
 
+    private IEnumerator _delayRotationCoroutine;
+    private bool _prevIsFirePressed = false;
 
     private void Awake()
     {
@@ -70,11 +74,36 @@ public class CameraController : NetworkBehaviour
         // Lerp to nearest position and rotation
         Vector3 lerpedPos = Vector3.Lerp(this.transform.position, targetPos, posLerpValue);
 
+        // When the player releases the fire button, delay the camera rotation to give the player a chance to see where they are shooting
+        if (_prevIsFirePressed != _inputValues.IsFirePressed)
+        {
+            if (_inputValues.IsFirePressed)
+            {
+                if (_delayRotationCoroutine != null)
+                {
+                    StopCoroutine(_delayRotationCoroutine);
+                }
+            }
+            else
+            {
+                _delayRotationCoroutine = DelayRotationCoroutine();
+                StartCoroutine(_delayRotationCoroutine);
+            }
+        }
+
         // If the player is shooting don't adjust the camera rotation
-        Quaternion lerpedRot = _inputValues.IsFirePressed
+        Quaternion lerpedRot = _inputValues.IsFirePressed || _delayRotationCoroutine != null
             ? this.transform.rotation
             : Quaternion.Lerp(this.transform.rotation, player.rotation, rotLerpValue);
 
         this.transform.SetPositionAndRotation(new Vector3(lerpedPos.x, lerpedPos.y, lerpedPos.z), lerpedRot);
+
+        _prevIsFirePressed = _inputValues.IsFirePressed;
+    }
+
+    private IEnumerator DelayRotationCoroutine()
+    {
+        yield return new WaitForSeconds(_rotationDelay);
+        _delayRotationCoroutine = null;
     }
 }
