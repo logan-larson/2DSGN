@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using FishNet.Connection;
 using FishNet.Object.Synchronizing;
+using UnityEngine.Events;
 
 /**
 <summary>
@@ -54,6 +55,8 @@ public class CombatSystem : NetworkBehaviour
     private Vector3 _worldMousePosition = Vector3.zero;
 
     public Vector3 AimDirection => _aimDirection;
+
+    public UnityEvent OnFire = new UnityEvent();
 
 
     private void Start()
@@ -202,6 +205,8 @@ public class CombatSystem : NetworkBehaviour
 
         _shootTimer = 0f;
 
+        OnFire.Invoke();
+
         // TODO: Change bullet spawn location to be related to WeaponInfo.MuzzlePosition
         ShootServer(_weaponEquipManager.CurrentWeapon.WeaponInfo, _weaponHolder.transform.position, _aimDirection, _playerName.Username);
     }
@@ -210,6 +215,8 @@ public class CombatSystem : NetworkBehaviour
     public void ShootServer(WeaponInfo weapon, Vector3 position, Vector3 direction, string username)
     {
         if (weapon == null) return;
+
+        OnFire.Invoke();
 
         RaycastHit2D[][] allHits = GetHits(weapon, position, direction);
 

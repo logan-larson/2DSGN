@@ -160,6 +160,9 @@ public class MovementSystem : NetworkBehaviour
     [SerializeField]
     private bool _movementDisabled = false;
 
+    [SerializeField]
+    private bool _isShooting = false;
+
 
 
     #endregion
@@ -221,6 +224,8 @@ public class MovementSystem : NetworkBehaviour
 
         GameStateManager.Instance.OnGameStart.AddListener(OnGameStart);
         GameStateManager.Instance.OnGameEnd.AddListener(OnGameEnd);
+
+        _combatSystem.OnFire.AddListener(OnFire);
     }
 
     private void Start()
@@ -271,6 +276,11 @@ public class MovementSystem : NetworkBehaviour
         _movementDisabled = false;
     }
 
+    private void OnFire()
+    {
+        _isShooting = true;
+    }
+
     private void OnTick()
     {
         if (base.IsOwner)
@@ -300,6 +310,7 @@ public class MovementSystem : NetworkBehaviour
             Reconciliation(reconcileData, true);
         }
 
+        _isShooting = false;
 
         SetPublicMovementData();
     }
@@ -315,7 +326,7 @@ public class MovementSystem : NetworkBehaviour
         moveData.Horizontal = _input.HorizontalMovementInput;
         moveData.Sprint = _input.IsSprintKeyPressed;
         moveData.Jump = _input.IsJumpKeyPressed;
-        moveData.Shoot = _input.IsFirePressed;
+        moveData.Shoot = _isShooting;
     }
 
     /// <summary>
@@ -480,7 +491,7 @@ public class MovementSystem : NetworkBehaviour
                         var knockbackForce = _weaponEquipManager.CurrentWeapon.WeaponInfo.Knockback * 5f;
 
                         // Apply the force in the opposite direction of the aim direction
-                        gravity += dir * knockbackForce * Time.deltaTime;
+                        gravity += dir * knockbackForce;
                         //_currentVelocity += -dir * knockbackForce * Time.deltaTime;
 
                         // If forces were applied then we need to recalculate the landing
@@ -506,10 +517,10 @@ public class MovementSystem : NetworkBehaviour
                 var dir = _combatSystem.AimDirection;
 
                 // Get the weapon's knockback force
-                var knockbackForce = _weaponEquipManager.CurrentWeapon.WeaponInfo.Knockback;
+                var knockbackForce = _weaponEquipManager.CurrentWeapon.WeaponInfo.Knockback / 5f;
 
                 // Apply the force in the opposite direction of the aim direction
-                _currentVelocity += -dir * knockbackForce * Time.deltaTime;
+                _currentVelocity += -dir * knockbackForce;
 
                 // If forces were applied then we need to recalculate the landing
                 _recalculateLanding = true;
