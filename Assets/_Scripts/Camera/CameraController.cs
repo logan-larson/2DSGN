@@ -13,7 +13,8 @@ public class CameraController : NetworkBehaviour
     [SerializeField] private Camera cam;
     public Transform player = null;
     [SerializeField] private float posLerpValue = 0.05f;
-    [SerializeField] private float rotLerpValue = 0.05f;
+    [SerializeField] private float _airborneRotLerpValue = 0.01f;
+    [SerializeField] private float _grounedRotLerpValue = 0.05f;
 
     [SerializeField] private float startingZ = -10f;
     /// <summary>
@@ -74,7 +75,8 @@ public class CameraController : NetworkBehaviour
         // Lerp to nearest position and rotation
         Vector3 lerpedPos = Vector3.Lerp(this.transform.position, targetPos, posLerpValue);
 
-        // When the player releases the fire button, delay the camera rotation to give the player a chance to see where they are shooting
+        // When the player releases the fire button, delay the camera rotation to give the player
+        // a chance to start firing again and not have the camera rotate
         if (_prevIsFirePressed != _inputValues.IsFirePressed)
         {
             if (_inputValues.IsFirePressed)
@@ -84,12 +86,15 @@ public class CameraController : NetworkBehaviour
                     StopCoroutine(_delayRotationCoroutine);
                 }
             }
-            else
+            else // maybe switch this back to else??
             {
                 _delayRotationCoroutine = DelayRotationCoroutine();
                 StartCoroutine(_delayRotationCoroutine);
             }
         }
+
+        // Set the rotation lerp value based on whether the player is grounded or not
+        var rotLerpValue = _movementSystem.PublicData.IsGrounded ? _grounedRotLerpValue : _airborneRotLerpValue;
 
         // If the player is shooting don't adjust the camera rotation
         Quaternion lerpedRot = _inputValues.IsFirePressed || _delayRotationCoroutine != null

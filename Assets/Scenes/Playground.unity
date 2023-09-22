@@ -13564,9 +13564,11 @@ MonoBehaviour:
   cam: {fileID: 1919249584}
   player: {fileID: 0}
   posLerpValue: 0.05
-  rotLerpValue: 0.05
+  _airborneRotLerpValue: 0.01
+  _grounedRotLerpValue: 0.05
   startingZ: -10
   zFactor: 0.4
+  _rotationDelay: 0.25
 --- !u!4 &1919249583
 Transform:
   m_ObjectHideFlags: 0
