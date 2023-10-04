@@ -22,3 +22,4 @@ MonoBehaviour:
   MaxBloomAngle: 10
   BloomAngleIncreasePerShot: 1
   Knockback: 7
+  MuzzleLength: 0.75

@@ -207,8 +207,39 @@ public class CombatSystem : NetworkBehaviour
 
         OnShoot.Invoke();
 
-        // TODO: Change bullet spawn location to be related to WeaponInfo.MuzzlePosition
-        ShootServer(_weaponEquipManager.CurrentWeapon.WeaponInfo, _weaponHolder.transform.position, _aimDirection, _playerName.Username);
+        var currentWeapon = _weaponEquipManager.CurrentWeapon.WeaponInfo;
+
+        var bulletSpawnPosition = _weaponHolder.transform.position + (_aimDirection * currentWeapon.MuzzleLength);
+        var bulletDirection = new List<Vector3>();
+
+        var slidingMultiplier = _input.IsSlideKeyPressed ? 2f : 1f;
+
+        if (currentWeapon.BulletsPerShot == 1)
+        {
+            var currentBloom = _weaponEquipManager.CurrentWeapon.CurrentBloom * slidingMultiplier;
+            Vector3 bloomDir = Quaternion.Euler(0f, 0f, Random.Range(-currentBloom, currentBloom)) * _aimDirection;
+
+            bulletDirection.Add(bloomDir);
+        }
+        else
+        {
+            for (int i = 0; i < currentWeapon.BulletsPerShot; i++)
+            {
+                var angle = currentWeapon.SpreadAngle * slidingMultiplier;
+                Vector3 randomDirection = Quaternion.Euler(0f, 0f, Random.Range(-angle, angle)) * _aimDirection;
+
+                bulletDirection.Add(randomDirection);
+            }
+        }
+
+        // Shoot on client
+        for (int i = 0; i < bulletDirection.Count; i++)
+        {
+            DrawShotOwner(bulletSpawnPosition, bulletDirection[i], currentWeapon.Range);
+        }
+
+        // Shoot on server and enable collider rollback
+        //ShootServer(_weaponEquipManager.CurrentWeapon.WeaponInfo, bulletSpawnPosition, bulletDirection, _playerName.Username);
     }
 
     [ServerRpc]
@@ -311,6 +342,13 @@ public class CombatSystem : NetworkBehaviour
         }
     }
 
+    public void DrawShotOwner(Vector3 position, Vector3 direction, float distance)
+    {
+        TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
+        
+        StartCoroutine(ShootCoroutine(position, direction, distance, bulletTrail));
+    }
+
     [Server]
     public void DrawShotServer(Vector3 position, Vector3 direction, float distance)
     {
@@ -322,6 +360,8 @@ public class CombatSystem : NetworkBehaviour
     [ObserversRpc]
     public void DrawShotObservers(Vector3 position, Vector3 direction, float distance)
     {
+        if (base.IsOwner || base.IsServer) return;
+
         TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
         
         StartCoroutine(ShootCoroutine(position, direction, distance, bulletTrail));
