@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 using FishNet.Connection;
 using FishNet.Object.Synchronizing;
 using UnityEngine.Events;
+using FishNet.Managing.Timing;
+using FishNet.Component.ColliderRollback;
 
 /**
 <summary>
@@ -135,19 +137,16 @@ public class CombatSystem : NetworkBehaviour
             CheckShoot();
         }
 
-        if (base.IsServer)
+        if (!_isShooting)
         {
-            if (!_isShooting)
+            if (_bloomTimer > _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate)
             {
-                if (_bloomTimer > _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate)
-                {
-                    SubtractBloom(_weaponEquipManager.CurrentWeapon.WeaponInfo);
-                    _bloomTimer = 0f;
-                }
-                else
-                {
-                    _bloomTimer += Time.deltaTime;
-                }
+                SubtractBloom(_weaponEquipManager.CurrentWeapon.WeaponInfo);
+                _bloomTimer = 0f;
+            }
+            else
+            {
+                _bloomTimer += Time.deltaTime;
             }
         }
     }
@@ -210,16 +209,16 @@ public class CombatSystem : NetworkBehaviour
         var currentWeapon = _weaponEquipManager.CurrentWeapon.WeaponInfo;
 
         var bulletSpawnPosition = _weaponHolder.transform.position + (_aimDirection * currentWeapon.MuzzleLength);
-        var bulletDirection = new List<Vector3>();
 
         var slidingMultiplier = _input.IsSlideKeyPressed ? 2f : 1f;
 
+        Vector3[] bulletDirections = new Vector3[currentWeapon.BulletsPerShot];
         if (currentWeapon.BulletsPerShot == 1)
         {
             var currentBloom = _weaponEquipManager.CurrentWeapon.CurrentBloom * slidingMultiplier;
             Vector3 bloomDir = Quaternion.Euler(0f, 0f, Random.Range(-currentBloom, currentBloom)) * _aimDirection;
 
-            bulletDirection.Add(bloomDir);
+            bulletDirections[0] = bloomDir;
         }
         else
         {
@@ -228,26 +227,44 @@ public class CombatSystem : NetworkBehaviour
                 var angle = currentWeapon.SpreadAngle * slidingMultiplier;
                 Vector3 randomDirection = Quaternion.Euler(0f, 0f, Random.Range(-angle, angle)) * _aimDirection;
 
-                bulletDirection.Add(randomDirection);
+                bulletDirections[i] = randomDirection;
             }
         }
 
         // Shoot on client
-        for (int i = 0; i < bulletDirection.Count; i++)
+        for (int i = 0; i < bulletDirections.Length; i++)
         {
-            DrawShotOwner(bulletSpawnPosition, bulletDirection[i], currentWeapon.Range);
+            DrawShotOwner(bulletSpawnPosition, bulletDirections[i], currentWeapon.Range);
         }
 
+        PreciseTick pt = base.TimeManager.GetPreciseTick(base.TimeManager.LastPacketTick);
+
         // Shoot on server and enable collider rollback
-        //ShootServer(_weaponEquipManager.CurrentWeapon.WeaponInfo, bulletSpawnPosition, bulletDirection, _playerName.Username);
+        ShootServer(pt, _weaponEquipManager.CurrentWeapon.WeaponInfo, bulletSpawnPosition, bulletDirections, _playerName.Username);
+
+        AddBloom(currentWeapon);
     }
 
     [ServerRpc]
-    public void ShootServer(WeaponInfo weapon, Vector3 position, Vector3 direction, string username)
+    public void ShootServer(PreciseTick pt, WeaponInfo weapon, Vector3 position, Vector3[] directions, string username)
     {
         if (weapon == null) return;
 
-        RaycastHit2D[][] allHits = GetHits(weapon, position, direction);
+        base.RollbackManager.Rollback(pt, RollbackPhysicsType.Physics2D, base.IsOwner);
+
+        RaycastHit2D[][] allHits = new RaycastHit2D[directions.Length][];
+
+        LayerMask nonHittable = LayerMask.GetMask("WeaponPickup");
+        for (int i = 0; i < directions.Length; i++)
+        {
+            RaycastHit2D[] hits = Physics2D.RaycastAll(position, directions[i], weapon.Range, ~nonHittable);
+
+            allHits[i] = hits;
+        }
+
+        //RaycastHit2D[][] allHits = GetHits(weapon, position, directions);
+
+        base.RollbackManager.Return();
 
         foreach (RaycastHit2D[] hits in allHits) 
         {
@@ -277,7 +294,7 @@ public class CombatSystem : NetworkBehaviour
             }
         }
 
-        AddBloom(weapon);
+        //AddBloom(weapon);
     }
 
     private void DamagePlayerServer(GameObject playerHit, int damage, string weaponName, NetworkConnection playerConn)
