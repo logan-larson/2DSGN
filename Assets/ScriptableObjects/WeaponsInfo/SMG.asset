@@ -15,10 +15,10 @@ MonoBehaviour:
   Name: SMG
   Damage: 15
   FireRate: 0.15
-  Range: 14
+  Range: 15
   IsAutomatic: 1
   BulletsPerShot: 1
   SpreadAngle: 0
   MaxBloomAngle: 10
   BloomAngleIncreasePerShot: 1
-  Knockback: 3
+  Knockback: 7

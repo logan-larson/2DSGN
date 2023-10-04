@@ -15,10 +15,10 @@ MonoBehaviour:
   Name: Rifle
   Damage: 23
   FireRate: 0.2
-  Range: 16
+  Range: 20
   IsAutomatic: 1
   BulletsPerShot: 1
   SpreadAngle: 0
   MaxBloomAngle: 7
   BloomAngleIncreasePerShot: 1
-  Knockback: 5
+  Knockback: 8

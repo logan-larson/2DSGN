@@ -490,7 +490,7 @@ public class MovementSystem : NetworkBehaviour
                         var dir = _combatSystem.AimDirection;
 
                         // Get the weapon's knockback force
-                        var knockbackForce = _weaponEquipManager.CurrentWeapon.WeaponInfo.Knockback * 5f;
+                        var knockbackForce = _weaponEquipManager.CurrentWeapon.WeaponInfo.Knockback * 3f;
 
                         // Apply the force in the opposite direction of the aim direction
                         gravity += dir * knockbackForce;

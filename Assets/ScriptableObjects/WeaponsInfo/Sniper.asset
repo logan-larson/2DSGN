@@ -15,10 +15,10 @@ MonoBehaviour:
   Name: Sniper
   Damage: 100
   FireRate: 2
-  Range: 20
+  Range: 25
   IsAutomatic: 1
   BulletsPerShot: 1
   SpreadAngle: 0
   MaxBloomAngle: 1
   BloomAngleIncreasePerShot: 0
-  Knockback: 15
+  Knockback: 50
