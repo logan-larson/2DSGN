@@ -234,9 +234,12 @@ public class CombatSystem : NetworkBehaviour
         }
 
         // Shoot on client
+        LayerMask nonHittable = LayerMask.GetMask("WeaponPickup");
         for (int i = 0; i < bulletDirections.Length; i++)
         {
-            DrawShotOwner(bulletSpawnPosition, bulletDirections[i], currentWeapon.Range);
+            RaycastHit2D[] hits = Physics2D.RaycastAll(bulletSpawnPosition, bulletDirections[i], currentWeapon.Range, ~nonHittable);
+
+            DrawShotOwner(hits, bulletSpawnPosition, bulletDirections[i], currentWeapon.Range);
         }
 
         PreciseTick pt = base.TimeManager.GetPreciseTick(base.TimeManager.LastPacketTick);
@@ -365,11 +368,29 @@ public class CombatSystem : NetworkBehaviour
         }
     }
 
-    public void DrawShotOwner(Vector3 position, Vector3 direction, float distance)
+    public void DrawShotOwner(RaycastHit2D[] hits, Vector3 position, Vector3 direction, float distance)
     {
-        TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
-        
-        StartCoroutine(ShootCoroutine(position, direction, distance, bulletTrail));
+        bool hitSomething = false;
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.collider != null && hit.transform.GetComponentInChildren<Weapon>() == null)
+            {
+                TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
+                
+                StartCoroutine(ShootCoroutine(position, direction, distance, bulletTrail));
+
+                hitSomething = true;
+                break;
+            }
+        }
+
+        if (!hitSomething)
+        {
+            TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
+            
+            StartCoroutine(ShootCoroutine(position, direction, distance, bulletTrail));
+        }
+
     }
 
     [Server]
@@ -383,7 +404,7 @@ public class CombatSystem : NetworkBehaviour
     [ObserversRpc]
     public void DrawShotObservers(Vector3 position, Vector3 direction, float distance)
     {
-        if (base.IsOwner || base.IsServer) return;
+        if (base.IsOwner) return;
 
         TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
         
