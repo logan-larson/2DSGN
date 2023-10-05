@@ -58,12 +58,16 @@ public class CountdownManager : NetworkBehaviour
     [ObserversRpc]
     private void StartCountdownObserversRpc()
     {
+        if (!base.IsOwner) return;
+
         StartCountdown();
     }
 
     [ObserversRpc]
     private void GameStartObserversRpc()
     {
+        if (!base.IsOwner) return;
+
         GameStart();
     }
 

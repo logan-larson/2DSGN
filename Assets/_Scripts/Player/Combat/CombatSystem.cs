@@ -47,11 +47,11 @@ public class CombatSystem : NetworkBehaviour
     [SerializeField]
     private bool _combatDisabled = false;
 
-    private float _shootTimer = 0f;
+    public float ShootTimer = 0f;
     private float _bloomTimer = 0f;
 
     [SyncVar]
-    private bool _isShooting = false;
+    public bool IsShooting = false;
 
     private Vector3 _aimDirection = Vector3.zero;
     private Vector3 _worldMousePosition = Vector3.zero;
@@ -89,6 +89,8 @@ public class CombatSystem : NetworkBehaviour
         _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
         _playerName ??= GetComponentInChildren<PlayerName>();
 
+        _weaponEquipManager.ChangeWeapon.AddListener(OnWeaponChanged);
+
         _input = _inputSystem.InputValues;
 
         GameStateManager.Instance.OnGameStart.AddListener(OnGameStart);
@@ -105,13 +107,13 @@ public class CombatSystem : NetworkBehaviour
     {
         // Disable movement things
         _combatDisabled = true;
-        _isShooting = false;
+        IsShooting = false;
     }
 
     private void OnWeaponChanged()
     {
         // When you switch weapons, allow the player to shoot right away
-        _shootTimer = _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate;
+        ShootTimer = _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate;
     }
 
     private void Update()
@@ -128,16 +130,16 @@ public class CombatSystem : NetworkBehaviour
 
             UpdateAimDirection();
 
-            if (_shootTimer < _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate)
+            if (ShootTimer < _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate)
             {
-                _shootTimer += Time.deltaTime;
+                ShootTimer += Time.deltaTime;
                 return;
             }
 
             CheckShoot();
         }
 
-        if (!_isShooting)
+        if (!IsShooting)
         {
             if (_bloomTimer > _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate)
             {
@@ -187,7 +189,7 @@ public class CombatSystem : NetworkBehaviour
     [ServerRpc]
     public void SetIsShootingServerRpc(bool isShooting)
     {
-        _isShooting = isShooting;
+        IsShooting = isShooting;
     }
 
     private void CheckShoot()
@@ -198,11 +200,11 @@ public class CombatSystem : NetworkBehaviour
             return;
         }
 
-        if (!_isShooting) return;
+        if (!IsShooting) return;
 
-        if (_shootTimer < _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate) return;
+        if (ShootTimer < _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate) return;
 
-        _shootTimer = 0f;
+        ShootTimer = 0f;
 
         OnShoot.Invoke();
 
@@ -249,6 +251,11 @@ public class CombatSystem : NetworkBehaviour
     public void ShootServer(PreciseTick pt, WeaponInfo weapon, Vector3 position, Vector3[] directions, string username)
     {
         if (weapon == null) return;
+
+        if (!base.IsOwner)
+        {
+            OnShoot.Invoke();
+        }
 
         base.RollbackManager.Rollback(pt, RollbackPhysicsType.Physics2D, base.IsOwner);
 

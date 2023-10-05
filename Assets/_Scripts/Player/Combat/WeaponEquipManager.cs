@@ -253,6 +253,8 @@ public class WeaponEquipManager : NetworkBehaviour
         if (Owner.ClientId == clientId)
         {
             _currentWeaponIndex = index;
+
+            ChangeWeapon.Invoke();
         }
 
         ChangeWeaponActivationObservers(index, isActive, clientId);
