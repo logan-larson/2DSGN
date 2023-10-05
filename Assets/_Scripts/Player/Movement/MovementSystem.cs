@@ -178,10 +178,20 @@ public class MovementSystem : NetworkBehaviour
     [SerializeField]
     private bool _movementDisabled = false;
 
+    [SerializeField]
+    private Vector2 MousePos = Vector2.zero;
+
+    [SerializeField]
+    private Vector2 _mousePosition = Vector2.zero;
+
     /// <summary>
     /// Aim direction of the player.
     /// </summary>
+    [SerializeField]
     private Vector3 _aimDirection = Vector3.zero;
+
+    [SerializeField]
+    private Camera MapCamera = null;
 
     #endregion
 
@@ -244,6 +254,8 @@ public class MovementSystem : NetworkBehaviour
         GameStateManager.Instance.OnGameEnd.AddListener(OnGameEnd);
 
         //_combatSystem.OnFire.AddListener(OnFire);
+
+        MapCamera = GameObject.FindGameObjectWithTag("MapCamera").GetComponent<Camera>();
     }
 
     private void Start()
@@ -342,10 +354,6 @@ public class MovementSystem : NetworkBehaviour
         moveData.Jump = _input.IsJumpKeyPressed;
         moveData.Shoot = _input.IsFirePressed;
         moveData.MousePosition = Mouse.current.position.ReadValue();
-            
-        
-        /// HERE
-        ///_combatSystem.IsShooting && _combatSystem.ShootTimer >= _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate;
     }
 
     /// <summary>
@@ -358,6 +366,8 @@ public class MovementSystem : NetworkBehaviour
     [Replicate]
     private void Move(MoveData moveData, bool asServer, bool replaying = false)
     {
+        MousePos = moveData.MousePosition;
+
         if (_movementDisabled)
         {
             _currentVelocity = Vector3.zero;
@@ -451,9 +461,13 @@ public class MovementSystem : NetworkBehaviour
         Vector3 screenMousePosition = moveData.MousePosition;
         screenMousePosition.z = 10f;
 
-        if (Camera.main == null) return;
+        if (MapCamera == null) return;
 
-        Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
+        MapCamera.transform.SetPositionAndRotation(transform.position, transform.rotation);
+
+        Vector3 worldMousePosition = MapCamera.ScreenToWorldPoint(screenMousePosition);
+
+        _mousePosition = worldMousePosition;
 
         // Determine input type
         if (_input.IsGamepad)
@@ -806,4 +820,11 @@ public class MovementSystem : NetworkBehaviour
 
     #endregion
 
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(transform.position + (_aimDirection * 5f), 0.2f);
+        Debug.DrawLine(transform.position, transform.position + (_aimDirection * 5f), Color.red);
+    }
 }
