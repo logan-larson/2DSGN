@@ -266,6 +266,8 @@ public class CombatSystem : NetworkBehaviour
         {
             RaycastHit2D[] hits = Physics2D.RaycastAll(position, directions[i], weapon.Range, ~nonHittable);
 
+            DrawShot(hits, position, directions[i], weapon.Range);
+
             allHits[i] = hits;
         }
 
@@ -279,19 +281,16 @@ public class CombatSystem : NetworkBehaviour
             {
                 if (hit.collider != null)
                 {
-                    if (hit.transform.GetComponentInChildren<PlayerName>() != null)
+                    var player = hit.transform.parent;
+                    if (player.GetComponentInChildren<PlayerName>() != null && player.GetComponentInChildren<PlayerName>().Username != username)
                     {
-                        if (hit.transform.GetComponentInChildren<PlayerName>().Username != username)
-                        {
-                            if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
-                                var nob = hit.transform.GetComponent<NetworkObject>();
-                                DamagePlayerServer(hit.transform.gameObject, weapon.Damage, weapon.Name, nob.LocalConnection);
-                            }
-                            //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
-
+                        if (player.TryGetComponent(out PlayerHealth enemyHealth)) {
+                            var nob = player.GetComponent<NetworkObject>();
+                            DamagePlayerServer(player.gameObject, weapon.Damage, weapon.Name, nob.LocalConnection);
                         }
+                        //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
                     }
-                    else if (hit.transform.GetComponentInChildren<Weapon>() == null)
+                    else if (player.GetComponentInChildren<Weapon>() == null)
                     {
                         //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
 
