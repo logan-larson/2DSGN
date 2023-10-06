@@ -198,7 +198,8 @@ public class InputSystem : NetworkBehaviour
 
     public void OnForceRespawn(InputValue _)
     {
-        _respawnManager.ForceRespawn();
+        //_respawnManager.ForceRespawn();
+        _playerHealth.TakeDamageServerRpc(25);
     }
 
     public void OnControlsChanged()

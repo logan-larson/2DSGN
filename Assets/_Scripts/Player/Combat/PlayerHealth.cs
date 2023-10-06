@@ -37,6 +37,12 @@ public class PlayerHealth : NetworkBehaviour
         OnDeath = OnDeath ?? new UnityEvent<bool>();
     }
 
+    [ServerRpc]
+    public void TakeDamageServerRpc(int damage)
+    {
+        PlayerManager.Instance.DamagePlayer(gameObject.GetInstanceID(), damage, gameObject.GetInstanceID(), "Revolver");
+    }
+
     [Server]
     public void TakeDamage(int damage)
     {

@@ -8,6 +8,7 @@ using FishNet.Object.Synchronizing;
 using UnityEngine.Events;
 using FishNet.Managing.Timing;
 using FishNet.Component.ColliderRollback;
+using FishNet.Transporting;
 
 /**
 <summary>
@@ -39,7 +40,10 @@ public class CombatSystem : NetworkBehaviour
     private WeaponEquipManager _weaponEquipManager;
 
     [SerializeField]
-    private PlayerName _playerName;
+    private Camera _camera;
+
+    [SerializeField]
+    private CameraController _cameraController;
 
     [SerializeField]
     private LineRenderer _bullet;
@@ -60,6 +64,8 @@ public class CombatSystem : NetworkBehaviour
 
     public UnityEvent OnShoot = new UnityEvent();
 
+    [SerializeField]
+    private int _instanceID = -1;
 
     private void Start()
     {
@@ -73,12 +79,17 @@ public class CombatSystem : NetworkBehaviour
         if (!base.IsOwner) return;
 
         _inputSystem ??= GetComponent<InputSystem>();
-        _playerName ??= GetComponentInChildren<PlayerName>();
         _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
 
         _weaponEquipManager.ChangeWeapon.AddListener(OnWeaponChanged);
 
         _input = _inputSystem.InputValues;
+
+        _camera = _weaponEquipManager.transform.GetComponent<CameraManager>().Camera;
+
+        _cameraController = _camera.GetComponent<CameraController>();
+
+        GetInstanceIDServer(base.Owner);
     }
 
     public override void OnStartServer()
@@ -87,7 +98,6 @@ public class CombatSystem : NetworkBehaviour
 
         _inputSystem ??= GetComponent<InputSystem>();
         _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
-        _playerName ??= GetComponentInChildren<PlayerName>();
 
         _weaponEquipManager.ChangeWeapon.AddListener(OnWeaponChanged);
 
@@ -95,6 +105,26 @@ public class CombatSystem : NetworkBehaviour
 
         GameStateManager.Instance.OnGameStart.AddListener(OnGameStart);
         GameStateManager.Instance.OnGameEnd.AddListener(OnGameEnd);
+
+        if (base.IsHost)
+        {
+            _instanceID = gameObject.GetInstanceID();
+        }
+    }
+
+
+    [ServerRpc]
+    private void GetInstanceIDServer(NetworkConnection conn)
+    {
+        if (conn == null) return;
+
+        SetInstanceIDTarget(conn, gameObject.GetInstanceID());
+    }
+
+    [TargetRpc]
+    private void SetInstanceIDTarget(NetworkConnection conn, int instanceID)
+    {
+        _instanceID = instanceID;
     }
 
     private void OnGameStart()
@@ -163,15 +193,6 @@ public class CombatSystem : NetworkBehaviour
 
     private void UpdateAimDirection()
     {
-        Vector3 screenMousePosition = Mouse.current.position.ReadValue();
-        screenMousePosition.z = 10f;
-
-        if (Camera.main == null) return;
-
-        Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
-
-        _worldMousePosition = new Vector3(worldMousePosition.x, worldMousePosition.y, 0f);
-
         // Determine input type
         if (_input.IsGamepad)
         {
@@ -181,7 +202,17 @@ public class CombatSystem : NetworkBehaviour
         }
         else
         {
-            _aimDirection = (new Vector3(worldMousePosition.x, worldMousePosition.y, 0f) - new Vector3(transform.position.x, transform.position.y, 0f)).normalized;
+            var mousePosition = Input.mousePosition;
+
+            if (_cameraController == null || _camera == null) return;
+
+            mousePosition.z = _cameraController.CurrentZ * -1f;
+
+            Vector3 mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
+
+            mouseWorldPosition.z = 0f;
+
+            _aimDirection = (mouseWorldPosition - transform.position).normalized;
         }
 
     }
@@ -202,18 +233,28 @@ public class CombatSystem : NetworkBehaviour
 
         if (!IsShooting) return;
 
-        if (ShootTimer < _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate) return;
+        // Maybe breakpoint this because I don't think it will ever hit
+        if (ShootTimer < _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate)
+        {
+            return;
+        }
 
+        // -- Shoot a bullet --
+        Shoot();
+    }
+
+    private void Shoot()
+    {
         ShootTimer = 0f;
 
         OnShoot.Invoke();
 
+        // -- Setup --
         var currentWeapon = _weaponEquipManager.CurrentWeapon.WeaponInfo;
-
         var bulletSpawnPosition = _weaponHolder.transform.position + (_aimDirection * currentWeapon.MuzzleLength);
-
         var slidingMultiplier = _input.IsSlideKeyPressed ? 2f : 1f;
 
+        // -- Calculate bullet direction(s) --
         Vector3[] bulletDirections = new Vector3[currentWeapon.BulletsPerShot];
         if (currentWeapon.BulletsPerShot == 1)
         {
@@ -233,32 +274,100 @@ public class CombatSystem : NetworkBehaviour
             }
         }
 
-        // Shoot on client
+        // -- Draw the shot for the shooter --
+        LayerMask environment = LayerMask.GetMask("Obstacle");
         for (int i = 0; i < bulletDirections.Length; i++)
         {
-            DrawShotOwner(bulletSpawnPosition, bulletDirections[i], currentWeapon.Range);
+            RaycastHit2D hit = Physics2D.Raycast(bulletSpawnPosition, bulletDirections[i], currentWeapon.Range, environment);
+            RaycastHit2D barrelStuff = Physics2D.Raycast(transform.position, bulletDirections[i], currentWeapon.MuzzleLength, LayerMask.GetMask("Obstacle"));
+
+            if (barrelStuff.collider is not null) continue;
+
+            if (hit.collider is not null)
+            {
+                // -- Hit the environment, so draw a line to the hit point --
+                DrawShot(bulletSpawnPosition, bulletDirections[i], hit.distance);
+            }
+            else
+            {
+                // -- Didn't hit anything, so draw a line to the end of the range --
+                DrawShot(bulletSpawnPosition, bulletDirections[i], currentWeapon.Range);
+            }
         }
 
         PreciseTick pt = base.TimeManager.GetPreciseTick(base.TimeManager.LastPacketTick);
 
-        // Shoot on server and enable collider rollback
-        ShootServer(pt, _weaponEquipManager.CurrentWeapon.WeaponInfo, bulletSpawnPosition, bulletDirections, _playerName.Username);
+        // -- Shoot on server -- 
+        ShootServer(pt, currentWeapon, transform.position, bulletSpawnPosition, bulletDirections, _instanceID);
 
+        // -- Increase bloom --
         AddBloom(currentWeapon);
     }
 
     [ServerRpc]
-    public void ShootServer(PreciseTick pt, WeaponInfo weapon, Vector3 position, Vector3[] directions, string username)
+    public void ShootServer(PreciseTick pt, WeaponInfo weapon, Vector3 playerPosition, Vector3 bulletSpawnPosition, Vector3[] bulletDirections, int instanceID)
     {
         if (weapon == null) return;
 
-        if (!base.IsOwner)
-        {
-            OnShoot.Invoke();
-        }
-
+        // -- Rollback the colliders --
         base.RollbackManager.Rollback(pt, RollbackPhysicsType.Physics2D, base.IsOwner);
 
+        // -- Get all the environment hits --
+        LayerMask environment = LayerMask.GetMask("Obstacle");
+        for (int i = 0; i < bulletDirections.Length; i++)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(bulletSpawnPosition, bulletDirections[i], weapon.Range, environment);
+            RaycastHit2D barrelStuff = Physics2D.Raycast(playerPosition, bulletDirections[i], weapon.MuzzleLength, LayerMask.GetMask("Obstacle"));
+
+            if (barrelStuff.collider is not null) continue;
+
+            // -- Draw the shots for the other players --
+            if (hit.collider is not null)
+            {
+                // -- Hit the environment, so draw a line to the hit point --
+                DrawShot(bulletSpawnPosition, bulletDirections[i], hit.distance);
+                DrawShotObservers(bulletSpawnPosition, bulletDirections[i], hit.distance);
+            }
+            else
+            {
+                // -- Didn't hit anything, so draw a line to the end of the range --
+                DrawShot(bulletSpawnPosition, bulletDirections[i], weapon.Range);
+                DrawShotObservers(bulletSpawnPosition, bulletDirections[i], weapon.Range);
+            }
+        }
+
+        // -- Get all the player hits --
+        LayerMask hitbox = LayerMask.GetMask("Hitbox", "Obstacle");
+        for (int i = 0; i < bulletDirections.Length; i++)
+        {
+            RaycastHit2D[] hits = Physics2D.RaycastAll(bulletSpawnPosition, bulletDirections[i], weapon.Range, hitbox);
+            RaycastHit2D barrelStuff = Physics2D.Raycast(playerPosition, bulletDirections[i], weapon.MuzzleLength, LayerMask.GetMask("Obstacle"));
+
+            // -- Damage the players --
+            foreach (RaycastHit2D hit in hits)
+            {
+                if (hit.collider != null) // Maybe check if the username is the same as the shooter
+                {
+                    if (barrelStuff.collider is not null && hit.distance > barrelStuff.distance) break;
+
+                    if (hit.collider.gameObject.layer == LayerMask.NameToLayer("Obstacle")) break;
+
+                    var player = hit.transform.parent;
+
+                    if (player.gameObject.GetInstanceID() == instanceID) continue;
+
+                    var nob = player.GetComponent<NetworkObject>();
+                    PlayerManager.Instance.DamagePlayer(player.gameObject.GetInstanceID(), weapon.Damage, gameObject.GetInstanceID(), weapon.Name, nob.LocalConnection);
+                }
+            }
+        }
+
+
+        // -- Return the colliders --
+        base.RollbackManager.Return();
+
+        // -- Get all the hits for each bullet --
+        /*
         RaycastHit2D[][] allHits = new RaycastHit2D[directions.Length][];
 
         LayerMask nonHittable = LayerMask.GetMask("WeaponPickup");
@@ -266,32 +375,30 @@ public class CombatSystem : NetworkBehaviour
         {
             RaycastHit2D[] hits = Physics2D.RaycastAll(position, directions[i], weapon.Range, ~nonHittable);
 
+            //DrawShotWithHits(hits, position, directions[i], weapon.Range);
+
             allHits[i] = hits;
         }
 
         //RaycastHit2D[][] allHits = GetHits(weapon, position, directions);
 
-        base.RollbackManager.Return();
-
+        // -- Damage the players --
         foreach (RaycastHit2D[] hits in allHits) 
         {
             foreach (RaycastHit2D hit in hits)
             {
                 if (hit.collider != null)
                 {
-                    if (hit.transform.GetComponentInChildren<PlayerName>() != null)
+                    var player = hit.transform.parent;
+                    if (player.GetComponentInChildren<PlayerName>() != null && player.GetComponentInChildren<PlayerName>().Username != username)
                     {
-                        if (hit.transform.GetComponentInChildren<PlayerName>().Username != username)
-                        {
-                            if (hit.transform.TryGetComponent(out PlayerHealth enemyHealth)) {
-                                var nob = hit.transform.GetComponent<NetworkObject>();
-                                DamagePlayerServer(hit.transform.gameObject, weapon.Damage, weapon.Name, nob.LocalConnection);
-                            }
-                            //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
-
+                        if (player.TryGetComponent(out PlayerHealth enemyHealth)) {
+                            var nob = player.GetComponent<NetworkObject>();
+                            DamagePlayerServer(player.gameObject, weapon.Damage, weapon.Name, nob.LocalConnection);
                         }
+                        //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
                     }
-                    else if (hit.transform.GetComponentInChildren<Weapon>() == null)
+                    else if (player.GetComponentInChildren<Weapon>() == null)
                     {
                         //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
 
@@ -302,6 +409,7 @@ public class CombatSystem : NetworkBehaviour
         }
 
         //AddBloom(weapon);
+        */
     }
 
     private void DamagePlayerServer(GameObject playerHit, int damage, string weaponName, NetworkConnection playerConn)
@@ -309,86 +417,22 @@ public class CombatSystem : NetworkBehaviour
         PlayerManager.Instance.DamagePlayer(playerHit.GetInstanceID(), damage, gameObject.GetInstanceID(), weaponName, playerConn);
     }
 
-    private RaycastHit2D[][] GetHits(WeaponInfo weapon, Vector3 position, Vector3 direction)
+    private void DrawShot(Vector3 origin, Vector3 direction, float distance)
     {
-        LayerMask nonHittable = LayerMask.GetMask("WeaponPickup");
-        RaycastHit2D[][] hits = new RaycastHit2D[0][];
-        if (weapon.BulletsPerShot == 1)
-        {
-            hits = new RaycastHit2D[1][];
-
-            var currentBloom = _weaponEquipManager.CurrentWeapon.CurrentBloom;
-            Vector3 bloomDir= Quaternion.Euler(0f, 0f, Random.Range(-currentBloom, currentBloom)) * direction;
-
-            hits[0] = Physics2D.RaycastAll(position, bloomDir, weapon.Range, ~nonHittable);
-
-            DrawShot(hits[0], position, bloomDir, weapon.Range);
-        }
-        else
-        {
-            hits = new RaycastHit2D[weapon.BulletsPerShot][];
-            for (int i = 0; i < weapon.BulletsPerShot; i++)
-            {
-                Vector3 randomDirection = Quaternion.Euler(0f, 0f, Random.Range(-weapon.SpreadAngle, weapon.SpreadAngle)) * direction;
-
-                Debug.DrawRay(position, randomDirection * weapon.Range, Color.green, 0.5f);
-
-                RaycastHit2D[] bulletHits = Physics2D.RaycastAll(position, randomDirection, weapon.Range, ~nonHittable);
-
-                hits[i] = bulletHits;
-
-                DrawShot(hits[i], position, randomDirection, weapon.Range);
-            }
-        }
-
-        return hits;
-    }
-
-    private void DrawShot(RaycastHit2D[] hits, Vector3 position, Vector3 direction, float distance)
-    {
-        bool hitSomething = false;
-        foreach (RaycastHit2D hit in hits)
-        {
-            if (hit.collider != null && hit.transform.GetComponentInChildren<Weapon>() == null)
-            {
-                DrawShotServer(position, direction, hits[System.Array.IndexOf(hits, hit)].distance);
-                DrawShotObservers(position, direction, hits[System.Array.IndexOf(hits, hit)].distance);
-
-                hitSomething = true;
-                break;
-            }
-        }
-
-        if (!hitSomething)
-        {
-            DrawShotServer(position, direction, distance);
-            DrawShotObservers(position, direction, distance);
-        }
-    }
-
-    public void DrawShotOwner(Vector3 position, Vector3 direction, float distance)
-    {
-        TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
+        TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, origin, Quaternion.identity);
         
-        StartCoroutine(ShootCoroutine(position, direction, distance, bulletTrail));
-    }
-
-    [Server]
-    public void DrawShotServer(Vector3 position, Vector3 direction, float distance)
-    {
-        TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
-        
-        StartCoroutine(ShootCoroutine(position, direction, distance, bulletTrail));
+        StartCoroutine(ShootCoroutine(origin, direction, distance, bulletTrail));
     }
 
     [ObserversRpc]
-    public void DrawShotObservers(Vector3 position, Vector3 direction, float distance)
+    public void DrawShotObservers(Vector3 origin, Vector3 direction, float distance)
     {
-        if (base.IsOwner || base.IsServer) return;
+        // -- Owner of shot check --
+        if (base.IsOwner) return;
 
-        TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, position, Quaternion.identity);
+        TrailRenderer bulletTrail = Instantiate(_weaponEquipManager.CurrentWeapon.BulletTrailRenderer, origin, Quaternion.identity);
         
-        StartCoroutine(ShootCoroutine(position, direction, distance, bulletTrail));
+        StartCoroutine(ShootCoroutine(origin, direction, distance, bulletTrail));
     }
 
     private IEnumerator ShootCoroutine(Vector3 position, Vector3 direction, float distance, TrailRenderer bulletTrail)

@@ -1,14 +1,7 @@
-using System;
 using System.Collections;
-using System.Data;
-using System.Runtime.CompilerServices;
-using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Prediction;
-using FishNet.Object.Synchronizing;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 
 /**
 <summary>
@@ -27,8 +20,6 @@ public class MovementSystem : NetworkBehaviour
         public float Horizontal;
         public bool Sprint;
         public bool Jump;
-        public bool Shoot;
-        public Vector2 MousePosition;
     }
 
     /// <summary>
@@ -41,8 +32,6 @@ public class MovementSystem : NetworkBehaviour
         public Quaternion Rotation;
         public bool IsGrounded;
         public float TimeOnGround;
-        public bool IsShooting;
-        public float TimeSinceLastShot;
     }
 
     /// <summary>
@@ -136,18 +125,6 @@ public class MovementSystem : NetworkBehaviour
     private float _timeOnGround = 0f;
 
     /// <summary>
-    /// True if the player is currently shooting.
-    /// </summary>
-    [SerializeField]
-    private bool _isShooting = false;
-
-    /// <summary>
-    /// Time since player has last shot.
-    /// </summary>
-    [SerializeField]
-    private float _timeSinceLastShot = 0f;
-
-    /// <summary>
     /// True if the player is allowed to jump.
     /// </summary>
     private bool _canJump = true;
@@ -177,21 +154,6 @@ public class MovementSystem : NetworkBehaviour
     /// </summary>
     [SerializeField]
     private bool _movementDisabled = false;
-
-    [SerializeField]
-    private Vector2 MousePos = Vector2.zero;
-
-    [SerializeField]
-    private Vector2 _mousePosition = Vector2.zero;
-
-    /// <summary>
-    /// Aim direction of the player.
-    /// </summary>
-    [SerializeField]
-    private Vector3 _aimDirection = Vector3.zero;
-
-    [SerializeField]
-    private Camera MapCamera = null;
 
     #endregion
 
@@ -252,10 +214,6 @@ public class MovementSystem : NetworkBehaviour
 
         GameStateManager.Instance.OnGameStart.AddListener(OnGameStart);
         GameStateManager.Instance.OnGameEnd.AddListener(OnGameEnd);
-
-        //_combatSystem.OnFire.AddListener(OnFire);
-
-        MapCamera = GameObject.FindGameObjectWithTag("MapCamera").GetComponent<Camera>();
     }
 
     private void Start()
@@ -330,9 +288,6 @@ public class MovementSystem : NetworkBehaviour
 
                 IsGrounded = _isGrounded,
                 TimeOnGround = _timeOnGround,
-
-                IsShooting = _isShooting,
-                TimeSinceLastShot = _timeSinceLastShot,
             };
 
             Reconciliation(reconcileData, true);
@@ -352,8 +307,6 @@ public class MovementSystem : NetworkBehaviour
         moveData.Horizontal = _input.HorizontalMovementInput;
         moveData.Sprint = _input.IsSprintKeyPressed;
         moveData.Jump = _input.IsJumpKeyPressed;
-        moveData.Shoot = _input.IsFirePressed;
-        moveData.MousePosition = Mouse.current.position.ReadValue();
     }
 
     /// <summary>
@@ -366,8 +319,6 @@ public class MovementSystem : NetworkBehaviour
     [Replicate]
     private void Move(MoveData moveData, bool asServer, bool replaying = false)
     {
-        MousePos = moveData.MousePosition;
-
         if (_movementDisabled)
         {
             _currentVelocity = Vector3.zero;
@@ -379,10 +330,6 @@ public class MovementSystem : NetworkBehaviour
         UpdateRaycastOrigins();
 
         UpdateGrounded();
-
-        UpdateShooting(moveData);
-
-        UpdateAimDirection(moveData);
 
         UpdateVelocity(moveData, asServer);
 
@@ -434,53 +381,6 @@ public class MovementSystem : NetworkBehaviour
         {
             _timeSinceGrounded += (float)TimeManager.TickDelta;
         }
-    }
-
-    private void UpdateShooting(MoveData moveData)
-    {
-        if (_timeSinceLastShot < _weaponEquipManager.CurrentWeapon.WeaponInfo.FireRate)
-        {
-            _timeSinceLastShot += (float)TimeManager.TickDelta;
-            _isShooting = false;
-            return;
-        }
-
-        if (moveData.Shoot)
-        {
-            _isShooting = true;
-            _timeSinceLastShot = 0f;
-        }
-        else
-        {
-            _isShooting = false;
-        }   
-    }
-
-    private void UpdateAimDirection(MoveData moveData)
-    {
-        Vector3 screenMousePosition = moveData.MousePosition;
-        screenMousePosition.z = 10f;
-
-        if (MapCamera == null) return;
-
-        MapCamera.transform.SetPositionAndRotation(transform.position, transform.rotation);
-
-        Vector3 worldMousePosition = MapCamera.ScreenToWorldPoint(screenMousePosition);
-
-        _mousePosition = worldMousePosition;
-
-        // Determine input type
-        if (_input.IsGamepad)
-        {
-            // If player is actively aiming, use that direction
-            if (_input.AimInput != Vector2.zero)
-                _aimDirection = transform.localRotation * _input.AimInput.normalized;
-        }
-        else
-        {
-            _aimDirection = (new Vector3(worldMousePosition.x, worldMousePosition.y, 0f) - new Vector3(transform.position.x, transform.position.y, 0f)).normalized;
-        }
-
     }
 
     private void UpdateVelocity(MoveData moveData, bool asServer)
@@ -561,25 +461,6 @@ public class MovementSystem : NetworkBehaviour
                     // Apply gravity in direction of slope
                     Vector3 gravity = new Vector3(0f, MovementProperties.Gravity, 0f);
 
-                    // Allow players to shoot while sliding and have that affect their velocity
-                    if (_isShooting)
-                    {
-                        // Get the aim direction
-                        var dir = _aimDirection;
-
-                        // Get the weapon's knockback force
-                        var knockbackForce = _weaponEquipManager.CurrentWeapon.WeaponInfo.Knockback * 3f;
-
-                        // Apply the force in the opposite direction of the aim direction
-                        gravity += dir * knockbackForce;
-                        //_currentVelocity += -dir * knockbackForce * Time.deltaTime;
-
-                        // If forces were applied then we need to recalculate the landing
-                        //RecalculateLandingPosition();
-                        //_recalculateLanding = true;
-                        //moveData.Shoot = false;
-                    }
-
                     Vector3 gravityParallel = Vector3.Project(gravity, transform.right);
 
                     _currentVelocity -= gravityParallel * (float)TimeManager.TickDelta;
@@ -592,22 +473,6 @@ public class MovementSystem : NetworkBehaviour
             _currentVelocity += (Vector3.down * MovementProperties.Gravity * (float)TimeManager.TickDelta);
 
             // This is where airborne movement forces can be applied
-            if (_isShooting)
-            {
-                // Get the aim direction
-                var dir = _aimDirection;
-
-                // Get the weapon's knockback force
-                var knockbackForce = _weaponEquipManager.CurrentWeapon.WeaponInfo.Knockback / 5f;
-
-                // Apply the force in the opposite direction of the aim direction
-                _currentVelocity += -dir * knockbackForce;
-
-                // If forces were applied then we need to recalculate the landing
-                _recalculateLanding = true;
-
-                //moveData.Shoot = false;
-            }
         }
 
         //CheckNeedRecalc();
@@ -819,12 +684,4 @@ public class MovementSystem : NetworkBehaviour
     }
 
     #endregion
-
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(transform.position + (_aimDirection * 5f), 0.2f);
-        Debug.DrawLine(transform.position, transform.position + (_aimDirection * 5f), Color.red);
-    }
 }
