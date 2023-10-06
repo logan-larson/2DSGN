@@ -54,7 +54,7 @@ public class InputSystem : NetworkBehaviour
         _playerHealth ??= GetComponent<PlayerHealth>();
         _combatSystem ??= GetComponent<CombatSystem>();
 
-        _playerHealth.OnDeath.AddListener((bool _) => _isEnabled = false);
+        _playerHealth.OnDeath.AddListener((bool _, Vector3 __) => _isEnabled = false);
 
 
 
@@ -87,17 +87,17 @@ public class InputSystem : NetworkBehaviour
         GameStateManager.Instance.OnGameEnd.AddListener(() =>
         {
             _isEnabled = false;
-            //Cursor.visible = true;
+            Cursor.visible = true;
         });
         GameStateManager.Instance.OnGameStart.AddListener(() =>
         {
             _isEnabled = true;
-            //Cursor.visible = false;
+            Cursor.visible = false;
         });
         GameStateManager.Instance.OnLobbyStart.AddListener(() =>
         {
             _isEnabled = false;
-            //Cursor.visible = true;
+            Cursor.visible = true;
         });
 
         if (GameStateManager.Instance.CurrentGameState == GameStateManager.GameState.Game)
@@ -129,7 +129,7 @@ public class InputSystem : NetworkBehaviour
 
     public void OnSprint(InputValue value)
     {
-        if (!_isEnabled) return;
+        if (!_isEnabled || !base.IsOwner) return;
 
         InputValues.IsSprintKeyPressed = value.Get<float>() == 1f;
 
@@ -149,7 +149,7 @@ public class InputSystem : NetworkBehaviour
 
     public void OnSlide(InputValue value)
     {
-        if (!_isEnabled) return;
+        if (!_isEnabled || !base.IsOwner) return;
 
         InputValues.IsSlideKeyPressed = value.Get<float>() == 1f;
 
@@ -163,7 +163,10 @@ public class InputSystem : NetworkBehaviour
 
         InputValues.IsFirePressed = value.Get<float>() == 1f;
 
-        _combatSystem.SetIsShootingServerRpc(value.Get<float>() == 1f);
+        if (base.IsHost)
+            _combatSystem.SetIsShooting(value.Get<float>() == 1f);
+        else
+            _combatSystem.SetIsShootingServerRpc(value.Get<float>() == 1f);
 
         if (InputValues.IsFirePressed && _modeManager.CurrentMode == ModeManager.Mode.Parkour)
             _modeManager.ChangeToCombatMode();

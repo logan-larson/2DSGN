@@ -102,11 +102,11 @@ public class WeaponEquipManager : NetworkBehaviour
     {
         if (args.ConnectionState == RemoteConnectionState.Stopped)
         {
-            OnDeath(false);
+            OnDeath(false, Vector3.zero);
         }
     }
 
-    private void OnDeath(bool _)
+    private void OnDeath(bool _, Vector3 __)
     {
         // Drop the current weapon, if it isn't the default weapon
         if (_currentWeaponIndex != _defaultWeaponIndex)

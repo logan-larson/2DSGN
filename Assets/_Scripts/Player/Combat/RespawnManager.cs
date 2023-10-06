@@ -50,7 +50,7 @@ public class RespawnManager : NetworkBehaviour
     [ServerRpc]
     private void ForceRespawnServerRpc()
     {
-        Respawn(true);
+        Respawn(true, Vector3.zero);
     }
 
     [ServerRpc]
@@ -59,7 +59,7 @@ public class RespawnManager : NetworkBehaviour
         PlayerManager.Instance.DamagePlayer(gameObject.GetInstanceID(), 100, gameObject.GetInstanceID(), "Revolver");
     }
 
-    private void Respawn(bool isGameStart)
+    private void Respawn(bool isGameStart, Vector3 _)
     {
         //transform.SetPositionAndRotation(new Vector3(0, 78.5f, 0), Quaternion.identity);
 

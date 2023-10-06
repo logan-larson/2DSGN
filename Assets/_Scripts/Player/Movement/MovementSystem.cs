@@ -243,7 +243,7 @@ public class MovementSystem : NetworkBehaviour
 
     #endregion
 
-    private void OnDeath(bool _)
+    private void OnDeath(bool _, Vector3 __)
     {
         // Disable movement
         //_isRespawning = true;

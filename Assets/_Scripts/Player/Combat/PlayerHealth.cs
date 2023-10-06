@@ -16,10 +16,13 @@ public class PlayerHealth : NetworkBehaviour
     [SyncVar]
     public int Health = 100;
 
-    public UnityEvent<bool> OnDeath;
+    public UnityEvent<bool, Vector3> OnDeath;
 
     [SerializeField]
     private GameObject _damageIndicatorPrefab;
+
+    [SerializeField]
+    private GameObject _deathIndicatorPrefab;
 
     private void Start() { }
 
@@ -34,7 +37,24 @@ public class PlayerHealth : NetworkBehaviour
     {
         base.OnStartServer();
 
-        OnDeath = OnDeath ?? new UnityEvent<bool>();
+        OnDeath = OnDeath ?? new UnityEvent<bool, Vector3>();
+
+        OnDeath.AddListener(SpawnDeathIndicator);
+    }
+
+    private void SpawnDeathIndicator(bool isSuicide, Vector3 deathPosition)
+    {
+        Instantiate(_deathIndicatorPrefab, deathPosition, Quaternion.identity);
+
+        SpawnDeathIndicatorObserversRpc(deathPosition);
+    }
+
+    [ObserversRpc]
+    private void SpawnDeathIndicatorObserversRpc(Vector3 position)
+    {
+        if (base.IsHost) return;
+
+        Instantiate(_deathIndicatorPrefab, position, Quaternion.identity);
     }
 
     [ServerRpc]

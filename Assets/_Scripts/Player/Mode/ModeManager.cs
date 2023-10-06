@@ -10,6 +10,9 @@ using System.Security.Cryptography;
 
 public class ModeManager : NetworkBehaviour
 {
+    [SerializeField]
+    private PlayerHealth _playerHealth;
+
     public enum Mode
     {
         Parkour,
@@ -47,6 +50,36 @@ public class ModeManager : NetworkBehaviour
         base.OnStartClient();
 
         if (!base.IsOwner) return;
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        _playerHealth ??= GetComponent<PlayerHealth>();
+
+        _playerHealth.OnDeath.AddListener(OnDeath);
+
+        GameStateManager.Instance.OnInitiateCountdown.AddListener(OnInitiateCountdown);
+        GameStateManager.Instance.OnGameEnd.AddListener(OnGameEnd);
+    }
+
+    private void OnDeath(bool isSuicide, Vector3 deathPosition)
+    {
+        CurrentMode = Mode.Combat;
+        ChangeModeObservers(Mode.Combat);
+    }
+
+    private void OnInitiateCountdown()
+    {
+        CurrentMode = Mode.Combat;
+        ChangeModeObservers(Mode.Combat);
+    }
+
+    private void OnGameEnd()
+    {
+        CurrentMode = Mode.Combat;
+        ChangeModeObservers(Mode.Combat);
     }
 
     /* This was my attempt at syncing the mode between clients. It didn't work for now...

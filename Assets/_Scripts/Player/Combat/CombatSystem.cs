@@ -40,6 +40,15 @@ public class CombatSystem : NetworkBehaviour
     private WeaponEquipManager _weaponEquipManager;
 
     [SerializeField]
+    private ModeManager _modeManager;
+
+    [SerializeField]
+    private PlayerHealth _playerHealth;
+
+    [SerializeField]
+    private RespawnManager _respawnManager;
+
+    [SerializeField]
     private Camera _camera;
 
     [SerializeField]
@@ -98,8 +107,12 @@ public class CombatSystem : NetworkBehaviour
 
         _inputSystem ??= GetComponent<InputSystem>();
         _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
+        _playerHealth ??= GetComponent<PlayerHealth>();
+        _respawnManager ??= GetComponent<RespawnManager>();
 
         _weaponEquipManager.ChangeWeapon.AddListener(OnWeaponChanged);
+        _playerHealth.OnDeath.AddListener(OnDeath);
+        _respawnManager.OnRespawn.AddListener(OnRespawn);
 
         _input = _inputSystem.InputValues;
 
@@ -112,6 +125,17 @@ public class CombatSystem : NetworkBehaviour
         }
     }
 
+    private void OnDeath(bool _, Vector3 __)
+    {
+        IsShooting = false;
+        _combatDisabled = true;
+    }
+
+    private void OnRespawn()
+    {
+        IsShooting = false;
+        _combatDisabled = false;
+    }
 
     [ServerRpc]
     private void GetInstanceIDServer(NetworkConnection conn)
@@ -217,6 +241,14 @@ public class CombatSystem : NetworkBehaviour
 
     }
 
+    [Server]
+    public void SetIsShooting(bool isShooting)
+    {
+        if (!base.IsOwner) return;
+
+        IsShooting = isShooting;
+    }
+
     [ServerRpc]
     public void SetIsShootingServerRpc(bool isShooting)
     {
@@ -252,13 +284,13 @@ public class CombatSystem : NetworkBehaviour
         // -- Setup --
         var currentWeapon = _weaponEquipManager.CurrentWeapon.WeaponInfo;
         var bulletSpawnPosition = _weaponHolder.transform.position + (_aimDirection * currentWeapon.MuzzleLength);
-        var slidingMultiplier = _input.IsSlideKeyPressed ? 2f : 1f;
 
         // -- Calculate bullet direction(s) --
         Vector3[] bulletDirections = new Vector3[currentWeapon.BulletsPerShot];
         if (currentWeapon.BulletsPerShot == 1)
         {
-            var currentBloom = _weaponEquipManager.CurrentWeapon.CurrentBloom * slidingMultiplier;
+            var currentBloom = _weaponEquipManager.CurrentWeapon.CurrentBloom;
+            currentBloom = _modeManager.CurrentMode == ModeManager.Mode.Combat ? currentBloom / 2 : currentBloom * 2;
             Vector3 bloomDir = Quaternion.Euler(0f, 0f, Random.Range(-currentBloom, currentBloom)) * _aimDirection;
 
             bulletDirections[0] = bloomDir;
@@ -267,7 +299,7 @@ public class CombatSystem : NetworkBehaviour
         {
             for (int i = 0; i < currentWeapon.BulletsPerShot; i++)
             {
-                var angle = currentWeapon.SpreadAngle * slidingMultiplier;
+                var angle = _modeManager.CurrentMode == ModeManager.Mode.Combat ? currentWeapon.SpreadAngle : currentWeapon.SpreadAngle * 2f;
                 Vector3 randomDirection = Quaternion.Euler(0f, 0f, Random.Range(-angle, angle)) * _aimDirection;
 
                 bulletDirections[i] = randomDirection;

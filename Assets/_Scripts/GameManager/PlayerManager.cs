@@ -60,7 +60,7 @@ public class PlayerManager : NetworkBehaviour
 
         if (attackerID == -1)
         {
-            Players[playerID].PlayerHealth.OnDeath.Invoke(true);
+            Players[playerID].PlayerHealth.OnDeath.Invoke(true, Players[playerID].GameObject.transform.position);
             return;
         }
 
@@ -96,7 +96,7 @@ public class PlayerManager : NetworkBehaviour
         GameStateManager.Instance.OnPlayerKilled.Invoke();
         OnPlayerKilled.Invoke(Players[playerID].Username, attackerUsername, weaponName);
 
-        Players[playerID].PlayerHealth.OnDeath.Invoke(false);
+        Players[playerID].PlayerHealth.OnDeath.Invoke(false, Players[playerID].GameObject.transform.position);
     }
 
     public void RespawnPlayer(int playerID)
