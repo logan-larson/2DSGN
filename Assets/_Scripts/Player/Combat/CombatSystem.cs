@@ -40,6 +40,12 @@ public class CombatSystem : NetworkBehaviour
     private WeaponEquipManager _weaponEquipManager;
 
     [SerializeField]
+    private Camera _camera;
+
+    [SerializeField]
+    private CameraController _cameraController;
+
+    [SerializeField]
     private LineRenderer _bullet;
 
     [SerializeField]
@@ -78,6 +84,10 @@ public class CombatSystem : NetworkBehaviour
         _weaponEquipManager.ChangeWeapon.AddListener(OnWeaponChanged);
 
         _input = _inputSystem.InputValues;
+
+        _camera = _weaponEquipManager.transform.GetComponent<CameraManager>().Camera;
+
+        _cameraController = _camera.GetComponent<CameraController>();
 
         GetInstanceIDServer(base.Owner);
     }
@@ -183,15 +193,6 @@ public class CombatSystem : NetworkBehaviour
 
     private void UpdateAimDirection()
     {
-        Vector3 screenMousePosition = Mouse.current.position.ReadValue();
-        screenMousePosition.z = 10f;
-
-        if (Camera.main == null) return;
-
-        Vector3 worldMousePosition = Camera.main.ScreenToWorldPoint(screenMousePosition);
-
-        _worldMousePosition = new Vector3(worldMousePosition.x, worldMousePosition.y, 0f);
-
         // Determine input type
         if (_input.IsGamepad)
         {
@@ -201,7 +202,17 @@ public class CombatSystem : NetworkBehaviour
         }
         else
         {
-            _aimDirection = (new Vector3(worldMousePosition.x, worldMousePosition.y, 0f) - new Vector3(transform.position.x, transform.position.y, 0f)).normalized;
+            var mousePosition = Input.mousePosition;
+
+            if (_cameraController == null || _camera == null) return;
+
+            mousePosition.z = _cameraController.CurrentZ * -1f;
+
+            Vector3 mouseWorldPosition = _camera.ScreenToWorldPoint(mousePosition);
+
+            mouseWorldPosition.z = 0f;
+
+            _aimDirection = (mouseWorldPosition - transform.position).normalized;
         }
 
     }
