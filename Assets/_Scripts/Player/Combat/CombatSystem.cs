@@ -43,6 +43,12 @@ public class CombatSystem : NetworkBehaviour
     private ModeManager _modeManager;
 
     [SerializeField]
+    private PlayerHealth _playerHealth;
+
+    [SerializeField]
+    private RespawnManager _respawnManager;
+
+    [SerializeField]
     private Camera _camera;
 
     [SerializeField]
@@ -101,8 +107,12 @@ public class CombatSystem : NetworkBehaviour
 
         _inputSystem ??= GetComponent<InputSystem>();
         _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
+        _playerHealth ??= GetComponent<PlayerHealth>();
+        _respawnManager ??= GetComponent<RespawnManager>();
 
         _weaponEquipManager.ChangeWeapon.AddListener(OnWeaponChanged);
+        _playerHealth.OnDeath.AddListener(OnDeath);
+        _respawnManager.OnRespawn.AddListener(OnRespawn);
 
         _input = _inputSystem.InputValues;
 
@@ -115,6 +125,17 @@ public class CombatSystem : NetworkBehaviour
         }
     }
 
+    private void OnDeath(bool _, Vector3 __)
+    {
+        IsShooting = false;
+        _combatDisabled = true;
+    }
+
+    private void OnRespawn()
+    {
+        IsShooting = false;
+        _combatDisabled = false;
+    }
 
     [ServerRpc]
     private void GetInstanceIDServer(NetworkConnection conn)
