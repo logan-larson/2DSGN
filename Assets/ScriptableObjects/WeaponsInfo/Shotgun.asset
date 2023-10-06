@@ -18,7 +18,7 @@ MonoBehaviour:
   Range: 8
   IsAutomatic: 1
   BulletsPerShot: 4
-  SpreadAngle: 18.77
+  SpreadAngle: 10
   MaxBloomAngle: 30
   BloomAngleIncreasePerShot: 0
   Knockback: 25
