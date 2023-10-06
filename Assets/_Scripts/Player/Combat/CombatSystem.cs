@@ -9,6 +9,7 @@ using UnityEngine.Events;
 using FishNet.Managing.Timing;
 using FishNet.Component.ColliderRollback;
 using FishNet.Transporting;
+using System.Linq;
 
 /**
 <summary>
@@ -281,6 +282,9 @@ public class CombatSystem : NetworkBehaviour
 
         OnShoot.Invoke();
 
+        if (_weaponEquipManager.CurrentWeapon.FireSound != null)
+            _weaponEquipManager.CurrentWeapon.FireSound.Play();
+
         // -- Setup --
         var currentWeapon = _weaponEquipManager.CurrentWeapon.WeaponInfo;
         var bulletSpawnPosition = _weaponHolder.transform.position + (_aimDirection * currentWeapon.MuzzleLength);
@@ -341,6 +345,10 @@ public class CombatSystem : NetworkBehaviour
     {
         if (weapon == null) return;
 
+        // -- Play fire sound on observers --
+        if (_weaponEquipManager.CurrentWeapon.FireSound != null)
+            PlayFireSoundObservers(weapon.Name, playerPosition);
+
         // -- Rollback the colliders --
         base.RollbackManager.Rollback(pt, RollbackPhysicsType.Physics2D, base.IsOwner);
 
@@ -398,50 +406,18 @@ public class CombatSystem : NetworkBehaviour
         // -- Return the colliders --
         base.RollbackManager.Return();
 
-        // -- Get all the hits for each bullet --
-        /*
-        RaycastHit2D[][] allHits = new RaycastHit2D[directions.Length][];
+    }
 
-        LayerMask nonHittable = LayerMask.GetMask("WeaponPickup");
-        for (int i = 0; i < directions.Length; i++)
-        {
-            RaycastHit2D[] hits = Physics2D.RaycastAll(position, directions[i], weapon.Range, ~nonHittable);
+    [ObserversRpc]
+    private void PlayFireSoundObservers(string weaponName, Vector3 playerPosition)
+    {
+        // -- Owner of shot check --
+        if (base.IsOwner) return;
 
-            //DrawShotWithHits(hits, position, directions[i], weapon.Range);
+        // -- Get the fire sound from the player's own weapons --
+        var fireSound = _weaponEquipManager.Weapons.Where(w => w.WeaponInfo.Name == weaponName).FirstOrDefault().FireSound.clip;
 
-            allHits[i] = hits;
-        }
-
-        //RaycastHit2D[][] allHits = GetHits(weapon, position, directions);
-
-        // -- Damage the players --
-        foreach (RaycastHit2D[] hits in allHits) 
-        {
-            foreach (RaycastHit2D hit in hits)
-            {
-                if (hit.collider != null)
-                {
-                    var player = hit.transform.parent;
-                    if (player.GetComponentInChildren<PlayerName>() != null && player.GetComponentInChildren<PlayerName>().Username != username)
-                    {
-                        if (player.TryGetComponent(out PlayerHealth enemyHealth)) {
-                            var nob = player.GetComponent<NetworkObject>();
-                            DamagePlayerServer(player.gameObject, weapon.Damage, weapon.Name, nob.LocalConnection);
-                        }
-                        //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
-                    }
-                    else if (player.GetComponentInChildren<Weapon>() == null)
-                    {
-                        //var dir = (new Vector3(hit.point.x, hit.point.y, 0f) - transform.position).normalized;
-
-                        break;
-                    }
-                }
-            }
-        }
-
-        //AddBloom(weapon);
-        */
+        AudioSource.PlayClipAtPoint(fireSound, playerPosition);
     }
 
     private void DamagePlayerServer(GameObject playerHit, int damage, string weaponName, NetworkConnection playerConn)

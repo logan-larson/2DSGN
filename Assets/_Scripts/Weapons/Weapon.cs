@@ -12,6 +12,7 @@ public class Weapon : NetworkBehaviour
     public SpriteRenderer MuzzleFlashSprite;
     public TrailRenderer BulletTrailRenderer;
     public GameObject WeaponPickup;
+    public AudioSource FireSound;
 
     [SerializeField]
     private CombatSystem _combatSystem;
