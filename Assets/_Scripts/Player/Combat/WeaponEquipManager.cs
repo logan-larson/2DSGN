@@ -31,6 +31,9 @@ public class WeaponEquipManager : NetworkBehaviour
     private int _defaultWeaponIndex;
 
     [SerializeField]
+    private AudioClip _changeWeapon;
+
+    [SerializeField]
     public Weapon[] Weapons { get; private set; }
 
     public Weapon CurrentWeapon => Weapons[_currentWeaponIndex];
@@ -215,10 +218,10 @@ public class WeaponEquipManager : NetworkBehaviour
         if (highlightedWeaponIndex == _currentWeaponIndex) return;
 
         // 2. Disable the current weapon in inventory.
-        ChangeWeaponActivationServer(_currentWeaponIndex, false, Owner.ClientId);
+        ChangeWeaponActivationServer(_currentWeaponIndex, false, Owner.ClientId, transform.position);
 
         // 3. Enable the new weapon in inventory.
-        ChangeWeaponActivationServer(highlightedWeaponIndex, true, Owner.ClientId);
+        ChangeWeaponActivationServer(highlightedWeaponIndex, true, Owner.ClientId, transform.position);
 
         // 4. Pickup the weapon pickup.
         PickupWeaponPickupServer(_highlightedWeapon.WeaponID);
@@ -239,7 +242,7 @@ public class WeaponEquipManager : NetworkBehaviour
 
 
     [ServerRpc]
-    private void ChangeWeaponActivationServer(int index, bool isActive, int clientId)
+    private void ChangeWeaponActivationServer(int index, bool isActive, int clientId, Vector3? position = null)
     {
         var weapon = Weapons[index];
 
@@ -257,11 +260,11 @@ public class WeaponEquipManager : NetworkBehaviour
             ChangeWeapon.Invoke();
         }
 
-        ChangeWeaponActivationObservers(index, isActive, clientId);
+        ChangeWeaponActivationObservers(index, isActive, clientId, position);
     }
 
     [ObserversRpc]
-    private void ChangeWeaponActivationObservers(int index, bool isActive, int clientId)
+    private void ChangeWeaponActivationObservers(int index, bool isActive, int clientId, Vector3? position = null)
     {
         var weapon = Weapons[index];
 
@@ -277,6 +280,12 @@ public class WeaponEquipManager : NetworkBehaviour
             _currentWeaponIndex = index;
 
             ChangeWeapon.Invoke();
+        }
+
+        if (isActive && position is not null)
+        {
+            var volume = base.IsOwner ? 3f : 5f;
+            AudioSource.PlayClipAtPoint(_changeWeapon, position.Value, volume);
         }
     }
 

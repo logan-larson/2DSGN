@@ -1964,6 +1964,7 @@ MonoBehaviour:
   _predictedPosition: {x: 0, y: 0, z: 0}
   _predictedNormal: {x: 0, y: 0, z: 0}
   _movementDisabled: 0
+  _footstepClip: {fileID: 8300000, guid: e222f414028ba24408b340f250caebbe, type: 3}
 --- !u!114 &910081836431450381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2104,6 +2105,7 @@ MonoBehaviour:
   _respawnManager: {fileID: 7009170370438044222}
   _modeManager: {fileID: 4046090544347073888}
   _defaultWeaponIndex: 0
+  _changeWeapon: {fileID: 8300000, guid: 94b7ea6a4d2cd884384bece33e25424a, type: 3}
   ChangeWeapon:
     m_PersistentCalls:
       m_Calls: []
@@ -4429,6 +4431,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3820729183353319264}
     m_Modifications:
+    - target: {fileID: -129832054022607323, guid: a4cf3271dcf1cdb40b986ca2bbe0ff02, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4419493321268451506, guid: a4cf3271dcf1cdb40b986ca2bbe0ff02, type: 3}
       propertyPath: m_RootOrder
       value: 5
@@ -4496,6 +4502,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3820729183353319264}
     m_Modifications:
+    - target: {fileID: -129832054022607323, guid: 259a927c0a94f4748af0cd69c14c3351, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4419493321268451506, guid: 259a927c0a94f4748af0cd69c14c3351, type: 3}
       propertyPath: m_RootOrder
       value: 6
@@ -4563,6 +4573,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3820729183353319264}
     m_Modifications:
+    - target: {fileID: -129832054022607323, guid: df08b10e560e5fe46adbdefb442df255, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4419493321268451506, guid: df08b10e560e5fe46adbdefb442df255, type: 3}
       propertyPath: m_RootOrder
       value: 9
@@ -4735,6 +4749,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3820729183353319264}
     m_Modifications:
+    - target: {fileID: -129832054022607323, guid: 2ad0cd1439d9c2d47b25f8e29cb8cef7, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4419493321268451506, guid: 2ad0cd1439d9c2d47b25f8e29cb8cef7, type: 3}
       propertyPath: m_RootOrder
       value: 7
@@ -4802,6 +4820,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3820729183353319264}
     m_Modifications:
+    - target: {fileID: -129832054022607323, guid: 166b591eab598fb489fe60400d7825c9, type: 3}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4419493321268451506, guid: 166b591eab598fb489fe60400d7825c9, type: 3}
       propertyPath: m_RootOrder
       value: 8

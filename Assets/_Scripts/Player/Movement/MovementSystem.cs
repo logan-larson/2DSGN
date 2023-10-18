@@ -155,6 +155,12 @@ public class MovementSystem : NetworkBehaviour
     [SerializeField]
     private bool _movementDisabled = false;
 
+    /// <summary>
+    /// Footstep audio clip.
+    /// </summary>
+    [SerializeField]
+    private AudioClip _footstepClip;
+
     #endregion
 
 
@@ -227,6 +233,31 @@ public class MovementSystem : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+
+        StartCoroutine(PlayFootstepsCoroutine());
+    }
+
+    private IEnumerator PlayFootstepsCoroutine()
+    {
+        while (true)
+        {
+            if (_currentVelocity.magnitude > 0.1f && _isGrounded && _modeManager.CurrentMode != ModeManager.Mode.Sliding)
+            {
+                PlayFootstepObservers(transform.position);
+            }
+            yield return new WaitForSeconds(1f - (_currentVelocity.magnitude / 20f));
+        }
+    }
+
+    private void PlayFootstepObservers(Vector3 position)
+    {
+        var volume = base.IsOwner ? 3f : 5f;
+        AudioSource.PlayClipAtPoint(_footstepClip, position, volume);
     }
 
     private void OnGameStart()
