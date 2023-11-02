@@ -1,5 +1,7 @@
 using UnityEngine;
 using FishNet.Managing;
+using PlayFab;
+using System.Collections;
 
 /**
 <summary>
@@ -15,6 +17,8 @@ public class NetworkHandler : MonoBehaviour
 
     private void Start()
     {
+        // Start connection to PlayFab Multiplayer Agent
+
         _networkManager ??= FindObjectOfType<NetworkManager>();
 
         if (_networkManager == null)
@@ -23,13 +27,24 @@ public class NetworkHandler : MonoBehaviour
             return;
         }
 
+
         if (IsServerBuild)
         {
+            PlayFabMultiplayerAgentAPI.Start();
             _networkManager.ServerManager.StartConnection();
+
+            // Register the PlayFab Multiplayer Agent's callback for when a connection is established
+            StartCoroutine(ReadyForPlayers());
         }
         else
         {
             _networkManager.ClientManager.StartConnection();
         }
+    }
+
+    private IEnumerator ReadyForPlayers()
+    {
+        yield return new WaitForSeconds(.5f);
+        PlayFabMultiplayerAgentAPI.ReadyForPlayers();
     }
 }
