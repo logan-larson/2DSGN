@@ -2,6 +2,7 @@ using UnityEngine;
 using FishNet.Managing;
 using PlayFab;
 using System.Collections;
+using FishNet.Transporting.Tugboat;
 
 /**
 <summary>
@@ -14,6 +15,11 @@ public class NetworkHandler : MonoBehaviour
 
     [SerializeField]
     private NetworkManager _networkManager;
+
+    [SerializeField]
+    private Tugboat _tugboat;
+
+    public UserInfo UserInfo;
 
     private void Start()
     {
@@ -38,6 +44,9 @@ public class NetworkHandler : MonoBehaviour
         }
         else
         {
+            _tugboat.SetClientAddress(UserInfo.IP);
+            _tugboat.SetPort((ushort) UserInfo.Port);
+
             _networkManager.ClientManager.StartConnection();
         }
     }

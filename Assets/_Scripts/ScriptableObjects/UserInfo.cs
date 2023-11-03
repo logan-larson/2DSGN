@@ -7,4 +7,7 @@ public class UserInfo : ScriptableObject
     public int Wins;
     public int Kills;
     public int Deaths;
+
+    public string IP;
+    public int Port;
 }
