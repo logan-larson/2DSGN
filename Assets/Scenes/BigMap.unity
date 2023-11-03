@@ -19026,8 +19026,8 @@ MonoBehaviour:
   _unreliableMTU: 1023
   _ipv4BindAddress: 
   _ipv6BindAddress: 
-  _port: 7770
-  _maximumClients: 4095
+  _port: 56100
+  _maximumClients: 5396
   _clientAddress: localhost
   _timeout: 15
 --- !u!114 &5313784219897215940
@@ -19044,6 +19044,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsServerBuild: 0
   _networkManager: {fileID: 3382790915900136164}
+  _tugboat: {fileID: 5313784219897215939}
+  UserInfo: {fileID: 11400000, guid: 643573264b41f1240997b14195ca096f, type: 2}
 --- !u!114 &5313784219897215941
 MonoBehaviour:
   m_ObjectHideFlags: 0
