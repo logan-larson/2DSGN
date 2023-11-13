@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MainMenu : MonoBehaviour
+public class Menus : MonoBehaviour
 {
+    public GameObject MainMenu;
     public GameObject HostLobbyMenu;
     public GameObject JoinLobbyMenu;
 

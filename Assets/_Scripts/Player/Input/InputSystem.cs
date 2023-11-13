@@ -23,7 +23,6 @@ public class InputSystem : NetworkBehaviour
     private ModeManager _modeManager;
     private PlayerHealth _playerHealth;
     private RespawnManager _respawnManager;
-    private LobbyManager _lobbyManager;
     private ScoreboardManager _scoreboardManager;
     private HealthNutManager _healthNutManager;
 
@@ -61,7 +60,6 @@ public class InputSystem : NetworkBehaviour
         // Just uncommented these
         _weaponEquipManager ??= GetComponent<WeaponEquipManager>();
         _healthNutManager ??= GetComponent<HealthNutManager>();
-        _lobbyManager ??= GetComponent<LobbyManager>();
         _scoreboardManager ??= GetComponentInChildren<ScoreboardManager>();
         _respawnManager ??= GetComponent<RespawnManager>();
 
@@ -192,11 +190,6 @@ public class InputSystem : NetworkBehaviour
     public void OnToggleLeaderboard(InputValue _)
     {
         _scoreboardManager.ToggleScoreboard();
-    }
-
-    public void OnToggleReady(InputValue _)
-    {
-        _lobbyManager.ToggleReady();
     }
 
     public void OnForceRespawn(InputValue _)

@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class HostLobbyManager : MonoBehaviour
 {
@@ -29,68 +30,10 @@ public class HostLobbyManager : MonoBehaviour
         }
 
         UserInfo.Username = _usernameInput.text;
+        UserInfo.IsHost = true;
 
-        LoginWithCustomIDRequest request = new LoginWithCustomIDRequest()
-        {
-            TitleId = PlayFabSettings.TitleId,
-            CreateAccount = true,
-            CustomId = SystemInfo.deviceUniqueIdentifier
-        };
-
-        PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnLoginFailure);
+        // Change to the Lobby scene
+        SceneManager.LoadScene("Lobby");
     }
 
-    private void OnLoginSuccess(LoginResult result)
-    {
-        Debug.Log("Login Success");
-
-        // TEMP: Hardcoded access policy
-        AccessPolicy = AccessPolicy.Private;
-
-        var entity = new PlayFab.MultiplayerModels.EntityKey
-        {
-            Id = result.EntityToken.Entity.Id,
-            Type = result.EntityToken.Entity.Type
-        };
-
-        List<Member> members = new List<Member>()
-        {
-            new Member
-            {
-                MemberEntity = entity,
-                MemberData = new Dictionary<string, string>
-                {
-                    { "Team", "Blue" }
-                }
-
-            } 
-        };
-
-        var createLobbyRequest = new CreateLobbyRequest
-        {
-            MaxPlayers = 9,
-            Owner = entity,
-            UseConnections = true,
-            Members = members,
-            AccessPolicy = AccessPolicy,
-            OwnerMigrationPolicy = OwnerMigrationPolicy.Automatic 
-        };
-
-        PlayFabMultiplayerAPI.CreateLobby(createLobbyRequest, OnCreateLobbySuccess, OnCreateLobbyFailure);
-    }
-
-    private void OnLoginFailure(PlayFabError error)
-    {
-        Debug.LogError(error.GenerateErrorReport());
-    }
-
-    private void OnCreateLobbySuccess(CreateLobbyResult result)
-    {
-        Debug.Log("Lobby Created");
-    }
-
-    private void OnCreateLobbyFailure(PlayFabError error)
-    {
-        Debug.LogError(error.GenerateErrorReport());
-    }
 }

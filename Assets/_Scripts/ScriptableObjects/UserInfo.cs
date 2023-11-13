@@ -10,4 +10,6 @@ public class UserInfo : ScriptableObject
 
     public string IP;
     public int Port;
+
+    public bool IsHost;
 }
