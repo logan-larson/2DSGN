@@ -3,15 +3,11 @@ using PlayFab.ClientModels;
 using PlayFab.MultiplayerModels;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
-public struct EntityKey
-{
-    public string Id;
-    public string Type;
-}
 
 /// <summary>
 /// Currently this is the Ready Up manager
@@ -29,10 +25,29 @@ public class LobbyManager : MonoBehaviour
 
     public List<Member> PlayerList = new List<Member>();
 
-    private EntityKey _entityKey;
+    private string _lobbyId;
+    private string _connectionString;
+    private Lobby _lobby;
+
+    private LoginResult _loginResult;
 
     private void Start()
     {
+        Initialize();
+    }
+
+    private async void Initialize()
+    {
+        _loginResult = await Login();
+
+        if (_loginResult == null)
+        {
+            Debug.Log("Login failed, returning to main menu");
+            SceneManager.LoadScene("Menu");
+        }
+
+        Debug.Log("Login success");
+
         if (UserInfo.IsHost)
         {
             // Create a new lobby
@@ -40,12 +55,17 @@ public class LobbyManager : MonoBehaviour
         }
         else
         {
-
+            // Join the lobby
+            JoinLobby();
         }
     }
 
-    private void CreateLobby()
+    #region Login
+
+    private Task<LoginResult> Login()
     {
+        var tcs = new TaskCompletionSource<LoginResult>();
+
         LoginWithCustomIDRequest request = new LoginWithCustomIDRequest()
         {
             TitleId = PlayFabSettings.TitleId,
@@ -53,27 +73,31 @@ public class LobbyManager : MonoBehaviour
             CustomId = SystemInfo.deviceUniqueIdentifier
         };
 
-        PlayFabClientAPI.LoginWithCustomID(request, OnLoginSuccess, OnLoginFailure);
+        PlayFabClientAPI.LoginWithCustomID(request,
+            result => tcs.SetResult(result),
+            error =>
+            {
+                Debug.LogError(error.GenerateErrorReport());
+                tcs.SetResult((LoginResult)null);
+            });
+
+        return tcs.Task;
     }
 
-    private void OnLoginSuccess(LoginResult result)
-    {
-        Debug.Log("Login Success");
+    #endregion
 
+    #region Create Lobby
+
+    private void CreateLobby()
+    {
         // TEMP: Hardcoded access policy
         AccessPolicy = AccessPolicy.Private;
 
         // Create the entity key
-        _entityKey = new EntityKey
-        {
-            Id = result.EntityToken.Entity.Id,
-            Type = result.EntityToken.Entity.Type
-        };
-
         var entity = new PlayFab.MultiplayerModels.EntityKey
         {
-            Id = _entityKey.Id,
-            Type = _entityKey.Type
+            Id = _loginResult.EntityToken.Entity.Id,
+            Type = _loginResult.EntityToken.Entity.Type
         };
 
         List<Member> members = new List<Member>()
@@ -99,43 +123,115 @@ public class LobbyManager : MonoBehaviour
             OwnerMigrationPolicy = OwnerMigrationPolicy.Automatic 
         };
 
-        PlayFabMultiplayerAPI.CreateLobby(createLobbyRequest, OnCreateLobbySuccess, OnCreateLobbyFailure);
-    }
-
-    private void OnLoginFailure(PlayFabError error)
-    {
-        Debug.LogError(error.GenerateErrorReport());
+        PlayFabMultiplayerAPI.CreateLobby(createLobbyRequest, OnCreateLobbySuccess, error =>
+        {
+            Debug.Log("Create lobby failed, returning to main menu");
+            SceneManager.LoadScene("Menu");
+        });
     }
 
     private void OnCreateLobbySuccess(CreateLobbyResult result)
     {
         Debug.Log("Lobby Created");
 
+        _lobbyId = result.LobbyId;
+
+        // String other players use to connect
+        _connectionString = result.ConnectionString;
+        Debug.Log(_connectionString);
+
+        // Subscribe to lobby events
+
+        // TEMP
+        GetLobby();
+    }
+
+    #endregion
+
+    #region Join Lobby
+
+    private void JoinLobby()
+    {
+        var request = new JoinLobbyRequest()
+        {
+            ConnectionString = UserInfo.ConnectionString,
+            MemberEntity = new PlayFab.MultiplayerModels.EntityKey
+            {
+                Id = _loginResult.EntityToken.Entity.Id,
+                Type = _loginResult.EntityToken.Entity.Type
+            }
+        };
+
+        PlayFabMultiplayerAPI.JoinLobby(request, OnJoinLobbySuccess, error =>
+        {
+            Debug.Log("Join lobby failed, returning to main menu");
+            SceneManager.LoadScene("Menu");
+        });
+    }
+
+    private void OnJoinLobbySuccess(JoinLobbyResult result)
+    {
+        _lobbyId = result.LobbyId;
+
+        GetLobby();
+    }
+
+    #endregion
+
+    #region Get Lobby
+
+    private void GetLobby()
+    {
         // TEMP: Get the lobby details to see if it was created and if the player is joined
         GetLobbyRequest request = new GetLobbyRequest
         {
-            LobbyId = result.LobbyId
+            LobbyId = _lobbyId
         };
 
-        PlayFabMultiplayerAPI.GetLobby(request, OnGetLobbySuccess, OnGetLobbyFailure);
+        PlayFabMultiplayerAPI.GetLobby(request, OnGetLobbySuccess, OnError);
     }
-
-    private void OnCreateLobbyFailure(PlayFabError error)
-    {
-        Debug.LogError(error.GenerateErrorReport());
-    }
-
 
     private void OnGetLobbySuccess(GetLobbyResult result)
     {
         PlayerList = result.Lobby.Members;
 
+        _lobby = result.Lobby;
+
         OnUpdatePlayerList.Invoke();
     }
 
-    private void OnGetLobbyFailure(PlayFabError error)
+    #endregion
+
+    #region Leave Lobby
+
+    public void LeaveLobby()
+    {
+        var request = new LeaveLobbyRequest
+        {
+            MemberEntity = new PlayFab.MultiplayerModels.EntityKey
+            {
+                Id = _loginResult.EntityToken.Entity.Id,
+                Type = _loginResult.EntityToken.Entity.Type
+            },
+            LobbyId = _lobby.LobbyId
+        };
+
+        PlayFabMultiplayerAPI.LeaveLobby(request, OnLeaveLobbySuccess, OnError);
+    }
+
+    private void OnLeaveLobbySuccess(LobbyEmptyResult result)
+    {
+        Debug.Log("Left Lobby");
+
+        SceneManager.LoadScene("Menu");
+    }
+
+    #endregion
+
+    private void OnError(PlayFabError error)
     {
         Debug.LogError(error.GenerateErrorReport());
     }
+
 }
 

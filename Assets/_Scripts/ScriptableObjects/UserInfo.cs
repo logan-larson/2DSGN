@@ -12,4 +12,5 @@ public class UserInfo : ScriptableObject
     public int Port;
 
     public bool IsHost;
+    public string ConnectionString;
 }
