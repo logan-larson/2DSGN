@@ -12,6 +12,7 @@ NetworkHandler is responsible for starting the server or client connection.
 public class NetworkHandler : MonoBehaviour
 {
     public bool IsServerBuild;
+    public bool IsLocalBuild;
 
     [SerializeField]
     private NetworkManager _networkManager;
@@ -41,6 +42,10 @@ public class NetworkHandler : MonoBehaviour
 
             // Register the PlayFab Multiplayer Agent's callback for when a connection is established
             StartCoroutine(ReadyForPlayers());
+        }
+        else if (IsLocalBuild)
+        {
+            //_networkManager.ServerManager.StartConnection();
         }
         else
         {
