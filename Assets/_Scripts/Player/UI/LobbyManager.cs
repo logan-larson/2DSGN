@@ -18,6 +18,9 @@ public class LobbyManager : MonoBehaviour
 
     public AccessPolicy AccessPolicy = AccessPolicy.Public;
 
+    [SerializeField]
+    private GameObject _startGameButton;
+
     /// <summary>
     /// Event for when the player's list is updated.
     /// </summary>
@@ -50,11 +53,15 @@ public class LobbyManager : MonoBehaviour
 
         if (UserInfo.IsHost)
         {
+            _startGameButton.SetActive(true);
+
             // Create a new lobby
             CreateLobby();
         }
         else
         {
+            _startGameButton.SetActive(false);
+
             // Join the lobby
             JoinLobby();
         }
@@ -70,7 +77,7 @@ public class LobbyManager : MonoBehaviour
         {
             TitleId = PlayFabSettings.TitleId,
             CreateAccount = true,
-            CustomId = SystemInfo.deviceUniqueIdentifier
+            CustomId = SystemInfo.deviceUniqueIdentifier + UserInfo.Username
         };
 
         PlayFabClientAPI.LoginWithCustomID(request,
@@ -159,12 +166,17 @@ public class LobbyManager : MonoBehaviour
             {
                 Id = _loginResult.EntityToken.Entity.Id,
                 Type = _loginResult.EntityToken.Entity.Type
+            },
+            MemberData = new Dictionary<string, string>
+            {
+                { "Username", UserInfo.Username },
             }
         };
 
         PlayFabMultiplayerAPI.JoinLobby(request, OnJoinLobbySuccess, error =>
         {
             Debug.Log("Join lobby failed, returning to main menu");
+            Debug.Log($"{error.Error}: {error.ErrorMessage}");
             SceneManager.LoadScene("Menu");
         });
     }
@@ -194,6 +206,14 @@ public class LobbyManager : MonoBehaviour
     private void OnGetLobbySuccess(GetLobbyResult result)
     {
         PlayerList = result.Lobby.Members;
+
+        foreach (var member in PlayerList)
+        {
+            if (member.MemberData.ContainsKey("Username"))
+            {
+                Debug.Log(member.MemberData["Username"]);
+            }
+        }
 
         _lobby = result.Lobby;
 
