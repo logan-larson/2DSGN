@@ -441,7 +441,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UserInfo: {fileID: 11400000, guid: 643573264b41f1240997b14195ca096f, type: 2}
   AccessPolicy: 0
-  _startGameButton: {fileID: 0}
+  _startGameButton: {fileID: 1337711802}
   OnUpdatePlayerList:
     m_PersistentCalls:
       m_Calls: []
@@ -580,6 +580,11 @@ PrefabInstance:
 --- !u!224 &1337711801 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5818243132923112610, guid: 842f6d20e18e47e4aa548486df69cf8a, type: 3}
+  m_PrefabInstance: {fileID: 1337711800}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1337711802 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5818243132923112611, guid: 842f6d20e18e47e4aa548486df69cf8a, type: 3}
   m_PrefabInstance: {fileID: 1337711800}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1430063907

@@ -8,12 +8,24 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Microsoft.AspNetCore.SignalR.Client;
+using System;
 
 /// <summary>
 /// Currently this is the Ready Up manager
 /// </summary>
 public class LobbyManager : MonoBehaviour
 {
+    public struct HubSession
+    {
+        public string ConnectionHandle;
+        public string[] Topics;
+        public string Status;
+        public string TraceID;
+    }
+
+    private HubSession _hubSession;
+
     public UserInfo UserInfo;
 
     public AccessPolicy AccessPolicy = AccessPolicy.Public;
@@ -33,6 +45,9 @@ public class LobbyManager : MonoBehaviour
     private Lobby _lobby;
 
     private LoginResult _loginResult;
+
+    private HubConnection _hubConnection;
+    private string _connectionHandle;
 
     private void Start()
     {
@@ -143,11 +158,12 @@ public class LobbyManager : MonoBehaviour
 
         _lobbyId = result.LobbyId;
 
+        // Connect to the hub
+        ConnectToHub();
+
         // String other players use to connect
         _connectionString = result.ConnectionString;
-        Debug.Log(_connectionString);
-
-        // Subscribe to lobby events
+        Debug.Log($"ConnectionString: {_connectionString}");
 
         // TEMP
         GetLobby();
@@ -248,10 +264,114 @@ public class LobbyManager : MonoBehaviour
 
     #endregion
 
+    #region Hub Connection
+
+    private async void ConnectToHub()
+    {
+        try
+        {
+            var entityToken = _loginResult.EntityToken.EntityToken.ToString();
+
+            Debug.Log($"EntityToken: {entityToken}");
+
+            // Create the hub connection
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl("https://5B649.playfabapi.com/PubSub", options => { options.Headers.Add("X-EntityToken", entityToken); })
+                .WithAutomaticReconnect()
+                .Build();
+
+            await _hubConnection.StartAsync();
+
+            var request = new StartOrRecoverSessionRequest(TraceContextGenerator.GenerateTraceParent());
+
+            var response = await _hubConnection.InvokeAsync<StartOrRecoverSessionResponse>("StartOrRecoverSession", request);
+
+            _hubSession = new HubSession
+            {
+                ConnectionHandle = response.NewConnectionHandle,
+                Topics = response.RecoveredTopics,
+                Status = response.Status,
+                TraceID = response.TraceId
+            };
+
+            var subscribeRequest = new SubscribeToLobbyResourceRequest
+            {
+                PubSubConnectionHandle = _hubSession.ConnectionHandle,
+                EntityKey = new PlayFab.MultiplayerModels.EntityKey
+                {
+                    Id = _loginResult.EntityToken.Entity.Id,
+                    Type = _loginResult.EntityToken.Entity.Type
+                },
+                
+
+
+            };
+
+            PlayFabMultiplayerAPI.SubscribeToLobbyResource()
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"Error in ConnectToHub: {ex.Message}");
+        }
+    }
+
+    public class TraceContextGenerator
+    {
+        private static System.Random random = new System.Random();
+
+        public static string GenerateTraceParent()
+        {
+            string version = "00";
+            string traceId = GenerateRandomHexString(32);
+            string parentId = GenerateRandomHexString(16);
+            string traceFlags = "01"; // Recording is requested.
+
+            return $"{version}-{traceId}-{parentId}-{traceFlags}";
+        }
+
+        private static string GenerateRandomHexString(int length)
+        {
+            byte[] buffer = new byte[length / 2];
+            random.NextBytes(buffer);
+            return BitConverter.ToString(buffer).Replace("-", "").ToLower();
+        }
+    }
+
+    #endregion
+
     private void OnError(PlayFabError error)
     {
         Debug.LogError(error.GenerateErrorReport());
     }
 
+    public class StartOrRecoverSessionRequest
+    {
+        public string TraceParent { get; set; }
+
+        public StartOrRecoverSessionRequest(string traceParent)
+        {
+            this.TraceParent = traceParent;
+        }
+    }
+
+    public class StartOrRecoverSessionResponse
+    {
+        public string NewConnectionHandle { get; set; }
+
+        public string[] RecoveredTopics { get; set; }
+
+        public string Status { get; set; }
+
+        public string TraceId { get; set; }
+
+        public StartOrRecoverSessionResponse(string newConnectionHandle, string[] recoveredTopics, string status, string traceId)
+        {
+            this.NewConnectionHandle = newConnectionHandle;
+            this.RecoveredTopics = recoveredTopics;
+            this.Status = status;
+            this.TraceId = traceId;
+        }
+    }
 }
+
 
