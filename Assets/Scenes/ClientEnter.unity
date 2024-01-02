@@ -650,7 +650,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1671015141}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: JoinGame, Assembly-CSharp
         m_MethodName: OnJoinGame
         m_Mode: 1
@@ -709,7 +709,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1671015142}
-  - component: {fileID: 1671015141}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -717,22 +716,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1671015141
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1671015140}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5f35c817734df84c9f4792b9b1c9dda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UserInfo: {fileID: 11400000, guid: 643573264b41f1240997b14195ca096f, type: 2}
-  NetworkInfo: {fileID: 11400000, guid: 493434df7f0dddc4caf35666a53dc9f4, type: 2}
-  IsServerBuild: 0
-  _usernameInput: {fileID: 1737948039}
 --- !u!4 &1671015142
 Transform:
   m_ObjectHideFlags: 0

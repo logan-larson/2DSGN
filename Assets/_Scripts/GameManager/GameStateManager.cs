@@ -91,6 +91,7 @@ public class GameStateManager : NetworkBehaviour
     private void Players_OnChange(SyncDictionaryOperation op, int key, Player value, bool asServer)
     {
         OnPlayersChanged.Invoke();
+        InitiateCountdown();
     }
 
     private void Start()

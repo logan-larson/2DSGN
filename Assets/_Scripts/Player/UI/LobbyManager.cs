@@ -113,6 +113,7 @@ public class LobbyManager : MonoBehaviour
     private void CreateLobby()
     {
         // TEMP: Hardcoded access policy
+        // TODO: In host menu, allow the host to select the access policy from the main menu
         AccessPolicy = AccessPolicy.Private;
 
         // Create the entity key
@@ -122,6 +123,7 @@ public class LobbyManager : MonoBehaviour
             Type = _loginResult.EntityToken.Entity.Type
         };
 
+        // Set the members list
         List<Member> members = new List<Member>()
         {
             new Member
@@ -135,6 +137,7 @@ public class LobbyManager : MonoBehaviour
             } 
         };
 
+        // Send a request to create the lobby
         var createLobbyRequest = new CreateLobbyRequest
         {
             MaxPlayers = 9,
@@ -252,6 +255,11 @@ public class LobbyManager : MonoBehaviour
             LobbyId = _lobby.LobbyId
         };
 
+        if (_hubConnection != null)
+        {
+            _hubConnection.StopAsync();
+        }
+
         PlayFabMultiplayerAPI.LeaveLobby(request, OnLeaveLobbySuccess, OnError);
     }
 
@@ -307,7 +315,7 @@ public class LobbyManager : MonoBehaviour
 
             };
 
-            PlayFabMultiplayerAPI.SubscribeToLobbyResource()
+            //PlayFabMultiplayerAPI.SubscribeToLobbyResource()
         }
         catch (Exception ex)
         {
