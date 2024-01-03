@@ -27,6 +27,7 @@ public class LobbyManager : MonoBehaviour
     private HubSession _hubSession;
 
     public UserInfo UserInfo;
+    public LobbyInfo LobbyInfo;
 
     public AccessPolicy AccessPolicy = AccessPolicy.Public;
 
@@ -51,7 +52,8 @@ public class LobbyManager : MonoBehaviour
 
     private void Start()
     {
-        Initialize();
+        //Initialize();
+        GetLobbyWithLobbyInfo();
     }
 
     private async void Initialize()
@@ -211,6 +213,16 @@ public class LobbyManager : MonoBehaviour
 
     #region Get Lobby
 
+    private void GetLobbyWithLobbyInfo()
+    {
+        GetLobbyRequest request = new GetLobbyRequest
+        {
+            LobbyId = LobbyInfo.LobbyID
+        };
+
+        PlayFabMultiplayerAPI.GetLobby(request, OnGetLobbySuccess, OnError);
+    }
+
     private void GetLobby()
     {
         // TEMP: Get the lobby details to see if it was created and if the player is joined
@@ -224,6 +236,7 @@ public class LobbyManager : MonoBehaviour
 
     private void OnGetLobbySuccess(GetLobbyResult result)
     {
+        // Set the player list and lobby details
         PlayerList = result.Lobby.Members;
 
         foreach (var member in PlayerList)
@@ -237,6 +250,9 @@ public class LobbyManager : MonoBehaviour
         _lobby = result.Lobby;
 
         OnUpdatePlayerList.Invoke();
+
+        // Connect to the lobby events
+        // ConnectToLobbyEvents();
     }
 
     #endregion

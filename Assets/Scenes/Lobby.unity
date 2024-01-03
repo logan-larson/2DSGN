@@ -440,6 +440,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UserInfo: {fileID: 11400000, guid: 643573264b41f1240997b14195ca096f, type: 2}
+  LobbyInfo: {fileID: 11400000, guid: e2b221eca5be1454aa6e69994148b01e, type: 2}
   AccessPolicy: 0
   _startGameButton: {fileID: 1337711802}
   OnUpdatePlayerList:
