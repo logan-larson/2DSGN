@@ -26,14 +26,50 @@ public class JoinLobbyManager : MonoBehaviour
     private GameObject _usernameErrorIndicator;
 
     [SerializeField]
-    private GameObject _connectionStringErrorIndicator;
+    private GameObject _lobbyList;
 
-    public void OnJoinLobby()
+    [SerializeField]
+    private GameObject _lobbyItemPrefab;
+
+    private void Start()
+    {
+        // Get a list of the lobbies that are available to join
+        PlayFabMultiplayer.OnLobbyFindLobbiesCompleted += OnLobbyFindLobbiesCompleted;
+        Debug.Log("Finding lobbies...");
+        PlayFabMultiplayer.FindLobbies(new PFEntityKey(UserInfo.EntityKey.Id, UserInfo.EntityKey.Type), new LobbySearchConfiguration());
+    }
+
+    private void OnLobbyFindLobbiesCompleted(IList<LobbySearchResult> searchResults, PFEntityKey newMember, int reason)
+    {
+        for (var i = 1; i < _lobbyList.transform.childCount; i++)
+        {
+            Destroy(_lobbyList.transform.GetChild(i).gameObject);
+        }
+
+        if (LobbyError.SUCCEEDED(reason))
+        {
+
+            Debug.Log("Found " + searchResults.Count + " lobbies");
+            foreach (LobbySearchResult result in searchResults)
+            {
+                Debug.Log("Lobby Id: " + result.LobbyId + " - connection string: " + result.ConnectionString);
+                Debug.Log("Current Member Count: " + result.CurrentMemberCount);
+
+                GameObject lobbyItem = Instantiate(_lobbyItemPrefab, _lobbyList.transform);
+                lobbyItem.GetComponent<LobbyItem>().Initialize(result);
+            }
+        }
+        else
+        {
+            Debug.Log("Error finding lobbies");
+        }
+    }
+
+    public void OnJoinLobby(string connectionString)
     {
         PlayFabMultiplayer.OnLobbyJoinCompleted += OnLobbyJoinCompleted;
 
         _usernameErrorIndicator.SetActive(false);
-        _connectionStringErrorIndicator.SetActive(false);
 
         if (string.IsNullOrEmpty(_usernameInput.text))
         {
@@ -41,16 +77,10 @@ public class JoinLobbyManager : MonoBehaviour
             return;
         }
 
-        if (string.IsNullOrEmpty(_connectionStringInput.text))
-        {
-            _connectionStringErrorIndicator.SetActive(true);
-            return;
-        }
-
         UserInfo.Username = _usernameInput.text;
         UserInfo.IsHost = false;
 
-        LobbyInfo.ConnectionString = _connectionStringInput.text;
+        LobbyInfo.ConnectionString = connectionString;
 
 
         // Send request to join lobby on PlayFab
