@@ -1,5 +1,6 @@
 using PlayFab;
 using PlayFab.ClientModels;
+using PlayFab.Multiplayer;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -58,6 +59,7 @@ public class PlayFabAuthenticator : MonoBehaviour
 
         // Set the player's entity key.
         UserInfo.EntityKey = loginResult.EntityToken.Entity;
+        UserInfo.EntityToken = loginResult.EntityToken.EntityToken;
 
         Debug.Log("Login success");
     }
@@ -74,7 +76,14 @@ public class PlayFabAuthenticator : MonoBehaviour
         };
 
         PlayFabClientAPI.LoginWithCustomID(request,
-            result => tcs.SetResult(result),
+            result =>
+            {
+                PlayFabMultiplayer.SetEntityToken(new PFEntityKey(
+                    result.EntityToken.Entity.Id,
+                    result.EntityToken.Entity.Type), result.EntityToken.EntityToken
+                    );
+                tcs.SetResult(result);
+            },
             error =>
             {
                 Debug.LogError(error.GenerateErrorReport());

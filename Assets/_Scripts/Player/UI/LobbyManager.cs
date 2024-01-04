@@ -10,6 +10,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using PlayFab.Multiplayer;
 
 /// <summary>
 /// Currently this is the Ready Up manager
@@ -43,18 +44,134 @@ public class LobbyManager : MonoBehaviour
 
     private string _lobbyId;
     private string _connectionString;
-    private Lobby _lobby;
+    //private Lobby _lobby;
 
     private LoginResult _loginResult;
 
     private HubConnection _hubConnection;
     private string _connectionHandle;
 
+
+    private PlayFab.Multiplayer.Lobby _currentLobby;
+
+    private void Awake()
+    {
+        DontDestroyOnLoad(this); // This lobby manager will persist between scenes
+    }
+
     private void Start()
     {
+        // Connect to lobby events
+        PlayFabMultiplayer.OnLobbyCreateAndJoinCompleted += PlayFabMultiplayer_OnLobbyCreateAndJoinCompleted;
+        PlayFabMultiplayer.OnLobbyJoinCompleted += PlayFabMultiplayer_OnLobbyJoinCompleted;
+        PlayFabMultiplayer.OnLobbyDisconnected += PlayFabMultiplayer_OnLobbyDisconnected;
+        PlayFabMultiplayer.OnLobbyMemberAdded += PlayFabMultiplayer_OnLobbyMemberAdded;
+        PlayFabMultiplayer.OnLobbyMemberRemoved += PlayFabMultiplayer_OnLobbyMemberRemoved;
+        PlayFabMultiplayer.OnLobbyUpdated += PlayFabMultiplayer_OnLobbyUpdated;
+
+        // Create the hub connection
+        //CreateHubConnection();
+
         //Initialize();
-        GetLobbyWithLobbyInfo();
+        //GetLobbyWithLobbyInfo();
     }
+
+    private void PlayFabMultiplayer_OnLobbyCreateAndJoinCompleted(PlayFab.Multiplayer.Lobby lobby, int result)
+    {
+        Debug.Log("Lobby created and joined");
+        _currentLobby = lobby;
+
+        UpdatePlayerList();
+    }
+
+    private void PlayFabMultiplayer_OnLobbyJoinCompleted(PlayFab.Multiplayer.Lobby lobby, PFEntityKey newMember, int result)
+    {
+        Debug.Log("Lobby joined");
+        _currentLobby = lobby;
+
+        UpdatePlayerList();
+    }
+
+    private void PlayFabMultiplayer_OnLobbyDisconnected(PlayFab.Multiplayer.Lobby lobby)
+    {
+        Debug.Log("Lobby disconnected");
+        _currentLobby = null;
+
+        UpdatePlayerList();
+    }
+
+    private void PlayFabMultiplayer_OnLobbyMemberAdded(PlayFab.Multiplayer.Lobby lobby, PFEntityKey member)
+    {
+        Debug.Log("Lobby member added");
+
+        UpdatePlayerList();
+    }
+
+    private void PlayFabMultiplayer_OnLobbyMemberRemoved(PlayFab.Multiplayer.Lobby lobby, PFEntityKey member, LobbyMemberRemovedReason reason)
+    {
+        Debug.Log("Lobby member removed");
+
+        UpdatePlayerList();
+    }
+
+    private void PlayFabMultiplayer_OnLobbyUpdated(PlayFab.Multiplayer.Lobby lobby, bool ownerUpdated, bool maxMembersUpdated, bool accessPolicyUpdated, bool membershipLockUpdated, IList<string> updatedSearchPropertyKeys, IList<string> updatedLobbyPropertyKeys, IList<LobbyMemberUpdateSummary> memberUpdates)
+    {
+        Debug.Log("Lobby updated");
+    }
+
+    private void UpdatePlayerList()
+    {
+        // Get the player list
+        if (_currentLobby == null)
+        {
+            Debug.Log("Lobby is null");
+            return;
+        }
+
+        var playerList = _currentLobby.GetMembers();
+
+        // Clear the current player list
+        PlayerList.Clear();
+
+        Debug.Log($"Player list size: {playerList.Count}");
+
+        // Add the players to the player list
+        foreach (var player in playerList)
+        {
+            // Get the player's properties
+            var properties = _currentLobby.GetMemberProperties(player);
+
+            // Create a new member
+            var member = new Member()
+            {
+                MemberEntity = new PlayFab.MultiplayerModels.EntityKey()
+                {
+                    Id = player.Id,
+                    Type = player.Type,
+                },
+                MemberData = new Dictionary<string, string>(properties),
+            };
+
+            // Add the member to the player list
+            PlayerList.Add(member);
+        }
+
+        // Invoke the event
+        OnUpdatePlayerList.Invoke();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private async void Initialize()
     {
@@ -82,6 +199,20 @@ public class LobbyManager : MonoBehaviour
             // Join the lobby
             JoinLobby();
         }
+    }
+
+    private void CreateHubConnection()
+    {
+        // Create the hub connection
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://5B649.playfabapi.com/PubSub", options => { options.Headers.Add("X-EntityToken", UserInfo.EntityToken); })
+            .WithAutomaticReconnect()
+            .Build();
+
+        // Subscribe to the lobby events
+        // - Closed (called when the connection is closed??)
+        // - Connected?
+        // - ...
     }
 
     #region Login
@@ -164,7 +295,7 @@ public class LobbyManager : MonoBehaviour
         _lobbyId = result.LobbyId;
 
         // Connect to the hub
-        ConnectToHub();
+        //ConnectToHub();
 
         // String other players use to connect
         _connectionString = result.ConnectionString;
@@ -215,6 +346,7 @@ public class LobbyManager : MonoBehaviour
 
     private void GetLobbyWithLobbyInfo()
     {
+
         GetLobbyRequest request = new GetLobbyRequest
         {
             LobbyId = LobbyInfo.LobbyID
@@ -247,12 +379,12 @@ public class LobbyManager : MonoBehaviour
             }
         }
 
-        _lobby = result.Lobby;
+        //_lobby = result.Lobby;
 
         OnUpdatePlayerList.Invoke();
 
         // Connect to the lobby events
-        // ConnectToLobbyEvents();
+        ConnectToLobbyEvents();
     }
 
     #endregion
@@ -261,14 +393,19 @@ public class LobbyManager : MonoBehaviour
 
     public void LeaveLobby()
     {
+        // Unsubscribe from the lobby events
+
+
+
+        // Send a request to leave the lobby
         var request = new LeaveLobbyRequest
         {
             MemberEntity = new PlayFab.MultiplayerModels.EntityKey
             {
-                Id = _loginResult.EntityToken.Entity.Id,
-                Type = _loginResult.EntityToken.Entity.Type
+                Id = UserInfo.EntityKey.Id,
+                Type = UserInfo.EntityKey.Type
             },
-            LobbyId = _lobby.LobbyId
+            LobbyId = LobbyInfo.LobbyID
         };
 
         if (_hubConnection != null)
@@ -290,53 +427,76 @@ public class LobbyManager : MonoBehaviour
 
     #region Hub Connection
 
-    private async void ConnectToHub()
+    private async void ConnectToLobbyEvents()
     {
         try
         {
-            var entityToken = _loginResult.EntityToken.EntityToken.ToString();
+            var entityToken = UserInfo.EntityToken;
 
             Debug.Log($"EntityToken: {entityToken}");
 
+
+            // TODO: Move this to the initialization of this component
             // Create the hub connection
             _hubConnection = new HubConnectionBuilder()
-                .WithUrl("https://5B649.playfabapi.com/PubSub", options => { options.Headers.Add("X-EntityToken", entityToken); })
+                .WithUrl("https://5B649.playfabapi.com/PubSub", options => { options.Headers.Add("X-EntityToken", UserInfo.EntityToken); })
                 .WithAutomaticReconnect()
                 .Build();
 
+            // Subscribe to the lobby events
+            // - Closed (called when the connection is closed??)
+            // - Connected?
+            // - ...
+
+
+            // Start the connection
+
             await _hubConnection.StartAsync();
+
+
+
+
+            // Call StartOrRecoverSession to get the connection handle
+            // which is used to subscribe to the lobby events
 
             var request = new StartOrRecoverSessionRequest(TraceContextGenerator.GenerateTraceParent());
 
             var response = await _hubConnection.InvokeAsync<StartOrRecoverSessionResponse>("StartOrRecoverSession", request);
 
+            Debug.Log("Successfully connected to hub");
+            Debug.Log($"Connection handle: {response.NewConnectionHandle}");
+
             _hubSession = new HubSession
             {
                 ConnectionHandle = response.NewConnectionHandle,
-                Topics = response.RecoveredTopics,
                 Status = response.Status,
                 TraceID = response.TraceId
             };
 
+            // Subscribing to the lobby events
+            Debug.Log("Subscribing to lobby events");
             var subscribeRequest = new SubscribeToLobbyResourceRequest
             {
                 PubSubConnectionHandle = _hubSession.ConnectionHandle,
+                ResourceId = LobbyInfo.LobbyID,
                 EntityKey = new PlayFab.MultiplayerModels.EntityKey
                 {
-                    Id = _loginResult.EntityToken.Entity.Id,
-                    Type = _loginResult.EntityToken.Entity.Type
+                    Id = UserInfo.EntityKey.Id,
+                    Type = UserInfo.EntityKey.Type
                 },
-                
-
-
             };
 
-            //PlayFabMultiplayerAPI.SubscribeToLobbyResource()
+            PlayFabMultiplayerAPI.SubscribeToLobbyResource(subscribeRequest, OnSubscribeToLobbyResourceSuccess, OnError);
         }
         catch (Exception ex)
         {
-            Debug.Log($"Error in ConnectToHub: {ex.Message}");
+            Debug.Log($"Error in ConnectToLobbyEvents: {ex.Message}");
         }
+    }
+
+    private void OnSubscribeToLobbyResourceSuccess(SubscribeToLobbyResourceResult result)
+    {
+        Debug.Log($"Subscribed to lobby resource: {result.Topic}");
     }
 
     public class TraceContextGenerator

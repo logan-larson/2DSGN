@@ -16,4 +16,5 @@ public class UserInfo : ScriptableObject
     public string ConnectionString;
 
     public EntityKey EntityKey;
+    public string EntityToken;
 }

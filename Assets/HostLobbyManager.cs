@@ -1,6 +1,7 @@
 using PlayFab;
 using PlayFab.ClientModels;
-using PlayFab.MultiplayerModels;
+using PlayFab.Multiplayer;
+//using PlayFab.MultiplayerModels;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -12,7 +13,7 @@ public class HostLobbyManager : MonoBehaviour
     public UserInfo UserInfo;
     public LobbyInfo LobbyInfo;
 
-    public AccessPolicy AccessPolicy = AccessPolicy.Private;
+    public LobbyAccessPolicy AccessPolicy = LobbyAccessPolicy.Private;
 
     [SerializeField]
     private TMP_InputField _usernameInput;
@@ -22,6 +23,8 @@ public class HostLobbyManager : MonoBehaviour
 
     public void OnCreateLobby()
     {
+        PlayFabMultiplayer.OnLobbyCreateAndJoinCompleted += OnLobbyCreateAndJoinCompleted;
+
         _errorIndicator.SetActive(false);
 
         if (string.IsNullOrEmpty(_usernameInput.text))
@@ -36,6 +39,26 @@ public class HostLobbyManager : MonoBehaviour
 
 
         // Send request to create lobby on PlayFab
+
+        var lobbyConfig = new LobbyCreateConfiguration()
+        {
+            MaxMemberCount = 9,
+            OwnerMigrationPolicy = LobbyOwnerMigrationPolicy.Automatic,
+            AccessPolicy = AccessPolicy,
+        };
+
+        lobbyConfig.LobbyProperties["map"] = "BigMap";
+
+        var joinConfig = new LobbyJoinConfiguration();
+        joinConfig.MemberProperties["Username"] = UserInfo.Username;
+
+        PlayFabMultiplayer.CreateAndJoinLobby(
+            new PFEntityKey(UserInfo.EntityKey.Id, UserInfo.EntityKey.Type),
+            lobbyConfig,
+            joinConfig
+        );
+       
+        /*
 
         // Create the entity key
         var entity = new PlayFab.MultiplayerModels.EntityKey
@@ -75,8 +98,30 @@ public class HostLobbyManager : MonoBehaviour
 
             // TODO: Show error toast
         });
+
+        */
     }
 
+    private void OnLobbyCreateAndJoinCompleted(Lobby lobby, int result)
+    {
+        if (LobbyError.SUCCEEDED(result))
+        {
+            Debug.Log("Lobby created successfully");
+
+            // Store the lobby ID and connection string in the LobbyInfo
+            LobbyInfo.LobbyID = lobby.Id;
+            LobbyInfo.ConnectionString = lobby.ConnectionString;
+
+            // Change to the Lobby scene
+            SceneManager.LoadScene("Lobby");
+        }
+        else
+        {
+            Debug.Log("Lobby creation failed");
+        }
+    }
+
+    /*
     private void OnCreateLobbySuccess(CreateLobbyResult result)
     {
         Debug.Log("Lobby created successfully");
@@ -88,4 +133,5 @@ public class HostLobbyManager : MonoBehaviour
         // Change to the Lobby scene
         SceneManager.LoadScene("Lobby");
     }
+    */
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PlayFabSharedSettings
   m_EditorClassIdentifier: 
   TitleId: 5B649
-  DeveloperSecretKey: ABHO6K4UEROH39AA891AM85FS7Y8JRHM5T8SWFN7J8CYCBWM5U
+  DeveloperSecretKey: 
   ProductionEnvironmentUrl: 
   RequestType: 2
   DisableDeviceInfo: 0

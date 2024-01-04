@@ -54,8 +54,7 @@ namespace PlayFab.CloudScriptModels
         EU,
         NA,
         OC,
-        SA,
-        Unknown
+        SA
     }
 
     public enum CountryCode
@@ -308,8 +307,7 @@ namespace PlayFab.CloudScriptModels
         EH,
         YE,
         ZM,
-        ZW,
-        Unknown
+        ZW
     }
 
     public enum EmailVerificationStatus

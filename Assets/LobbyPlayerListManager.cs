@@ -23,12 +23,18 @@ public class LobbyPlayerListManager : MonoBehaviour
 
     private void Start()
     {
+        _lobbyManager = GameObject.Find("LobbyManager").GetComponent<LobbyManager>();
+
         // Listen for changes from the LobbyManager.
         _lobbyManager.OnUpdatePlayerList.AddListener(UpdateScoreboard);
+
+        UpdateScoreboard();
     }
 
     private void UpdateScoreboard()
     {
+        Debug.Log("Updating scoreboard");
+
         // Set player list to the current list of players.
         var members = _lobbyManager.PlayerList;
         var players = members.Select(m => new Player()

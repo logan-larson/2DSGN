@@ -421,7 +421,7 @@ GameObject:
   - component: {fileID: 1320189847}
   - component: {fileID: 1320189849}
   m_Layer: 0
-  m_Name: LobbyManager
+  m_Name: PlayerListManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -434,7 +434,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1320189845}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc7aa745d90d3ac4888bb93f08f9cc57, type: 3}
   m_Name: 

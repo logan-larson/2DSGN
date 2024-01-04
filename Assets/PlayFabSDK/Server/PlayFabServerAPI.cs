@@ -26,8 +26,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Increments the character's balance of the specified virtual currency by the stated amount
+        /// Increments the character's balance of the specified virtual currency by the stated amount
         /// </summary>
         public static void AddCharacterVirtualCurrency(AddCharacterVirtualCurrencyRequest request, Action<ModifyCharacterVirtualCurrencyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -98,8 +97,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Increments the user's balance of the specified virtual currency by the stated amount
+        /// Increments the user's balance of the specified virtual currency by the stated amount
         /// </summary>
         public static void AddUserVirtualCurrency(AddUserVirtualCurrencyRequest request, Action<ModifyUserVirtualCurrencyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -151,9 +149,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Consume uses of a consumable item. When all uses are consumed, it will be removed from the player's
-        /// inventory.
+        /// Consume uses of a consumable item. When all uses are consumed, it will be removed from the player's inventory.
         /// </summary>
         public static void ConsumeItem(ConsumeItemRequest request, Action<ConsumeItemResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -236,10 +232,22 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Returns the result of an evaluation of a Random Result Table - the ItemId from the game Catalog which would
-        /// have been added to the player inventory, if the Random Result Table were added via a Bundle or a call to
-        /// UnlockContainer.
+        /// Inform the matchmaker that a Game Server Instance is removed.
+        /// </summary>
+        [Obsolete("No longer available", true)]
+        public static void DeregisterGame(DeregisterGameRequest request, Action<DeregisterGameResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/DeregisterGame", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Returns the result of an evaluation of a Random Result Table - the ItemId from the game Catalog which would have been
+        /// added to the player inventory, if the Random Result Table were added via a Bundle or a call to UnlockContainer.
         /// </summary>
         public static void EvaluateRandomResultTable(EvaluateRandomResultTableRequest request, Action<EvaluateRandomResultTableResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -314,8 +322,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Retrieves the specified version of the title's catalog of virtual goods, including all defined properties
+        /// Retrieves the specified version of the title's catalog of virtual goods, including all defined properties
         /// </summary>
         public static void GetCatalogItems(GetCatalogItemsRequest request, Action<GetCatalogItemsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -354,8 +361,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Retrieves the specified character's current inventory of virtual goods
+        /// Retrieves the specified character's current inventory of virtual goods
         /// </summary>
         public static void GetCharacterInventory(GetCharacterInventoryRequest request, Action<GetCharacterInventoryResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -736,9 +742,8 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Retrieves the configuration information for the specified random results tables for the title, including all
-        /// ItemId values and weights
+        /// Retrieves the configuration information for the specified random results tables for the title, including all ItemId
+        /// values and weights
         /// </summary>
         public static void GetRandomResultTables(GetRandomResultTablesRequest request, Action<GetRandomResultTablesResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -779,9 +784,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Retrieves the set of items defined for the specified store, including all prices defined, for the specified
-        /// player
+        /// Retrieves the set of items defined for the specified store, including all prices defined, for the specified player
         /// </summary>
         public static void GetStoreItems(GetStoreItemsServerRequest request, Action<GetStoreItemsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -898,8 +901,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Retrieves the specified user's current inventory of virtual goods
+        /// Retrieves the specified user's current inventory of virtual goods
         /// </summary>
         public static void GetUserInventory(GetUserInventoryRequest request, Action<GetUserInventoryResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -978,8 +980,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Adds the specified items to the specified character's inventory
+        /// Adds the specified items to the specified character's inventory
         /// </summary>
         public static void GrantItemsToCharacter(GrantItemsToCharacterRequest request, Action<GrantItemsToCharacterResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -992,8 +993,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Adds the specified items to the specified user's inventory
+        /// Adds the specified items to the specified user's inventory
         /// </summary>
         public static void GrantItemsToUser(GrantItemsToUserRequest request, Action<GrantItemsToUserResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1006,8 +1006,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Adds the specified items to the specified user inventories
+        /// Adds the specified items to the specified user inventories
         /// </summary>
         public static void GrantItemsToUsers(GrantItemsToUsersRequest request, Action<GrantItemsToUsersResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1030,19 +1029,6 @@ namespace PlayFab
 
 
             PlayFabHttp.MakeApiCall("/Server/LinkNintendoServiceAccount", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
-        }
-
-        /// <summary>
-        /// Links the Nintendo account associated with the Nintendo Service Account subject or id to the user's PlayFab account
-        /// </summary>
-        public static void LinkNintendoServiceAccountSubject(LinkNintendoServiceAccountSubjectRequest request, Action<EmptyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
-        {
-            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
-            var callSettings = PlayFabSettings.staticSettings;
-            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
-
-
-            PlayFabHttp.MakeApiCall("/Server/LinkNintendoServiceAccountSubject", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
         }
 
         /// <summary>
@@ -1180,8 +1166,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Modifies the number of remaining uses of a player's inventory item
+        /// Modifies the number of remaining uses of a player's inventory item
         /// </summary>
         public static void ModifyItemUses(ModifyItemUsesRequest request, Action<ModifyItemUsesResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1194,8 +1179,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Moves an item from a character's inventory into another of the users's character's inventory.
+        /// Moves an item from a character's inventory into another of the users's character's inventory.
         /// </summary>
         public static void MoveItemToCharacterFromCharacter(MoveItemToCharacterFromCharacterRequest request, Action<MoveItemToCharacterFromCharacterResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1208,8 +1192,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Moves an item from a user's inventory into their character's inventory.
+        /// Moves an item from a user's inventory into their character's inventory.
         /// </summary>
         public static void MoveItemToCharacterFromUser(MoveItemToCharacterFromUserRequest request, Action<MoveItemToCharacterFromUserResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1222,8 +1205,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Moves an item from a character's inventory into the owning user's inventory.
+        /// Moves an item from a character's inventory into the owning user's inventory.
         /// </summary>
         public static void MoveItemToUserFromCharacter(MoveItemToUserFromCharacterRequest request, Action<MoveItemToUserFromCharacterResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1236,8 +1218,21 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Adds the virtual goods associated with the coupon to the user's inventory. Coupons can be generated via the
+        /// Informs the PlayFab match-making service that the user specified has left the Game Server Instance
+        /// </summary>
+        [Obsolete("No longer available", true)]
+        public static void NotifyMatchmakerPlayerLeft(NotifyMatchmakerPlayerLeftRequest request, Action<NotifyMatchmakerPlayerLeftResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/NotifyMatchmakerPlayerLeft", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Adds the virtual goods associated with the coupon to the user's inventory. Coupons can be generated via the
         /// Economy->Catalogs tab in the PlayFab Game Manager.
         /// </summary>
         public static void RedeemCoupon(RedeemCouponRequest request, Action<RedeemCouponResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
@@ -1248,6 +1243,48 @@ namespace PlayFab
 
 
             PlayFabHttp.MakeApiCall("/Server/RedeemCoupon", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Validates a Game Server session ticket and returns details about the user
+        /// </summary>
+        [Obsolete("No longer available", true)]
+        public static void RedeemMatchmakerTicket(RedeemMatchmakerTicketRequest request, Action<RedeemMatchmakerTicketResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/RedeemMatchmakerTicket", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Set the state of the indicated Game Server Instance. Also update the heartbeat for the instance.
+        /// </summary>
+        [Obsolete("No longer available", true)]
+        public static void RefreshGameServerInstanceHeartbeat(RefreshGameServerInstanceHeartbeatRequest request, Action<RefreshGameServerInstanceHeartbeatResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/RefreshGameServerInstanceHeartbeat", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Inform the matchmaker that a new Game Server Instance is added.
+        /// </summary>
+        [Obsolete("No longer available", true)]
+        public static void RegisterGame(RegisterGameRequest request, Action<RegisterGameResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/RegisterGame", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
         }
 
         /// <summary>
@@ -1346,8 +1383,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Revokes access to an item in a user's inventory
+        /// Revokes access to an item in a user's inventory
         /// </summary>
         public static void RevokeInventoryItem(RevokeInventoryItemRequest request, Action<RevokeInventoryResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1360,8 +1396,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Revokes access for up to 25 items across multiple users and characters.
+        /// Revokes access for up to 25 items across multiple users and characters.
         /// </summary>
         public static void RevokeInventoryItems(RevokeInventoryItemsRequest request, Action<RevokeInventoryItemsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1455,6 +1490,48 @@ namespace PlayFab
         }
 
         /// <summary>
+        /// Sets the custom data of the indicated Game Server Instance
+        /// </summary>
+        [Obsolete("No longer available", true)]
+        public static void SetGameServerInstanceData(SetGameServerInstanceDataRequest request, Action<SetGameServerInstanceDataResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/SetGameServerInstanceData", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Set the state of the indicated Game Server Instance.
+        /// </summary>
+        [Obsolete("No longer available", true)]
+        public static void SetGameServerInstanceState(SetGameServerInstanceStateRequest request, Action<SetGameServerInstanceStateResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/SetGameServerInstanceState", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
+        /// Set custom tags for the specified Game Server Instance
+        /// </summary>
+        [Obsolete("No longer available", true)]
+        public static void SetGameServerInstanceTags(SetGameServerInstanceTagsRequest request, Action<SetGameServerInstanceTagsResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
+        {
+            var context = (request == null ? null : request.AuthenticationContext) ?? PlayFabSettings.staticPlayer;
+            var callSettings = PlayFabSettings.staticSettings;
+            if (string.IsNullOrEmpty(callSettings.DeveloperSecretKey)) { throw new PlayFabException(PlayFabExceptionCode.DeveloperKeyNotSet, "Must set DeveloperSecretKey in settings to call this method"); }
+
+
+            PlayFabHttp.MakeApiCall("/Server/SetGameServerInstanceTags", request, AuthType.DevSecretKey, resultCallback, errorCallback, customData, extraHeaders, context, callSettings);
+        }
+
+        /// <summary>
         /// Sets the player's secret if it is not already set. Player secrets are used to sign API requests. To reset a player's
         /// secret use the Admin or Server API method SetPlayerSecret.
         /// </summary>
@@ -1508,9 +1585,8 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Decrements the character's balance of the specified virtual currency by the stated amount. It is possible to
-        /// make a VC balance negative with this API.
+        /// Decrements the character's balance of the specified virtual currency by the stated amount. It is possible to make a VC
+        /// balance negative with this API.
         /// </summary>
         public static void SubtractCharacterVirtualCurrency(SubtractCharacterVirtualCurrencyRequest request, Action<ModifyCharacterVirtualCurrencyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1523,9 +1599,8 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Decrements the user's balance of the specified virtual currency by the stated amount. It is possible to make
-        /// a VC balance negative with this API.
+        /// Decrements the user's balance of the specified virtual currency by the stated amount. It is possible to make a VC
+        /// balance negative with this API.
         /// </summary>
         public static void SubtractUserVirtualCurrency(SubtractUserVirtualCurrencyRequest request, Action<ModifyUserVirtualCurrencyResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1616,10 +1691,9 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Opens a specific container (ContainerItemInstanceId), with a specific key (KeyItemInstanceId, when
-        /// required), and returns the contents of the opened container. If the container (and key when relevant) are consumable
-        /// (RemainingUses > 0), their RemainingUses will be decremented, consistent with the operation of ConsumeItem.
+        /// Opens a specific container (ContainerItemInstanceId), with a specific key (KeyItemInstanceId, when required), and
+        /// returns the contents of the opened container. If the container (and key when relevant) are consumable (RemainingUses >
+        /// 0), their RemainingUses will be decremented, consistent with the operation of ConsumeItem.
         /// </summary>
         public static void UnlockContainerInstance(UnlockContainerInstanceRequest request, Action<UnlockContainerItemResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
@@ -1632,10 +1706,9 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Searches Player or Character inventory for any ItemInstance matching the given CatalogItemId, if necessary
-        /// unlocks it using any appropriate key, and returns the contents of the opened container. If the container (and key when
-        /// relevant) are consumable (RemainingUses > 0), their RemainingUses will be decremented, consistent with the operation of
+        /// Searches Player or Character inventory for any ItemInstance matching the given CatalogItemId, if necessary unlocks it
+        /// using any appropriate key, and returns the contents of the opened container. If the container (and key when relevant)
+        /// are consumable (RemainingUses > 0), their RemainingUses will be decremented, consistent with the operation of
         /// ConsumeItem.
         /// </summary>
         public static void UnlockContainerItem(UnlockContainerItemRequest request, Action<UnlockContainerItemResult> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
@@ -1783,8 +1856,7 @@ namespace PlayFab
         }
 
         /// <summary>
-        /// _NOTE: This is a Legacy Economy API, and is in bugfix-only mode. All new Economy features are being developed only for
-        /// version 2._ Updates the key-value pair data tagged to the specified item, which is read-only from the client.
+        /// Updates the key-value pair data tagged to the specified item, which is read-only from the client.
         /// </summary>
         public static void UpdateUserInventoryItemCustomData(UpdateUserInventoryItemDataRequest request, Action<EmptyResponse> resultCallback, Action<PlayFabError> errorCallback, object customData = null, Dictionary<string, string> extraHeaders = null)
         {
