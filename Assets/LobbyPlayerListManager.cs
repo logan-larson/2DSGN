@@ -35,6 +35,11 @@ public class LobbyPlayerListManager : MonoBehaviour
     {
         Debug.Log("Updating scoreboard");
 
+        if (_playerList == null || _playerListElement == null)
+        {
+            return;
+        }
+
         // Set player list to the current list of players.
         var members = _lobbyManager.PlayerList;
         var players = members.Select(m => new Player()
